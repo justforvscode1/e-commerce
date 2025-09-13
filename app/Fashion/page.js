@@ -1,5 +1,6 @@
 "use client"
 import Navbar from '@/components/Navbar';
+import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 
@@ -9,80 +10,176 @@ const FashionCollections = () => {
     const [filteredProducts, setFilteredProducts] = useState([]);
 
     // Sample product data
-    const products = [
-        {
-            id: 1,
-            name: "Premium Cotton T-Shirt",
-            price: 29.99,
-            originalPrice: 39.99,
-            image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop",
-            category: "men",
-            isNew: true
-        },
-        {
-            id: 2,
-            name: "Elegant Summer Dress",
-            price: 79.99,
-            originalPrice: 99.99,
-            image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop",
-            category: "women",
-            isNew: false
-        },
-        {
-            id: 3,
-            name: "Kids Rainbow Hoodie",
-            price: 34.99,
-            originalPrice: null,
-            image: "https://images.unsplash.com/photo-1503944168184-dcb7d49c3c7d?w=400&h=500&fit=crop",
-            category: "kids",
-            isNew: true
-        },
-        {
-            id: 4,
-            name: "Leather Crossbody Bag",
-            price: 129.99,
-            originalPrice: 159.99,
-            image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=500&fit=crop",
-            category: "accessories",
-            isNew: false
-        },
-        {
-            id: 5,
-            name: "Classic Denim Jacket",
-            price: 89.99,
-            originalPrice: null,
-            image: "https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=400&h=500&fit=crop",
-            category: "men",
-            isNew: false
-        },
-        {
-            id: 6,
-            name: "Silk Blouse",
-            price: 65.99,
-            originalPrice: 85.99,
-            image: "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=400&h=500&fit=crop",
-            category: "women",
-            isNew: true
-        },
-        {
-            id: 7,
-            name: "Kids Sneakers",
-            price: 49.99,
-            originalPrice: null,
-            image: "https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=400&h=500&fit=crop",
-            category: "kids",
-            isNew: false
-        },
-        {
-            id: 8,
-            name: "Designer Sunglasses",
-            price: 199.99,
-            originalPrice: 249.99,
-            image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&h=500&fit=crop",
-            category: "accessories",
-            isNew: true
-        }
-    ];
+   const products = [
+    {
+        id: 1,
+        name: "Wireless Bluetooth Headphones",
+        price: 89.99,
+        originalPrice: 129.99,
+        origionalprice: 119.99,
+        rating: 4.5,
+        reviewCount: 187,
+        category: "electronics",
+        isNew: false,
+        inStock: true,
+        description: 'Premium wireless headphones with active noise cancellation and 30-hour battery life. Features high-quality audio drivers and comfortable over-ear design.',
+        image: ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=500&fit=crop"],
+        images: [
+            'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=600&h=600&fit=crop'
+        ]
+    },
+    {
+        id: 2,
+        name: "Designer Sunglasses",
+        price: 199.99,
+        originalPrice: 249.99,
+        origionalprice: 229.99,
+        rating: 4.8,
+        reviewCount: 95,
+        category: "fashion",
+        isNew: true,
+        inStock: true,
+        description: 'Stylish designer sunglasses with UV protection and polarized lenses. Perfect for sunny days with premium acetate frames and crystal-clear vision.',
+        image: ["https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&h=500&fit=crop"],
+        images: [
+            'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1556306535-38febf6782e7?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1577803645773-f96470509666?w=600&h=600&fit=crop'
+        ]
+    },
+    {
+        id: 3,
+        name: "Smart Watch",
+        price: 299.50,
+        originalPrice: 399.99,
+        origionalprice: 349.99,
+        rating: 4.6,
+        reviewCount: 142,
+        category: "electronics",
+        isNew: false,
+        inStock: true,
+        description: 'Advanced smart watch with fitness tracking, heart rate monitoring, and GPS. Features large AMOLED display and 48-hour battery life.',
+        image: ["https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=500&fit=crop"],
+        images: [
+            'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1544117519-31a4b719223d?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=600&h=600&fit=crop'
+        ]
+    },
+    {
+        id: 4,
+        name: "Leather Jacket",
+        price: 299.99,
+        originalPrice: 399.99,
+        origionalprice: 349.99,
+        rating: 4.9,
+        reviewCount: 78,
+        category: "fashion",
+        isNew: true,
+        inStock: false,
+        description: 'Premium genuine leather jacket with classic biker style. Features durable construction, multiple pockets, and comfortable fit for all seasons.',
+        image: ["https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=500&fit=crop"],
+        images: [
+            'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1520975954732-35dd22299614?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=600&fit=crop'
+        ]
+    },
+    {
+        id: 5,
+        name: "Casual Sneakers",
+        price: 129.00,
+        originalPrice: 169.99,
+        origionalprice: 149.99,
+        rating: 4.4,
+        reviewCount: 203,
+        category: "fashion",
+        isNew: false,
+        inStock: true,
+        description: 'Comfortable casual sneakers with breathable mesh upper and cushioned sole. Perfect for everyday wear with durable construction and stylish design.',
+        image: ["https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=500&fit=crop"],
+        images: [
+            'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600&h=600&fit=crop'
+        ]
+    },
+    {
+        id: 6,
+        name: "Gaming Headset",
+        price: 149.99,
+        originalPrice: 199.99,
+        origionalprice: 179.99,
+        rating: 4.7,
+        reviewCount: 156,
+        category: "electronics",
+        isNew: false,
+        inStock: true,
+        description: 'Professional gaming headset with 7.1 surround sound and noise-canceling microphone. RGB lighting and comfortable over-ear design for long gaming sessions.',
+        image: ["https://images.unsplash.com/photo-1586210055191-bff3c8dc4b4f?w=400&h=500&fit=crop"],
+        images: [
+            'https://images.unsplash.com/photo-1586210055191-bff3c8dc4b4f?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&h=600&fit=crop'
+        ]
+    },
+    {
+        id: 7,
+        name: "Wireless Earbuds",
+        price: 159.99,
+        originalPrice: 199.99,
+        origionalprice: 179.99,
+        rating: 4.3,
+        reviewCount: 89,
+        category: "electronics",
+        isNew: true,
+        inStock: true,
+        description: 'Premium wireless earbuds with active noise cancellation and wireless charging case. Crystal clear audio with 24-hour total battery life.',
+        image: ["https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=400&h=500&fit=crop"],
+        images: [
+            'https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&h=600&fit=crop'
+        ]
+    },
+    {
+        id: 8,
+        name: "Elegant Summer Dress",
+        price: 149,
+        originalPrice: 199.99,
+        origionalprice: 169,
+        rating: 4.8,
+        reviewCount: 124,
+        category: "fashion",
+        isNew: true,
+        inStock: true,
+        description: 'Beautiful flowing summer dress made from lightweight breathable fabric. Features elegant floral patterns and comfortable fit perfect for warm weather occasions.',
+        image: ["https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=500&fit=crop"],
+        images: [
+            'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&h=600&fit=crop'
+        ]
+    }
+];
 
     const categories = [
         { id: 'all', name: 'All Collections', count: products.length },
@@ -148,7 +245,7 @@ const FashionCollections = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {filteredProducts.map((product, index) => (
-                            <Link key={product.id} href={`/products/${product.name}`}>
+                            <Link key={product.id} href={`/products/${product.id}`}>
 
                                 <div
                                     
@@ -158,8 +255,8 @@ const FashionCollections = () => {
                                     }}
                                 >
                                     <div className="relative overflow-hidden">
-                                        <img
-                                            src={product.image}
+                                        <Image width={500} height={500}
+                                            src={product.image[0]}
                                             alt={product.name}
                                             className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
                                         />
@@ -231,7 +328,7 @@ const FashionCollections = () => {
                                             </div>
 
                                             <button className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transform transition-all duration-300 hover:scale-105">
-                                                Add to Cart
+                                               Cart
                                             </button>
                                         </div>
                                     </div>

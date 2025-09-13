@@ -9,12 +9,6 @@ const Navbar = () => {
         { name: 'Fashion', items: ['Men', 'Women', 'Kids', 'Accessories'] },
         { name: 'Electronics', items: ['Laptops', 'Smartphones', 'Headphones', 'Cameras'] },
     ];
-    const navLinks = [
-        { name: 'About', href: '/about' },
-        { name: 'Contact', href: '/contact' },
-        { name: 'Blog', href: '/blog' },
-        { name: 'FAQ', href: '/faq' }
-    ];
 
     const handleSearch = (e) => {
         e.preventDefault();
@@ -30,22 +24,24 @@ const Navbar = () => {
                 <div className="flex items-center gap-3 justify-between h-16">
 
                     <div className="flex items-center ">
-                        <h1 className="text-2xl font-bold text-blue-600 cursor-pointer">
-                            ShopLux
-                        </h1>
+                        <Link href={'/'}>
+                            <h1 className="text-2xl font-bold text-blue-600 cursor-pointer">
+                                ShopLux
+                            </h1></Link>
                     </div>
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex justify-between space-x-8">
                         {categories.map((category) => (
+
                             <div
                                 key={category.name}
                                 className="relative group"
                                 onMouseEnter={() => setIsDropdownOpen(category.name)}
-                                onMouseLeave={() => setIsDropdownOpen(null)}
-                            >
+                                onMouseLeave={() => setIsDropdownOpen(null)} >
+
                                 <button className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 py-2">
-                                    <span>{category.name}</span>
+                                    <Link key={category.name} href={`/${category.name}`}><span>{category.name}</span></Link>
                                     <svg className={`w-4 h-4 transition-transform duration-300 ${isDropdownOpen === category.name ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                     </svg>
@@ -79,7 +75,7 @@ const Navbar = () => {
                     </div>
 
                     {/* Search Bar */}
-                    <div className="hidden md:flex flex-1 max-w-lg mx-8">
+                    < div className="hidden md:flex flex-1 max-w-lg mx-8" >
                         <form onSubmit={handleSearch} className="relative w-full">
                             <input
                                 type="text"
@@ -185,18 +181,7 @@ const Navbar = () => {
                                 </div>
                             ))}
 
-                            {/* Mobile Nav Links */}
-                            <div className="pt-4 border-t border-gray-200 space-y-2">
-                                {navLinks.map((link) => (
-                                    <Link
-                                        key={link.name}
-                                        href={link.href}
-                                        className="block py-2 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
-                                    >
-                                        {link.name}
-                                    </Link>
-                                ))}
-                            </div>
+
                         </div>
                     </div>
                 </div>

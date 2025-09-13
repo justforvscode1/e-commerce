@@ -1,74 +1,199 @@
 // app/product/[id]/page.js
 'use client';
-import { use,Suspense } from 'react';
+import { use } from 'react';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { notFound } from 'next/navigation';
 
 // Mock data - in a real app, this would come from an API or database
-const products = {
-  'Elegant Summer Dress': {
-    id: 'Elegant Summer Dress',
-    name: 'Elegant Summer Dress',
-    price: 149,
-    rating: 4.8,
-    reviewCount: 24,
-    inStock: true,
-    description: 'Sleek and functional desk lamp with adjustable brightness and modern minimalist design. Perfect for contemporary workspaces and study areas. Features premium materials and energy-efficient LED technology.',
-    images: ['https://colorlib.com/go/startbuilding',
-      '/api/placeholder/600/600',
-      '/api/placeholder/600/600',
-      '/api/placeholder/600/600',
-      '/api/placeholder/600/600'
-    ]
-  },
-  'ergonomic-office-chair': {
-    id: 'ergonomic-office-chair',
-    name: 'Ergonomic Office Chair',
-    price: 299,
-    rating: 4.9,
-    reviewCount: 156,
-    inStock: true,
-    description: 'Premium ergonomic office chair designed for maximum comfort and productivity. Features lumbar support, breathable mesh back, and adjustable height. Built with high-quality materials for long-lasting durability.',
-    images: [
-      '/api/placeholder/600/600',
-      '/api/placeholder/600/600',
-      '/api/placeholder/600/600',
-      '/api/placeholder/600/600'
-    ]
-  },
-  'wireless-headphones': {
-    id: 'wireless-headphones',
-    name: 'Wireless Headphones',
-    price: 199,
-    rating: 4.7,
-    reviewCount: 89,
-    inStock: true,
-    description: 'Premium wireless headphones with active noise cancellation and superior sound quality. Long battery life and comfortable design for extended listening sessions.',
-    images: [
-      '/api/placeholder/600/600',
-      '/api/placeholder/600/600',
-      '/api/placeholder/600/600',
-      '/api/placeholder/600/600'
-    ]
-  }
-};
+const products = [
+    {
+        id: 1,
+        name: "Wireless Bluetooth Headphones",
+        price: 89.99,
+        originalPrice: 129.99,
+        origionalprice: 119.99,
+        rating: 4.5,
+        reviewCount: 187,
+        category: "electronics",
+        isNew: false,
+        inStock: true,
+        description: 'Premium wireless headphones with active noise cancellation and 30-hour battery life. Features high-quality audio drivers and comfortable over-ear design.',
+        images: [
+            'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=600&h=600&fit=crop'
+        ]
+    },
+    {
+        id: 2,
+        name: "Designer Sunglasses",
+        price: 199.99,
+        originalPrice: 249.99,
+        origionalprice: 229.99,
+        rating: 4.8,
+        reviewCount: 95,
+        category: "fashion",
+        isNew: true,
+        inStock: true,
+        description: 'Stylish designer sunglasses with UV protection and polarized lenses. Perfect for sunny days with premium acetate frames and crystal-clear vision.',
+        images: [
+            'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1556306535-38febf6782e7?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1577803645773-f96470509666?w=600&h=600&fit=crop'
+        ]
+    },
+    {
+        id: 3,
+        name: "Smart Watch",
+        price: 299.50,
+        originalPrice: 399.99,
+        origionalprice: 349.99,
+        rating: 4.6,
+        reviewCount: 142,
+        category: "electronics",
+        isNew: false,
+        inStock: true,
+        description: 'Advanced smart watch with fitness tracking, heart rate monitoring, and GPS. Features large AMOLED display and 48-hour battery life.',
+        images: [
+            'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1544117519-31a4b719223d?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=600&h=600&fit=crop'
+        ]
+    },
+    {
+        id: 4,
+        name: "Leather Jacket",
+        price: 299.99,
+        originalPrice: 399.99,
+        origionalprice: 349.99,
+        rating: 4.9,
+        reviewCount: 78,
+        category: "fashion",
+        isNew: true,
+        inStock: false,
+        description: 'Premium genuine leather jacket with classic biker style. Features durable construction, multiple pockets, and comfortable fit for all seasons.',
+        images: [
+            'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1520975954732-35dd22299614?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=600&fit=crop'
+        ]
+    },
+    {
+        id: 5,
+        name: "Casual Sneakers",
+        price: 129.00,
+        originalPrice: 169.99,
+        origionalprice: 149.99,
+        rating: 4.4,
+        reviewCount: 203,
+        category: "fashion",
+        isNew: false,
+        inStock: true,
+        description: 'Comfortable casual sneakers with breathable mesh upper and cushioned sole. Perfect for everyday wear with durable construction and stylish design.',
+        images: [
+            'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600&h=600&fit=crop'
+        ]
+    },
+    {
+        id: 6,
+        name: "Gaming Headset",
+        price: 149.99,
+        originalPrice: 199.99,
+        origionalprice: 179.99,
+        rating: 4.7,
+        reviewCount: 156,
+        category: "electronics",
+        isNew: false,
+        inStock: true,
+        description: 'Professional gaming headset with 7.1 surround sound and noise-canceling microphone. RGB lighting and comfortable over-ear design for long gaming sessions.',
+        image: ["https://images.unsplash.com/photo-1586210055191-bff3c8dc4b4f?w=400&h=500&fit=crop"],
+        images: [
+            'https://images.unsplash.com/photo-1586210055191-bff3c8dc4b4f?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&h=600&fit=crop'
+        ]
+    },
+    {
+        id: 7,
+        name: "Wireless Earbuds",
+        price: 159.99,
+        originalPrice: 199.99,
+        origionalprice: 179.99,
+        rating: 4.3,
+        reviewCount: 89,
+        category: "electronics",
+        isNew: true,
+        inStock: true,
+        description: 'Premium wireless earbuds with active noise cancellation and wireless charging case. Crystal clear audio with 24-hour total battery life.',
+        image: ["https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=400&h=500&fit=crop"],
+        images: [
+            'https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&h=600&fit=crop'
+        ]
+    },
+    {
+        id: 8,
+        name: "Elegant Summer Dress",
+        price: 149,
+        originalPrice: 199.99,
+        origionalprice: 169,
+        rating: 4.8,
+        reviewCount: 124,
+        category: "fashion",
+        isNew: true,
+        inStock: true,
+        description: 'Beautiful flowing summer dress made from lightweight breathable fabric. Features elegant floral patterns and comfortable fit perfect for warm weather occasions.',
+        image: ["https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=500&fit=crop"],
+        images: [
+            'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=600&h=600&fit=crop',
+            'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&h=600&fit=crop'
+        ]
+    }
+];
 
 export default function ProductPage({ params }) {
   const router = useRouter();
   const id = decodeURIComponent(use(params).id); 
-  console.log(id)
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [product, setproduct] = useState([])
 
   // Get product data
-  const product = products[id];
+  const getproduct= () => {
+    const getit= products.filter(items=>items.id= id)
+    if (getit!=[]) {
+      setproduct(getit)
 
-  if (!product) {
-    notFound();
+    } else {
+      notFound()
+    }
   }
+  
+ 
+  
 
   const handleAddToCart = async () => {
     setIsAddingToCart(true);
@@ -161,7 +286,7 @@ export default function ProductPage({ params }) {
 
             {/* Thumbnail Images */}
             <div className="grid grid-cols-4 gap-3">
-              {product.images.map((image, index) => (
+              {product.map((data, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
