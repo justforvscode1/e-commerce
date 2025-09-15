@@ -1,46 +1,9 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 const CartPage = () => {
-    const [cartItems, setCartItems] = useState([
-        {
-            id: 1,
-            name: 'Premium Wireless Headphones',
-            brand: 'AudioTech Pro',
-            price: 299.99,
-            originalPrice: 349.99,
-            quantity: 1,
-            image: '/api/placeholder/120/120',
-            color: 'Matte Black',
-            size: 'Standard',
-            sku: 'AT-WH-001'
-        },
-        {
-            id: 2,
-            name: 'Smart Fitness Watch',
-            brand: 'FitTrack Elite',
-            price: 199.99,
-            originalPrice: 249.99,
-            quantity: 2,
-            image: '/api/placeholder/120/120',
-            color: 'Space Gray',
-            size: '42mm',
-            sku: 'FT-SW-042'
-        },
-        {
-            id: 3,
-            name: 'Organic Cotton T-Shirt',
-            brand: 'EcoWear',
-            price: 29.99,
-            originalPrice: 39.99,
-            quantity: 1,
-            image: '/api/placeholder/120/120',
-            color: 'Navy Blue',
-            size: 'Large',
-            sku: 'EW-TS-L-NV'
-        }
-    ]);
+    const [cartItems, setCartItems] = useState([]);
 
     const [promoCode, setPromoCode] = useState('');
     const [discount, setDiscount] = useState(0);
@@ -52,7 +15,7 @@ const CartPage = () => {
     const shipping = subtotal > 150 ? 0 : 12.99;
     const tax = subtotal * 0.0875; // 8.75% tax
     const total = subtotal + shipping + tax - discount;
-const router= useRouter()
+    const router = useRouter()
     const updateQuantity = (id, newQuantity) => {
         if (newQuantity <= 0) {
             removeItem(id);
@@ -64,9 +27,29 @@ const router= useRouter()
             )
         );
     };
+    useEffect(() => {
+        const getcartinfo = async () => {
+            const cart = await fetch("/api/cart")
+            const response = await cart.json()
+            console.log(response)
+            setCartItems(response)
+        }
 
-    const removeItem = (id) => {
-        setCartItems(items => items.filter(item => item.id !== id));
+        getcartinfo()
+
+    }, [cartItems])
+
+    const removeItem = async (id) => {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        const requestOptions = {
+            method: "DELETE",
+            headers: myHeaders,
+            body: JSON.stringify({id}),
+            redirect: "follow"
+        };
+
+        fetch("/api/cart", requestOptions)
     };
 
     const applyPromoCode = () => {
@@ -88,13 +71,13 @@ const router= useRouter()
         setPromoApplied(false);
         setPromoCode('');
     };
-const handleback= () => {
-  router.back()
-}
+    const handleback = () => {
+        router.back()
+    }
 
     if (cartItems.length === 0) {
         return (
-            <div onMouseDown={()=>{alert("hello")}} className="min-h-screen bg-gray-50">
+            <div  className="min-h-screen bg-gray-50">
                 <div className="container mx-auto px-4 py-20">
                     <div className="max-w-lg mx-auto text-center bg-white rounded-2xl p-12 shadow-sm">
                         <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -116,7 +99,7 @@ const handleback= () => {
     }
 
     return (
-        <div  className="min-h-screen text-black bg-gray-50">
+        <div className="min-h-screen text-black bg-gray-50">
             {/* Navigation Bar */}
             <nav className="bg-white border-b border-gray-200">
                 <div className="container mx-auto px-4">
@@ -156,16 +139,17 @@ const handleback= () => {
                     <div className="xl:col-span-3">
                         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                             {cartItems.map((item, index) => (
-                                <div key={item.id} className={`p-6 ${index !== cartItems.length - 1 ? 'border-b border-gray-100' : ''}`}>
+                                <div key={item._id} className={`p-6 ${index !== cartItems.length - 1 ? 'border-b border-gray-100' : ''}`}>
                                     <div className="flex items-start gap-6">
                                         {/* Product Image */}
                                         <div className="flex-shrink-0">
                                             <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden">
-                                                <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                                                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                    </svg>
-                                                </div>
+                                                <Link href={`/products/${item.id}`}>
+                                                    <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                                                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                    </div> </Link>
                                             </div>
                                         </div>
 
@@ -182,7 +166,7 @@ const handleback= () => {
                                                     </div>
                                                 </div>
                                                 <button
-                                                    onClick={() => removeItem(item.id)}
+                                                    onClick={() => removeItem(item._id)}
                                                     className="p-2 text-gray-400 hover:text-red-500 transition-colors"
                                                 >
                                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -330,10 +314,10 @@ const handleback= () => {
                                 </div>
                             </div>
 
-                           <Link href="/checkout">
-                           <button className="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition-all duration-200 mb-3">
-                                Proceed to Checkout
-                            </button> </Link>
+                            <Link href="/checkout">
+                                <button className="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition-all duration-200 mb-3">
+                                    Proceed to Checkout
+                                </button> </Link>
 
                             <button className="w-full text-gray-600 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors border border-gray-200">
                                 Continue Shopping

@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 
 // Mock data - in a real app, this would come from an API or database
 const products = [
@@ -177,20 +178,46 @@ export default function ProductPage({ params }) {
   const [pictureno, setpictureno] = useState(0)
   const [desclength, setdesclength] = useState(250)
   const [show, setshow] = useState(false)
+  const [length, setlength] = useState()
   // Get product data
 
   const id = decodeURIComponent(use(params).id);
+  useEffect(() => {
 
+
+
+    const cartlength = async () => {
+
+      const cart = await fetch("/api/cart")
+      const response = await cart.json()
+      setlength(response.length)
+    }
+    cartlength()
+  }, [])
   const product = products.find(items => items.id == Number(id))
   if (!product) {
     notFound()
   }
 
-
-
   const handleAddToCart = async () => {
     setIsAddingToCart(true);
     // Simulate API call
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    product.quantity = 1
+    const raw = JSON.stringify(product);
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow"
+    };
+
+    fetch("http://localhost:3000/api/cart", requestOptions)
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
     await new Promise(resolve => setTimeout(resolve, 800));
     setIsAddingToCart(false);
     // In a real app, you'd dispatch to cart state or call an API
@@ -227,17 +254,14 @@ export default function ProductPage({ params }) {
               <span className="ml-4 text-xl font-semibold text-gray-900">Modern Store</span>
             </div>
             <div className="flex items-center space-x-4">
-              <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors duration-200">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              </button>
-              <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors duration-200">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.293 2.293c-.195.195-.195.512 0 .707L7 18.293M7 13v4a2 2 0 002 2h6m3-16a1 1 0 011 1v4a1 1 0 01-1 1H9a1 1 0 01-1-1V5a1 1 0 011-1h8z" />
-                </svg>
-                <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
-              </button>
+
+              <Link href={'/my-cart'}>
+                <button className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.293 2.293c-.195.195-.195.512 0 .707L7 18.293M7 13v4a2 2 0 002 2h6m3-16a1 1 0 011 1v4a1 1 0 01-1 1H9a1 1 0 01-1-1V5a1 1 0 011-1h8z" />
+                  </svg>
+                  <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{length}</span>
+                </button></Link>
             </div>
           </div>
         </div>

@@ -181,6 +181,24 @@ const FashionCollections = () => {
     }, [])
 
 
+    const addtocart = (product) => {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        product.quantity = 1
+        const raw = JSON.stringify(product);
+
+        const requestOptions = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow"
+        };
+
+        fetch("http://localhost:3000/api/cart", requestOptions)
+            .then((response) => response.text())
+            .then((result) => console.log(result))
+            .catch((error) => console.error(error));
+    }
 
     const categories = [
         { id: 'all', name: 'All Collections', count: products.length },
@@ -200,7 +218,7 @@ const FashionCollections = () => {
             setFilteredProducts(filtered);
             setIsLoading(false);
         }, 300);
-    }, [activeCategory,products]);
+    }, [activeCategory, products]);
 
     const handleCategoryChange = (type) => {
         setActiveCategory(type);
@@ -313,7 +331,10 @@ const FashionCollections = () => {
                                                 )}
                                             </div>
 
-                                            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-600 transform transition-all duration-300 hover:scale-105">
+                                            <button onClick={() => {
+                                                addtocart(product)
+                                            }
+                                            } className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-600 transform transition-all duration-300 hover:scale-105">
                                                 +  Cart
                                             </button>
                                         </div>
