@@ -1,199 +1,192 @@
 // app/product/[id]/page.js
 'use client';
-import { use } from 'react';
+import { use, useEffect } from 'react';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 
 // Mock data - in a real app, this would come from an API or database
 const products = [
-    {
-        id: 1,
-        name: "Wireless Bluetooth Headphones",
-        price: 89.99,
-        originalPrice: 129.99,
-        origionalprice: 119.99,
-        rating: 4.5,
-        reviewCount: 187,
-        category: "electronics",
-        isNew: false,
-        inStock: true,
-        description: 'Premium wireless headphones with active noise cancellation and 30-hour battery life. Features high-quality audio drivers and comfortable over-ear design.',
-        images: [
-            'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=600&h=600&fit=crop'
-        ]
-    },
-    {
-        id: 2,
-        name: "Designer Sunglasses",
-        price: 199.99,
-        originalPrice: 249.99,
-        origionalprice: 229.99,
-        rating: 4.8,
-        reviewCount: 95,
-        category: "fashion",
-        isNew: true,
-        inStock: true,
-        description: 'Stylish designer sunglasses with UV protection and polarized lenses. Perfect for sunny days with premium acetate frames and crystal-clear vision.',
-        images: [
-            'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1556306535-38febf6782e7?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1577803645773-f96470509666?w=600&h=600&fit=crop'
-        ]
-    },
-    {
-        id: 3,
-        name: "Smart Watch",
-        price: 299.50,
-        originalPrice: 399.99,
-        origionalprice: 349.99,
-        rating: 4.6,
-        reviewCount: 142,
-        category: "electronics",
-        isNew: false,
-        inStock: true,
-        description: 'Advanced smart watch with fitness tracking, heart rate monitoring, and GPS. Features large AMOLED display and 48-hour battery life.',
-        images: [
-            'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1544117519-31a4b719223d?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1576243345690-4e4b79b63288?w=600&h=600&fit=crop'
-        ]
-    },
-    {
-        id: 4,
-        name: "Leather Jacket",
-        price: 299.99,
-        originalPrice: 399.99,
-        origionalprice: 349.99,
-        rating: 4.9,
-        reviewCount: 78,
-        category: "fashion",
-        isNew: true,
-        inStock: false,
-        description: 'Premium genuine leather jacket with classic biker style. Features durable construction, multiple pockets, and comfortable fit for all seasons.',
-        images: [
-            'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1520975954732-35dd22299614?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=600&fit=crop'
-        ]
-    },
-    {
-        id: 5,
-        name: "Casual Sneakers",
-        price: 129.00,
-        originalPrice: 169.99,
-        origionalprice: 149.99,
-        rating: 4.4,
-        reviewCount: 203,
-        category: "fashion",
-        isNew: false,
-        inStock: true,
-        description: 'Comfortable casual sneakers with breathable mesh upper and cushioned sole. Perfect for everyday wear with durable construction and stylish design.',
-        images: [
-            'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600&h=600&fit=crop'
-        ]
-    },
-    {
-        id: 6,
-        name: "Gaming Headset",
-        price: 149.99,
-        originalPrice: 199.99,
-        origionalprice: 179.99,
-        rating: 4.7,
-        reviewCount: 156,
-        category: "electronics",
-        isNew: false,
-        inStock: true,
-        description: 'Professional gaming headset with 7.1 surround sound and noise-canceling microphone. RGB lighting and comfortable over-ear design for long gaming sessions.',
-        image: ["https://images.unsplash.com/photo-1586210055191-bff3c8dc4b4f?w=400&h=500&fit=crop"],
-        images: [
-            'https://images.unsplash.com/photo-1586210055191-bff3c8dc4b4f?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&h=600&fit=crop'
-        ]
-    },
-    {
-        id: 7,
-        name: "Wireless Earbuds",
-        price: 159.99,
-        originalPrice: 199.99,
-        origionalprice: 179.99,
-        rating: 4.3,
-        reviewCount: 89,
-        category: "electronics",
-        isNew: true,
-        inStock: true,
-        description: 'Premium wireless earbuds with active noise cancellation and wireless charging case. Crystal clear audio with 24-hour total battery life.',
-        image: ["https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=400&h=500&fit=crop"],
-        images: [
-            'https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&h=600&fit=crop'
-        ]
-    },
-    {
-        id: 8,
-        name: "Elegant Summer Dress",
-        price: 149,
-        originalPrice: 199.99,
-        origionalprice: 169,
-        rating: 4.8,
-        reviewCount: 124,
-        category: "fashion",
-        isNew: true,
-        inStock: true,
-        description: 'Beautiful flowing summer dress made from lightweight breathable fabric. Features elegant floral patterns and comfortable fit perfect for warm weather occasions.',
-        image: ["https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=500&fit=crop"],
-        images: [
-            'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=600&h=600&fit=crop',
-            'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&h=600&fit=crop'
-        ]
-    }
+  {
+    id: 1,
+    name: "Men's Leather Jacket",
+    price: 12999,
+    originalPrice: 17999,
+    rating: 4.7,
+    reviewCount: 256,
+    category: "fashion",
+    brand: "Zara",
+    type: "men",
+    isNew: true,
+    inStock: true,
+    stockCount: 15,
+    description: "Stylish genuine leather jacket with modern slim fit design. Durable, warm, and perfect for casual or evening wear.",
+    image: ["https://images.unsplash.com/photo-1534126511673-b6899657816a?w=400&h=500&fit=crop"],
+    images: [
+      "https://images.unsplash.com/photo-1534126511673-b6899657816a?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1520975918318-3c83ef89fbb4?w=600&h=600&fit=crop"
+    ]
+  },
+  {
+    id: 2,
+    name: "Women's Summer Dress",
+    price: 7499,
+    originalPrice: 9999,
+    rating: 4.6,
+    reviewCount: 98,
+    category: "fashion",
+    brand: "H&M",
+    type: "women",
+    isNew: true,
+    inStock: true,
+    stockCount: 30,
+    description: "Lightweight breathable cotton dress with floral design. Ideal for summer outings and casual wear.",
+    image: ["https://images.unsplash.com/photo-1520975918318-3c83ef89fbb4?w=400&h=500&fit=crop"],
+    images: [
+      "https://images.unsplash.com/photo-1520975918318-3c83ef89fbb4?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&h=600&fit=crop"
+    ]
+  },
+  {
+    id: 3,
+    name: "Kids' Sports Shoes",
+    price: 4999,
+    originalPrice: 6999,
+    rating: 4.4,
+    reviewCount: 120,
+    category: "fashion",
+    brand: "Nike",
+    type: "kids",
+    isNew: false,
+    inStock: true,
+    stockCount: 25,
+    description: "Comfortable lightweight shoes for kids with cushioned sole, ideal for daily use and sports activities.",
+    image: ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=500&fit=crop"],
+    images: [
+      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1600185365483-26d7a4c0b4b1?w=600&h=600&fit=crop"
+    ]
+  },
+  {
+    id: 4,
+    name: "Leather Handbag",
+    price: 9999,
+    originalPrice: 13999,
+    rating: 4.8,
+    reviewCount: 310,
+    category: "fashion",
+    brand: "Michael Kors",
+    type: "accessories",
+    isNew: true,
+    inStock: true,
+    stockCount: 12,
+    description: "Premium leather handbag with spacious compartments and elegant design, perfect for work or casual outings.",
+    image: ["https://images.unsplash.com/photo-1584916201218-119fc747c2f9?w=400&h=500&fit=crop"],
+    images: [
+      "https://images.unsplash.com/photo-1584916201218-119fc747c2f9?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9c?w=600&h=600&fit=crop"
+    ]
+  },
+  {
+    id: 5,
+    name: "Gaming Laptop",
+    price: 119999,
+    originalPrice: 139999,
+    rating: 4.9,
+    reviewCount: 542,
+    category: "electronics",
+    brand: "Asus ROG",
+    type: "laptops",
+    isNew: true,
+    inStock: true,
+    stockCount: 8,
+    description: "High-performance gaming laptop with RTX 4070 GPU, Intel i9 processor, and 16GB RAM for ultimate gaming experience.",
+    image: ["https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=500&fit=crop"],
+    images: [
+      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&h=600&fit=crop"
+    ]
+  },
+  {
+    id: 6,
+    name: "Smartphone Pro X",
+    price: 99999,
+    originalPrice: 114999,
+    rating: 4.8,
+    reviewCount: 670,
+    category: "electronics",
+    brand: "Apple",
+    type: "smartphones",
+    isNew: true,
+    inStock: true,
+    stockCount: 20,
+    description: "Flagship smartphone with stunning OLED display, triple-lens camera, and powerful A-series chip.",
+    image: ["https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=500&fit=crop"],
+    images: [
+      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1510557880182-3d4d3c8ad0c7?w=600&h=600&fit=crop"
+    ]
+  },
+  {
+    id: 7,
+    name: "Wireless Bluetooth Headphones",
+    price: 8999,
+    originalPrice: 12999,
+    rating: 4.5,
+    reviewCount: 187,
+    category: "electronics",
+    brand: "Sony",
+    type: "headphones",
+    isNew: false,
+    inStock: true,
+    stockCount: 42,
+    description: "Premium wireless headphones with active noise cancellation and 30-hour battery life. Features high-quality audio drivers and comfortable over-ear design.",
+    image: ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=500&fit=crop"],
+    images: [
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&h=600&fit=crop"
+    ]
+  },
+  {
+    id: 8,
+    name: "DSLR Camera 24MP",
+    price: 64999,
+    originalPrice: 79999,
+    rating: 4.7,
+    reviewCount: 350,
+    category: "electronics",
+    brand: "Canon",
+    type: "cameras",
+    isNew: true,
+    inStock: true,
+    stockCount: 10,
+    description: "Professional DSLR camera with 24MP sensor, 4K video recording, and interchangeable lenses. Ideal for photography enthusiasts.",
+    image: ["https://images.unsplash.com/photo-1519183071298-a2962eadcdb9?w=400&h=500&fit=crop"],
+    images: [
+      "https://images.unsplash.com/photo-1519183071298-a2962eadcdb9?w=600&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1519183071298-a2962eadcdb9?w=600&h=600&fit=crop"
+    ]
+  }
 ];
 
 export default function ProductPage({ params }) {
   const router = useRouter();
-  const id = decodeURIComponent(use(params).id); 
-  const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [product, setproduct] = useState([])
-
+  const [pictureno, setpictureno] = useState(0)
+  const [desclength, setdesclength] = useState(250)
+  const [show, setshow] = useState(false)
   // Get product data
-  const getproduct= () => {
-    const getit= products.filter(items=>items.id= id)
-    if (getit!=[]) {
-      setproduct(getit)
 
-    } else {
-      notFound()
-    }
+  const id = decodeURIComponent(use(params).id);
+
+  const product = products.find(items => items.id == Number(id))
+  if (!product) {
+    notFound()
   }
-  
- 
-  
+
+
 
   const handleAddToCart = async () => {
     setIsAddingToCart(true);
@@ -224,11 +217,10 @@ export default function ProductPage({ params }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <button 
+              <button
                 onClick={() => router.back()}
-                className="text-gray-600 hover:text-gray-900 transition-colors duration-200 hover:scale-110 transform"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                className="text-gray-600 hover:text-gray-900 transition-colors duration-200 hover:scale-110 transform">
+                <svg className="w-6 h-6 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
@@ -251,33 +243,34 @@ export default function ProductPage({ params }) {
         </div>
       </nav>
 
-      
+
       {/* Product Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-          
+
           {/* Product Images */}
           <div className="space-y-4">
             {/* Main Image */}
             <div className="aspect-square bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden group relative">
-              <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center transform group-hover:scale-105 transition-transform duration-700">
-                <div className="text-center animate-fade-in">
-                  <div className="w-32 h-32 mx-auto bg-white rounded-2xl mb-4 flex items-center justify-center shadow-lg">
-                    <svg className="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <p className="text-sm font-medium text-gray-600">{product.name}</p>
-                </div>
-              </div>
-              
+              <Image width={1000} height={500} src={product.images[pictureno]} alt='images'></Image>
               {/* Image Navigation Arrows */}
-              <button className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <button onClick={() => {
+                if (pictureno >= 1) {
+                  setpictureno(p => p - 1)
+                }
+              }
+
+              } className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <button className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <button onClick={() => {
+                if (pictureno < product.images.length - 1) {
+                  setpictureno(p => p + 1)
+                }
+              }
+              } className="absolute right-4  top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -286,20 +279,17 @@ export default function ProductPage({ params }) {
 
             {/* Thumbnail Images */}
             <div className="grid grid-cols-4 gap-3">
-              {product.map((data, index) => (
+              {product.images.map((data, index) => (
                 <button
                   key={index}
-                  onClick={() => setSelectedImage(index)}
-                  className={`aspect-square bg-white rounded-xl shadow-sm border-2 overflow-hidden transition-all duration-300 ${
-                    selectedImage === index 
-                      ? 'border-blue-500 ring-2 ring-blue-200 scale-105' 
-                      : 'border-gray-200 hover:border-gray-300 hover:scale-102'
-                  }`}
+                  onClick={() => setpictureno(index)}
+                  className={`aspect-square bg-white rounded-xl shadow-sm border-2 overflow-hidden transition-all duration-300 ${pictureno === index
+                    ? 'border-blue-500 ring-2 ring-blue-200 scale-105'
+                    : 'border-gray-200 hover:border-gray-300 hover:scale-102'
+                    }`}
                 >
                   <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                    <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
-                    </svg>
+                    <Image src={data} height={500} width={500} alt='more pictures'></Image>
                   </div>
                 </button>
               ))}
@@ -313,6 +303,7 @@ export default function ProductPage({ params }) {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-3">
                   <span className="text-4xl font-bold text-blue-600">${product.price}</span>
+                  <span className="text-lg text-gray-500 line-through">${product.originalPrice}</span>
                   {product.inStock && (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 animate-pulse">
                       <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
@@ -326,9 +317,9 @@ export default function ProductPage({ params }) {
                   </svg>
                 </button>
               </div>
-              
+
               <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">{product.name}</h1>
-              
+
               {/* Rating */}
               <div className="flex items-center space-x-4">
                 <div className="flex items-center space-x-1">
@@ -349,7 +340,14 @@ export default function ProductPage({ params }) {
             {/* Description */}
             <div className="animate-slide-up" style={{ animationDelay: '0.1s' }}>
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Description</h3>
-              <p className="text-gray-700 leading-relaxed text-lg">{product.description}</p>
+              {product.description.length > desclength ? <> <p className="text-gray-700 leading-relaxed text-lg">{product.description.slice(0, 250)} <button onClick={() => {
+                setdesclength(product.description.length)
+                setshow(true)
+              }
+              } className='text-blue-600 px-3 hover:underline text-sm cursor-pointer'>read more</button> </p></> : <><p className="text-gray-700 leading-relaxed text-lg">{product.description}</p> <button onClick={() => {
+                setdesclength(250)
+              }
+              } className={`text-blue-600 px-3 hover:underline text-sm cursor-pointer ${show ? 'lock' : 'hidden'}`}>read less</button>  </>}
             </div>
 
             {/* Quantity Selector */}
@@ -397,7 +395,7 @@ export default function ProductPage({ params }) {
                   </div>
                 )}
               </button>
-              
+
               <button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold py-4 px-8 rounded-2xl transition-all duration-200 transform hover:scale-[1.02] border border-gray-300">
                 Buy Now
               </button>

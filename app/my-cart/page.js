@@ -191,7 +191,7 @@ const handleback= () => {
                                                 </button>
                                             </div>
 
-                                            <div className="flex items-center justify-between">
+                                            <div className="flex  items-center justify-between">
                                                 {/* Quantity Controls */}
                                                 <div className="flex items-center">
                                                     <label className="text-sm font-medium text-gray-700 mr-3">Qty:</label>
@@ -201,16 +201,16 @@ const handleback= () => {
                                                             className="p-2.5  hover:bg-gray-50 transition-colors border-r border-gray-300"
                                                             disabled={item.quantity <= 1}
                                                         >
-                                                            <svg className="w-4 h-4 invert" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <svg className="w-4 h-4 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                                                             </svg>
                                                         </button>
-                                                        <span className="px-4 py-2.5 invert font-medium min-w-[60px] text-center">{item.quantity}</span>
+                                                        <span className="px-4 py-2.5  font-medium min-w-[60px] text-center">{item.quantity}</span>
                                                         <button
                                                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                                             className="p-2.5 hover:bg-gray-50 transition-colors border-l border-gray-300"
                                                         >
-                                                            <svg className="w-4 h-4 invert" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <svg className="w-4 h-4 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                                             </svg>
                                                         </button>
