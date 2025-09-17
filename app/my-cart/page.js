@@ -2,11 +2,14 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { toast, ToastContainer } from 'react-toastify';
+
 const CartPage = () => {
     const [cartItems, setCartItems] = useState([]);
 
     const [promoCode, setPromoCode] = useState('');
     const [discount, setDiscount] = useState(0);
+    const [refresh, setrefresh] = useState(true)
     const [promoApplied, setPromoApplied] = useState(false);
 
     // Calculate totals
@@ -37,19 +40,36 @@ const CartPage = () => {
 
         getcartinfo()
 
-    }, [cartItems])
+    }, [refresh
+
+    ])
+    useEffect(() => {
+
+        setrefresh(prev => !prev)
+
+
+    }, [])
 
     const removeItem = async (id) => {
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        const requestOptions = {
-            method: "DELETE",
-            headers: myHeaders,
-            body: JSON.stringify({id}),
-            redirect: "follow"
-        };
+        try {
 
-        fetch("/api/cart", requestOptions)
+
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            const requestOptions = {
+                method: "DELETE",
+                headers: myHeaders,
+                body: JSON.stringify({ id }),
+            };
+
+            fetch("/api/cart", requestOptions)
+            toast.success("successfully deleted ")
+            setrefresh(prev => !prev)
+
+        } catch (error) {
+            toast.error("something wemt wrong ")
+            console.error("error occured", error)
+        }
     };
 
     const applyPromoCode = () => {
@@ -77,7 +97,7 @@ const CartPage = () => {
 
     if (cartItems.length === 0) {
         return (
-            <div  className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-gray-50">
                 <div className="container mx-auto px-4 py-20">
                     <div className="max-w-lg mx-auto text-center bg-white rounded-2xl p-12 shadow-sm">
                         <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -89,7 +109,7 @@ const CartPage = () => {
                         <p className="text-gray-600 mb-8 leading-relaxed">
                             Start adding items to your cart to see them here. Browse our collections to find something you love.
                         </p>
-                        <button className="bg-gray-900 text-white px-8 py-3.5 rounded-lg font-medium hover:bg-gray-800 transition-all duration-200">
+                        <button onClick={handleback} className="bg-gray-900 text-white px-8 py-3.5 rounded-lg font-medium hover:bg-gray-800 transition-all duration-200">
                             Continue Shopping
                         </button>
                     </div>
@@ -98,7 +118,8 @@ const CartPage = () => {
         );
     }
 
-    return (
+    return (<>
+        <ToastContainer />
         <div className="min-h-screen text-black bg-gray-50">
             {/* Navigation Bar */}
             <nav className="bg-white border-b border-gray-200">
@@ -166,7 +187,7 @@ const CartPage = () => {
                                                     </div>
                                                 </div>
                                                 <button
-                                                    onClick={() => removeItem(item._id)}
+                                                    onClick={() => removeItem(item.id)}
                                                     className="p-2 text-gray-400 hover:text-red-500 transition-colors"
                                                 >
                                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -345,6 +366,8 @@ const CartPage = () => {
                 </div>
             </div>
         </div>
+    </>
+
     );
 };
 

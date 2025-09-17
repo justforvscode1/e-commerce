@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-
+const [length, setlength] = useState()
     const categories = [
         { name: 'Fashion', items: ['Men', 'Women', 'Kids', 'Accessories'] },
         { name: 'Electronics', items: ['Laptops', 'Smartphones', 'Headphones', 'Cameras'] },
@@ -17,7 +17,16 @@ const Navbar = () => {
             // Add your search logic here
         }
     };
+useEffect(() => {
 
+    const cartlength = async () => {
+
+      const cart = await fetch("/api/cart")
+      const response = await cart.json()
+      setlength(response.length)
+    }
+    cartlength()
+  }, [])
     return (
         <nav className="bg-white shadow-md sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4">
@@ -109,7 +118,7 @@ const Navbar = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.293 2.293A1 1 0 005 16v0a1 1 0 001 1h11M7 13v4a2 2 0 002 2h4a2 2 0 002-2v-4" />
                             </svg>
                             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                                3
+                                {length}
                             </span>
                         </button></Link>
 
