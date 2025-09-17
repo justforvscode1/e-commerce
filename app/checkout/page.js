@@ -1,12 +1,14 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast, ToastContainer } from 'react-toastify';
 const CheckoutPage = () => {
     const [paymentMethod, setPaymentMethod] = useState('online');
     const [shippingMethod, setShippingMethod] = useState('standard');
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [newsletterSubscribe, setNewsletterSubscribe] = useState(false);
     const [orderItems, setorderitems] = useState([])
+    const [errorhandle, seterrorhandle] = useState(false)
     const router = useRouter()
     const [shippingForm, setShippingForm] = useState({
         firstName: '',
@@ -80,58 +82,63 @@ const CheckoutPage = () => {
     };
 
     const handlePlaceOrder = async () => {
-        const finaldata = {
-            orderId: crypto.randomUUID(),
-            userid: crypto.randomUUID(),
-            status: "pending",
-            createdat: new Date(),
-            tax, subtotal, total,
-            shippingForm,
-            shippingCost,
-            paymentMethod,
-            shippingMethod,
-            orderItems
-        }
-        const isEmptyField = Object.values(shippingForm).some(field =>
-            field.trim() === ''
-        );
+        try {
 
-        if (isEmptyField) {
-            alert("empty");
-        } else {
-            alert("ok");
-            const myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/json");
-            const sendcheckout = await fetch("/api/order", {
-                method: "POST",
-                headers: myHeaders,
-                body: JSON.stringify(finaldata)
-            })
-            const response = await sendcheckout.json()
-            console.log(response)
 
-            try {
+            const finaldata = {
+                orderId: crypto.randomUUID(),
+                userid: crypto.randomUUID(),
+                status: "pending",
+                createdat: new Date(),
+                tax, subtotal, total,
+                shippingForm,
+                shippingCost,
+                paymentMethod,
+                shippingMethod,
+                orderItems
+            }
+            const isEmptyField = Object.values(shippingForm).some(field =>
+                field.trim() === ''
+            );
+
+            if (isEmptyField) {
+                seterrorhandle(true)
+            } else {
+                seterrorhandle(false)
+                const myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/json");
+                const sendcheckout = await fetch("/api/order", {
+                    method: "POST",
+                    headers: myHeaders,
+                    body: JSON.stringify(finaldata)
+                })
+                const response = await sendcheckout.json()
+                console.log(response)
+
 
                 const userId = localStorage.getItem("userId")
-                const myHeaders = new Headers();
+                const myHeader = new Headers();
                 myHeaders.append("Content-Type", "application/json");
                 const requestOptions = {
                     method: "DELETE",
-                    headers: myHeaders,
+                    headers: myHeader,
                     body: JSON.stringify({ userId }),
                 };
 
                 fetch("/api/cart", requestOptions)
+                toast.success("Your order has been placed")
+                setTimeout(() => {
 
-            } catch (error) {
-                console.error("error occured", error)
+                    router.push("/settings")
+                }, 1000);
             }
+        } catch (error) {
+            toast.error("error placing your order")
         }
-        // Validation logic would go here
-        // alert(`Order placed successfully! Payment method: ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}`);
     };
 
-    return (
+    return (<>
+        <ToastContainer />
         <div className="min-h-screen text-black bg-gray-50">
             {/* Header */}
             <div className="bg-white border-b border-gray-200">
@@ -272,6 +279,7 @@ const CheckoutPage = () => {
                                     />
                                 </div>
                             </div>
+                            <div className={`text-center text-red-500 ${errorhandle ? "block" : "hidden"}`} >fill all the inputs</div>
                         </div>
 
                         {/* Shipping Method */}
@@ -464,34 +472,7 @@ const CheckoutPage = () => {
                         </div>
 
                         {/* Terms and Newsletter */}
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                            <div className="space-y-4">
-                                <label className="flex items-start">
-                                    <input
-                                        type="checkbox"
-                                        checked={agreedToTerms}
-                                        onChange={(e) => setAgreedToTerms(e.target.checked)}
-                                        className="mt-1 mr-3"
-                                        required
-                                    />
-                                    <span className="text-sm text-gray-700">
-                                        I agree to the <a href="#" className="text-blue-600 hover:underline">Terms and Conditions</a> and <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a> *
-                                    </span>
-                                </label>
 
-                                <label className="flex items-start">
-                                    <input
-                                        type="checkbox"
-                                        checked={newsletterSubscribe}
-                                        onChange={(e) => setNewsletterSubscribe(e.target.checked)}
-                                        className="mt-1 mr-3"
-                                    />
-                                    <span className="text-sm text-gray-700">
-                                        Subscribe to our newsletter for exclusive offers and updates
-                                    </span>
-                                </label>
-                            </div>
-                        </div>
                     </div>
 
                     {/* Right Column - Order Summary */}
@@ -570,10 +551,39 @@ const CheckoutPage = () => {
                                 </p>
                             </div>
                         </div>
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                            <div className="space-y-4">
+                                <label className="flex items-start">
+                                    <input
+                                        type="checkbox"
+                                        checked={agreedToTerms}
+                                        onChange={(e) => setAgreedToTerms(e.target.checked)}
+                                        className="mt-1 mr-3"
+                                        required
+                                    />
+                                    <span className="text-sm text-gray-700">
+                                        I agree to the <a href="#" className="text-blue-600 hover:underline">Terms and Conditions</a> and <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a> *
+                                    </span>
+                                </label>
+
+                                <label className="flex items-start">
+                                    <input
+                                        type="checkbox"
+                                        checked={newsletterSubscribe}
+                                        onChange={(e) => setNewsletterSubscribe(e.target.checked)}
+                                        className="mt-1 mr-3"
+                                    />
+                                    <span className="text-sm text-gray-700">
+                                        Subscribe to our newsletter for exclusive offers and updates
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </>
     );
 };
 
