@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 const CheckoutPage = () => {
     const [paymentMethod, setPaymentMethod] = useState('online');
@@ -7,23 +7,13 @@ const CheckoutPage = () => {
     const [sameAsShipping, setSameAsShipping] = useState(true);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [newsletterSubscribe, setNewsletterSubscribe] = useState(false);
+    const [orderItems, setorderitems] = useState([])
     const router = useRouter()
     const [shippingForm, setShippingForm] = useState({
         firstName: '',
         lastName: '',
         email: '',
         phone: '',
-        address: '',
-        apartment: '',
-        city: '',
-        state: '',
-        zipCode: '',
-        country: 'United States'
-    });
-
-    const [billingForm, setBillingForm] = useState({
-        firstName: '',
-        lastName: '',
         address: '',
         apartment: '',
         city: '',
@@ -40,11 +30,22 @@ const CheckoutPage = () => {
     });
 
     // Sample order data
-    const orderItems = [
-        { id: 1, name: 'Premium Wireless Headphones', brand: 'AudioTech Pro', price: 299.99, quantity: 1 },
-        { id: 2, name: 'Smart Fitness Watch', brand: 'FitTrack Elite', price: 199.99, quantity: 2 },
-        { id: 3, name: 'Organic Cotton T-Shirt', brand: 'EcoWear', price: 29.99, quantity: 1 }
-    ];
+    useEffect(() => {
+
+        const getcartitems = async () => {
+            const cart = await fetch("/api/cart")
+            const response = await cart.json()
+            console.log(response)
+            setorderitems(response)
+        }
+        getcartitems()
+    }, [])
+
+    // const orderItems = [
+    //     { id: 1, name: 'Premium Wireless Headphones', brand: 'AudioTech Pro', price: 299.99, quantity: 1 },
+    //     { id: 2, name: 'Smart Fitness Watch', brand: 'FitTrack Elite', price: 199.99, quantity: 2 },
+    //     { id: 3, name: 'Organic Cotton T-Shirt', brand: 'EcoWear', price: 29.99, quantity: 1 }
+    // ];
 
     const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const shippingCost = shippingMethod === 'express' ? 24.99 : shippingMethod === 'overnight' ? 49.99 : 0;
@@ -89,14 +90,15 @@ const CheckoutPage = () => {
         return v;
     };
 
-    const handlePlaceOrder = () => {
+    const handlePlaceOrder =async () => {
         if (!agreedToTerms) {
             alert('Please agree to the terms and conditions');
             return;
         }
+const sendcheckout= await fetch("/api/checkout")
 
         // Validation logic would go here
-        alert(`Order placed successfully! Payment method: ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}`);
+        // alert(`Order placed successfully! Payment method: ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}`);
     };
 
     return (
