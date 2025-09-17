@@ -31,11 +31,20 @@ const ElectronicsCollections = () => {
 
     const addtocart = async (product) => {
         try {
+            const local = localStorage.getItem("userId")
+            if (!local) {
+                const ifnot = localStorage.setItem("userId", crypto.randomUUID())
+                product.userID = ifnot
 
+            } else {
+
+                product.userID = local
+            }
 
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             product.quantity = 1
+            product.userID = local
             const raw = JSON.stringify(product);
 
             const requestOptions = {
@@ -47,6 +56,7 @@ const ElectronicsCollections = () => {
 
             const adding = await fetch("http://localhost:3000/api/cart", requestOptions)
             const response = await adding.json()
+
             if (response === "already added") {
                 toast.info('item is aleady in the  cart')
             } else {

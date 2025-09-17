@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 const CheckoutPage = () => {
     const [paymentMethod, setPaymentMethod] = useState('online');
     const [shippingMethod, setShippingMethod] = useState('standard');
-    const [sameAsShipping, setSameAsShipping] = useState(true);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [newsletterSubscribe, setNewsletterSubscribe] = useState(false);
     const [orderItems, setorderitems] = useState([])
@@ -41,12 +40,6 @@ const CheckoutPage = () => {
         getcartitems()
     }, [])
 
-    // const orderItems = [
-    //     { id: 1, name: 'Premium Wireless Headphones', brand: 'AudioTech Pro', price: 299.99, quantity: 1 },
-    //     { id: 2, name: 'Smart Fitness Watch', brand: 'FitTrack Elite', price: 199.99, quantity: 2 },
-    //     { id: 3, name: 'Organic Cotton T-Shirt', brand: 'EcoWear', price: 29.99, quantity: 1 }
-    // ];
-
     const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const shippingCost = shippingMethod === 'express' ? 24.99 : shippingMethod === 'overnight' ? 49.99 : 0;
     const tax = subtotal * 0.0875;
@@ -54,10 +47,6 @@ const CheckoutPage = () => {
 
     const handleShippingChange = (field, value) => {
         setShippingForm(prev => ({ ...prev, [field]: value }));
-    };
-
-    const handleBillingChange = (field, value) => {
-        setBillingForm(prev => ({ ...prev, [field]: value }));
     };
 
     const handleCardChange = (field, value) => {
@@ -90,13 +79,54 @@ const CheckoutPage = () => {
         return v;
     };
 
-    const handlePlaceOrder =async () => {
-        if (!agreedToTerms) {
-            alert('Please agree to the terms and conditions');
-            return;
+    const handlePlaceOrder = async () => {
+        const finaldata = {
+            orderId: crypto.randomUUID(),
+            userid: crypto.randomUUID(),
+            status: "pending",
+            createdat: new Date(),
+            tax, subtotal, total,
+            shippingForm,
+            shippingCost,
+            paymentMethod,
+            shippingMethod,
+            orderItems
         }
-const sendcheckout= await fetch("/api/checkout")
+        const isEmptyField = Object.values(shippingForm).some(field =>
+            field.trim() === ''
+        );
 
+        if (isEmptyField) {
+            alert("empty");
+        } else {
+            alert("ok");
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            const sendcheckout = await fetch("/api/order", {
+                method: "POST",
+                headers: myHeaders,
+                body: JSON.stringify(finaldata)
+            })
+            const response = await sendcheckout.json()
+            console.log(response)
+
+            try {
+
+                const userId = localStorage.getItem("userId")
+                const myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/json");
+                const requestOptions = {
+                    method: "DELETE",
+                    headers: myHeaders,
+                    body: JSON.stringify({ userId }),
+                };
+
+                fetch("/api/cart", requestOptions)
+
+            } catch (error) {
+                console.error("error occured", error)
+            }
+        }
         // Validation logic would go here
         // alert(`Order placed successfully! Payment method: ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}`);
     };

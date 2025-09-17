@@ -41,17 +41,18 @@ export async function POST(req) {
 }
 export async function DELETE(req) {
     try {
+        const client = await clientPromise;
+        const db = await client.db("mydb");
         const body = await req.json();
-        const { id } = body;
+        const { id, userId } = body;
         console.log(id)
-        if (!id) {
-            return NextResponse.json({ error: "id required" }, { status: 400 });
+        if (userId) {
+            const results = await db.collection("cart").deleteMany({ userID:userId })
+            return NextResponse.json({ results: "cart is cleared" }, { status: 200 });
         }
 
-        const client = await clientPromise;
-        const db = client.db("mydb");
 
-        const result = await db.collection("cart").deleteOne({ id:id })
+        const result = await db.collection("cart").deleteOne({ id: id })
 
 
         return NextResponse.json(result, { status: 200 });

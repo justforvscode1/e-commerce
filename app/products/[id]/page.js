@@ -55,7 +55,15 @@ export default function ProductPage({ params }) {
 
   const handleAddToCart = async () => {
     try {
+      const local = localStorage.getItem("userId")
+      if (!local) {
+        const ifnot = localStorage.setItem("userId", crypto.randomUUID())
+        products[0].userID = ifnot
 
+      } else {
+
+        products[0].userID = local
+      }
       setIsAddingToCart(true);
       // Simulate API call
       const myHeaders = new Headers();
@@ -75,7 +83,6 @@ export default function ProductPage({ params }) {
       await new Promise(resolve => setTimeout(resolve, 800));
       setIsAddingToCart(false);
       console.log(response)
-      // In a real app, you'd dispatch to cart state or call an API
       if (response === "already added") {
         toast.info('item is aleady in the  cart')
       } else {

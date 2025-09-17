@@ -6,7 +6,7 @@ export async function GET() {
     try {
         const client = await clientPromise;
         const db = await client.db("mydb");
-        const products = await db.collection("products").find().toArray();
+        const products = await db.collection("orders").find().toArray();
         return NextResponse.json(products);
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });
@@ -19,13 +19,13 @@ export async function POST(req) {
         const body = await req.json();
         console.log(body)
         // ✅ You decide validation rules here
-        if (!body.name || !body.price) {
+        if (!body) {
             return NextResponse.json({ error: "name and price are required" }, { status: 400 });
         }
 
         const client = await clientPromise;
         const db = await client.db("mydb");
-        const result = await db.collection("checkout").insertOne(body);
+        const result = await db.collection("order").insertOne(body);
 
         return NextResponse.json(result, { status: 201 });
     } catch (err) {
