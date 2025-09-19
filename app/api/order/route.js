@@ -6,7 +6,7 @@ export async function GET() {
     try {
         const client = await clientPromise;
         const db = await client.db("mydb");
-        const products = await db.collection("orders").find().toArray();
+        const products = await db.collection("order").find({}).toArray();
         return NextResponse.json(products);
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });

@@ -11,7 +11,7 @@ export default function AccountPage() {
             title: 'Your Orders',
             description: 'View and track your recent purchases',
             icon: '📦',
-            href: '/your-orders',
+            href: '/info/your-orders',
             color: 'blue'
         },
         {
@@ -19,7 +19,7 @@ export default function AccountPage() {
             title: 'Order History',
             description: 'Browse your complete purchase history',
             icon: '🕒',
-            href: '/history',
+            href: '/info/history',
             color: 'black'
         },
         {
@@ -27,7 +27,7 @@ export default function AccountPage() {
             title: 'Account Settings',
             description: 'Manage your profile and preferences',
             icon: '👤',
-            href: '/account',
+            href: '/info/account',
             color: 'blue'
         }
     ];

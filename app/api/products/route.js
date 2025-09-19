@@ -19,7 +19,7 @@ export async function POST(req) {
         const body = await req.json();
         console.log(body)
         // ✅ You decide validation rules here
-        if (!body.name || !body.price) {
+        if (!body) {
             return NextResponse.json({ error: "name and price are required" }, { status: 400 });
         }
 
