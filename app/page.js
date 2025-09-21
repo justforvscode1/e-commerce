@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isVisible, setIsVisible] = useState({});
-
+  const [featuredProducts, setfeaturedProducts] = useState([])
   const heroSlides = [
     {
       id: 1,
@@ -30,52 +30,52 @@ export default function Home() {
     }
   ];
 
-  const featuredProducts = [
-    {
-      id: 1,
-      name: "Premium Wireless Headphones",
-      price: 299,
-      originalPrice: 399,
-      rating: 4.8,
-      reviews: 124,
-      category: "Electronics",
-      image: "/api/placeholder/300/300",
-      badge: "Best Seller"
-    },
-    {
-      id: 2,
-      name: "Designer Leather Jacket",
-      price: 189,
-      originalPrice: 249,
-      rating: 4.9,
-      reviews: 89,
-      category: "Fashion",
-      image: "/api/placeholder/300/300",
-      badge: "New Arrival"
-    },
-    {
-      id: 3,
-      name: "Smart Fitness Watch",
-      price: 229,
-      originalPrice: 299,
-      rating: 4.7,
-      reviews: 156,
-      category: "Electronics",
-      image: "/api/placeholder/300/300",
-      badge: "Trending"
-    },
-    {
-      id: 4,
-      name: "Minimalist Handbag",
-      price: 129,
-      originalPrice: 179,
-      rating: 4.8,
-      reviews: 201,
-      category: "Fashion",
-      image: "/api/placeholder/300/300",
-      badge: "Limited"
-    }
-  ];
+  // const featuredProducts = [
+  //     {
+  //       id: 1,
+  //       name: "Premium Wireless Headphones",
+  //       price: 299,
+  //       originalPrice: 399,
+  //       rating: 4.8,
+  //       reviews: 124,
+  //       category: "Electronics",
+  //       image: "/api/placeholder/300/300",
+  //       badge: "Best Seller"
+  //     },
+  //     {
+  //       id: 2,
+  //       name: "Designer Leather Jacket",
+  //       price: 189,
+  //       originalPrice: 249,
+  //       rating: 4.9,
+  //       reviews: 89,
+  //       category: "Fashion",
+  //       image: "/api/placeholder/300/300",
+  //       badge: "New Arrival"
+  //     },
+  //     {
+  //       id: 3,
+  //       name: "Smart Fitness Watch",
+  //       price: 229,
+  //       originalPrice: 299,
+  //       rating: 4.7,
+  //       reviews: 156,
+  //       category: "Electronics",
+  //       image: "/api/placeholder/300/300",
+  //       badge: "Trending"
+  //     },
+  //     {
+  //       id: 4,
+  //       name: "Minimalist Handbag",
+  //       price: 129,
+  //       originalPrice: 179,
+  //       rating: 4.8,
+  //       reviews: 201,
+  //       category: "Fashion",
+  //       image: "/api/placeholder/300/300",
+  //       badge: "Limited"
+  //     }
+  //   ];
 
   const categories = [
     {
@@ -95,6 +95,12 @@ export default function Home() {
   ];
 
   useEffect(() => {
+    (async () => {
+      const gettheitems = await fetch("/api/products")
+      const itmes = await gettheitems.json()
+      setfeaturedProducts(itmes.slice(itmes.length - 4))
+
+    })()
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 5000);
@@ -128,9 +134,9 @@ export default function Home() {
 
       <div className="min-h-screen bg-gray-50">
         {/* Hero Section */}
-        <section  className="relative h-[600px] overflow-hidden bg-gradient-to-br from-slate-100 to-gray-200">
+        <section className="relative h-[600px] overflow-hidden bg-gradient-to-br from-slate-100 to-gray-200">
           {heroSlides.map((slide, index) => (
-            <div 
+            <div
               key={slide.id}
               className={`absolute inset-0 transition-all duration-1000 ease-in-out ${index === currentSlide
                 ? 'opacity-100 translate-x-0'
@@ -154,7 +160,7 @@ export default function Home() {
                     </div>
                     <div className={`transition-all duration-700 delay-500 ${index === currentSlide ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                       }`}>
-                     <Link href={`/${slide.buttonText.slice(5,)}`} > <button className="bg-blue-600 text-white px-8 py-4 rounded-lg font-medium hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
+                      <Link href={`/${slide.buttonText.slice(5,)}`} > <button className="bg-blue-600 text-white px-8 py-4 rounded-lg font-medium hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
                         {slide.buttonText}
                       </button></Link>
                     </div>
@@ -216,9 +222,9 @@ export default function Home() {
                         <p className="text-sm opacity-75">{category.itemCount}</p>
                         <div className="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
                           <Link href={`/${category.name}`}>
-                          <button className="bg-white text-gray-900 px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors">
-                            Explore Collection
-                          </button>
+                            <button className="bg-white text-gray-900 px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+                              Explore Collection
+                            </button>
                           </Link>
                         </div>
                       </div>
@@ -243,37 +249,30 @@ export default function Home() {
                   Handpicked items just for you
                 </p>
               </div>
-              <button className="hidden md:flex items-center text-blue-600 font-medium hover:text-blue-700 transition-colors">
-                View All
-              </button>
+
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {featuredProducts.map((product, index) => (
-                <div
-                  key={product.id}
+                <Link key={product.id} href={`/products/${product.id}`}> <div
                   className={`group bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 ${isVisible['section-products']
                     ? `opacity-100 translate-y-0 delay-${index * 100}`
                     : 'opacity-0 translate-y-8'
                     }`}
                 >
                   <div className="relative overflow-hidden rounded-t-2xl">
-                    <div className="w-full h-64 bg-gradient-to-br from-gray-100 to-gray-200"></div>
-                    <div className="absolute top-4 left-4">
+                    <Image src={product.image[0]} width={500} height={500} alt="image" className="w-full h-64 bg-gradient-to-br from-gray-100 to-gray-200" />
+                    {/* <div className="absolute top-4 left-4">
                       <span className="bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-medium">
                         {product.badge}
                       </span>
-                    </div>
+                    </div> */}
                     <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                      <button className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors">
-                      </button>
+                      {/* <button className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors">
+                      </button> */}
                     </div>
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300"></div>
-                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                      <button className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-lg">
-                        Quick View
-                      </button>
-                    </div>
+
                   </div>
 
                   <div className="p-6">
@@ -301,7 +300,7 @@ export default function Home() {
                       {product.reviews} reviews
                     </p>
                   </div>
-                </div>
+                </div></Link>
               ))}
             </div>
           </div>

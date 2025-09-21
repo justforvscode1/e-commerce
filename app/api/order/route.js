@@ -32,3 +32,30 @@ export async function POST(req) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
+
+export async function PATCH(request) {
+    try {
+
+
+        const data = await request.json()
+        console.log(data)
+        if (!data.status) {
+            return NextResponse.json({ "error": "status is missing", data })
+        }
+        if (!data.orderId) {
+            return NextResponse.json({ "error": "ordderId is missing", data })
+        }
+        const client = await clientPromise;
+        const db = await client.db("mydb");
+        const result = await db.collection("order").findOneAndUpdate(
+            { orderId: data.orderId },
+            { $set: { status: data.status } },
+            { returnDocument: 'after' }
+        );
+        return NextResponse.json({ "success": "true", result })
+    } catch (error) {
+        return NextResponse.json({ "internal server error": error })
+        
+    }
+
+}

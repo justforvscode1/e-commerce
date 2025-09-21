@@ -5,29 +5,43 @@ const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
-const [length, setlength] = useState()
+    const [filteredProducts, setfilteredProducts] = useState([])
+    const [length, setlength] = useState()
     const categories = [
         { name: 'Fashion', items: ['Men', 'Women', 'Kids', 'Accessories'] },
         { name: 'Electronics', items: ['Laptops', 'Smartphones', 'Headphones', 'Cameras'] },
     ];
 
-    const handleSearch = (e) => {
+    const handleSearch = async (e) => {
         e.preventDefault();
-        if (searchQuery.trim()) {
-            alert(`Searching for: ${searchQuery}`);
-            // Add your search logic here
+        try {
+            const search = await fetch("/api/products");
+            const response = await search.json();
+            const searchTerm = e.target.value.toLowerCase();
+
+            // Filter products while keeping all product data
+            const filtered = response.filter(item =>
+                item.name.toLowerCase().includes(searchTerm) ||
+                item.description.toLowerCase().includes(searchTerm)
+            );
+
+            setfilteredProducts(filtered);
+        } catch (error) {
+            console.error("Search error:", error);
         }
     };
-useEffect(() => {
 
-    const cartlength = async () => {
 
-      const cart = await fetch("/api/cart")
-      const response = await cart.json()
-      setlength(response.length)
-    }
-    cartlength()
-  }, [])
+    useEffect(() => {
+
+        const cartlength = async () => {
+
+            const cart = await fetch("/api/cart")
+            const response = await cart.json()
+            setlength(response.length)
+        }
+        cartlength()
+    }, [])
     return (
         <nav className="bg-white shadow-md sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4">
@@ -86,7 +100,7 @@ useEffect(() => {
 
                     {/* Search Bar */}
                     < div className="hidden md:flex flex-1 max-w-lg mx-8" >
-                        <form onSubmit={handleSearch} className="relative w-full">
+                        <form onChange={handleSearch} className="relative w-full">
                             <input
                                 type="text"
                                 value={searchQuery}
@@ -107,7 +121,7 @@ useEffect(() => {
 
 
                         {/* User Account */}
-                        <Link href={'/settings'}><button className="p-2 text-gray-600 hover:text-blue-600 transition-all duration-200 hover:scale-110">
+                        <Link href={'/info'}><button className="p-2 text-gray-600 hover:text-blue-600 transition-all duration-200 hover:scale-110">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
@@ -139,6 +153,51 @@ useEffect(() => {
                     </div>
                 </div>
             </div>
+
+            {/* Search Results - Below Navbar */}
+            {searchQuery && filteredProducts.length > 0 && (
+                <div className="bg-white border-t border-gray-200 shadow-lg max-w-7xl mx-auto px-4">
+                    <div className="py-4">
+                        <div className="mb-3">
+                            <p className="text-sm text-gray-600">
+                                Found {filteredProducts.length} result(s) for "{searchQuery}"
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
+                            {filteredProducts.map((product, index) => (
+                                <Link key={product._id} href={`/products/${product.id}`}><div className="hover:translate-y-0.5 hover:shadow-2xl bg-white border border-gray-200 rounded-lg shadow-sm transition-shadow duration-200 overflow-hidden">
+                                    <div className="aspect-w-16 aspect-h-9">
+                                        <img
+                                            src={product.image[0]}
+                                            alt={product.name}
+                                            className="w-full h-32 object-cover"
+                                        />
+                                    </div>
+                                    <div className="p-4">
+                                        <h3 className="font-semibold text-gray-900 text-sm mb-1 truncate">
+                                            {product.name}
+                                        </h3>
+                                        <p className="text-xs text-gray-600 line-clamp-2">
+                                            {product.description?.substring(0, 80)}...
+                                        </p>
+
+                                    </div>
+                                </div></Link>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* No Results */}
+            {searchQuery && filteredProducts.length === 0 && (
+                <div className="bg-white border-t border-gray-200 shadow-lg max-w-7xl mx-auto px-4">
+                    <div className="py-6 text-center">
+                        <p className="text-gray-500">No products found for "{searchQuery}"</p>
+                        <p className="text-sm text-gray-400 mt-1">Try searching with different keywords</p>
+                    </div>
+                </div>
+            )}
 
             {/* Mobile Menu */}
             <div className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'

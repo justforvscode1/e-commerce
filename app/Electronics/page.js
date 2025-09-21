@@ -54,7 +54,7 @@ const ElectronicsCollections = () => {
                 redirect: "follow"
             };
 
-            const adding = await fetch("http://localhost:3000/api/cart", requestOptions)
+            const adding = await fetch("/api/cart", requestOptions)
             const response = await adding.json()
 
             if (response === "already added") {

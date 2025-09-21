@@ -15,6 +15,8 @@ export default function ProductPage({ params }) {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [pictureno, setpictureno] = useState(0)
   const [desclength, setdesclength] = useState(250)
+  const [limit, setlimit] = useState({})
+
   const [show, setshow] = useState(false)
   const [length, setlength] = useState()
   const [products, setproducts] = useState([])
@@ -37,6 +39,32 @@ export default function ProductPage({ params }) {
     gettheproducts()
 
   }, [])
+
+  const updateQuantity = (id, newQuantity, stock) => {
+console.log(stock)
+    if (newQuantity > stock) {
+      // Set stock limit for specific item
+      setlimit(prev => ({
+        ...prev,
+        [id]: true
+      }));
+      return;
+    }
+
+    // Clear stock limit for this item if it's valid
+    setlimit(prev => ({
+      ...prev,
+      [id]: false
+    }));
+    setQuantity(newQuantity);
+
+    setproducts(items =>
+      items.map(item =>
+        item.id === id ? { ...item, quantity: newQuantity } : item
+      )
+    );
+
+  };
 
   const id = decodeURIComponent(use(params).id);
   useEffect(() => {
@@ -68,7 +96,7 @@ export default function ProductPage({ params }) {
       // Simulate API call
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
-      products[0].quantity = 1
+      products[0].quantity = quantity
       const raw = JSON.stringify(products[0]);
 
       const requestOptions = {
@@ -252,7 +280,7 @@ export default function ProductPage({ params }) {
                 <label className="block text-sm font-semibold text-gray-700 mb-3">Quantity</label>
                 <div className="flex items-center space-x-4">
                   <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    onClick={() => updateQuantity(product.id, quantity - 1, product.stockCount)}
                     className="w-12 h-12 rounded-xl border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 hover:scale-105 active:scale-95"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -261,7 +289,7 @@ export default function ProductPage({ params }) {
                   </button>
                   <span className="w-16 text-center font-bold text-xl bg-gray-50 py-3 rounded-xl">{quantity}</span>
                   <button
-                    onClick={() => setQuantity(quantity + 1)}
+                    onClick={() => updateQuantity(product.id, quantity + 1, product.stockCount)}
                     className="w-12 h-12 rounded-xl border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 hover:scale-105 active:scale-95"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -269,6 +297,7 @@ export default function ProductPage({ params }) {
                     </svg>
                   </button>
                 </div>
+                <div className={`text-center text-red-500 mt-2 ${limit[product._id] ? "block" : "hidden"}`}>owner only have ${product.stockCount} items</div>
               </div>
 
               {/* Action Buttons */}
@@ -291,10 +320,6 @@ export default function ProductPage({ params }) {
                       <span>Add to Cart</span>
                     </div>
                   )}
-                </button>
-
-                <button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold py-4 px-8 rounded-2xl transition-all duration-200 transform hover:scale-[1.02] border border-gray-300">
-                  Buy Now
                 </button>
               </div>
 
@@ -323,7 +348,7 @@ export default function ProductPage({ params }) {
           </div>
         </div>
       ))}
-    </div>
+    </div >
   </>
   );
 }

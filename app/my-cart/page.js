@@ -9,6 +9,7 @@ const CartPage = () => {
 
     const [promoCode, setPromoCode] = useState('');
     const [discount, setDiscount] = useState(0);
+    const [limit, setlimit] = useState({})
     const [refresh, setrefresh] = useState(true)
     const [promoApplied, setPromoApplied] = useState(false);
 
@@ -19,11 +20,23 @@ const CartPage = () => {
     const tax = subtotal * 0.0875; // 8.75% tax
     const total = subtotal + shipping + tax - discount;
     const router = useRouter()
-    const updateQuantity = (id, newQuantity) => {
-        if (newQuantity <= 0) {
-            removeItem(id);
+    const updateQuantity = (id, newQuantity, stock) => {
+
+        if (newQuantity > stock) {
+            // Set stock limit for specific item
+            setlimit(prev => ({
+                ...prev,
+                [id]: true
+            }));
             return;
         }
+
+        // Clear stock limit for this item if it's valid
+        setlimit(prev => ({
+            ...prev,
+            [id]: false
+        }));
+
         setCartItems(items =>
             items.map(item =>
                 item.id === id ? { ...item, quantity: newQuantity } : item
@@ -52,7 +65,6 @@ const CartPage = () => {
 
     const removeItem = async (id) => {
         try {
-
 
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
@@ -202,7 +214,7 @@ const CartPage = () => {
                                                     <label className="text-sm font-medium text-gray-700 mr-3">Qty:</label>
                                                     <div className="flex items-center border border-gray-300 rounded-lg">
                                                         <button
-                                                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                            onClick={() => updateQuantity(item.id, item.quantity - 1, item.stockCount)}
                                                             className="p-2.5  hover:bg-gray-50 transition-colors border-r border-gray-300"
                                                             disabled={item.quantity <= 1}
                                                         >
@@ -212,7 +224,7 @@ const CartPage = () => {
                                                         </button>
                                                         <span className="px-4 py-2.5  font-medium min-w-[60px] text-center">{item.quantity}</span>
                                                         <button
-                                                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                            onClick={() => updateQuantity(item.id, item.quantity + 1, item.stockCount)}
                                                             className="p-2.5 hover:bg-gray-50 transition-colors border-l border-gray-300"
                                                         >
                                                             <svg className="w-4 h-4 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -221,7 +233,6 @@ const CartPage = () => {
                                                         </button>
                                                     </div>
                                                 </div>
-
                                                 {/* Price */}
                                                 <div className="text-right">
                                                     <div className="text-xl font-bold text-gray-900">
@@ -236,6 +247,7 @@ const CartPage = () => {
                                             </div>
                                         </div>
                                     </div>
+                                    <div className={`text-center text-red-500 mt-2 ${limit[item._id] ? "block" : "hidden"}`}>owner only have ${item.stockCount} items</div>
                                 </div>
                             ))}
                         </div>

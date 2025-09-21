@@ -112,12 +112,12 @@ export default function PendingOrdersPage() {
             const orders = await fetch("/api/order")
             const response = await orders.json()
             console.log(response)
-
-            setOrders(response);
+            const remain = response.filter(items => items.status != "delivered")
+            setOrders(remain);
             setLoading(false);
 
         })()
-    }, []);
+    }, [orders]);
 
     const toggleOrderExpansion = (orderId) => {
         setExpandedOrder(expandedOrder === orderId ? null : orderId);
