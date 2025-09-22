@@ -50,7 +50,7 @@ const FashionCollections = ({params}) => {
                 redirect: "follow"
             };
 
-            const adding = await fetch("http://localhost:3000/api/cart", requestOptions)
+            const adding = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/cart`, requestOptions)
             const response = await adding.json()
             if (response === "already added") {
                 toast.info('item is aleady in the  cart')

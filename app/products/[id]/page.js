@@ -26,7 +26,7 @@ export default function ProductPage({ params }) {
   useEffect(() => {
     const gettheproducts = async () => {
 
-      const allproducts = await fetch("/api/products")
+      const allproducts = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/products`)
       const response = await allproducts.json()
       const productdata = response.filter(items => items.id == (id))
       if (!productdata) {

@@ -16,7 +16,7 @@ const Navbar = () => {
     const handleSearch = async (e) => {
         e.preventDefault();
         try {
-            const search = await fetch("/api/products");
+            const search = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/products`);
             const response = await search.json();
             const searchTerm = e.target.value.toLowerCase();
 

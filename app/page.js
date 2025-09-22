@@ -96,7 +96,7 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
-      const gettheitems = await fetch("/api/products")
+      const gettheitems = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/products`)
       const itmes = await gettheitems.json()
       setfeaturedProducts(itmes.slice(itmes.length - 4))
 
