@@ -65,7 +65,7 @@ const Navbar = () => {
                                 onMouseLeave={() => setIsDropdownOpen(null)} >
 
                                 <button className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 py-2">
-                                    <Link key={category.name} href={`/${category.name}`}><span>{category.name}</span></Link>
+                                    <Link key={category.name} href={`/${category.name}/all`}><span>{category.name}</span></Link>
                                     <svg className={`w-4 h-4 transition-transform duration-300 ${isDropdownOpen === category.name ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                     </svg>
@@ -80,7 +80,7 @@ const Navbar = () => {
                                         {category.items.map((item, index) => (
                                             <a
                                                 key={item}
-                                                href="#"
+                                                href={`/${category.name}/${item}`}
                                                 className={`block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 transform ${isDropdownOpen === category.name
                                                     ? 'translate-x-0 opacity-100'
                                                     : 'translate-x-2 opacity-0'
@@ -240,7 +240,7 @@ const Navbar = () => {
                                         {category.items.map((item) => (
                                             <a
                                                 key={item}
-                                                href="#"
+                                                  href={`/${category.name}/${item}`}
                                                 className="block pl-4 py-2 text-sm text-gray-600 hover:text-blue-600 transition-colors duration-200"
                                             >
                                                 {item}

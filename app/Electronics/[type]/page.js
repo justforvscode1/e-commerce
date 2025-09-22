@@ -3,11 +3,13 @@
 import Navbar from '@/components/Navbar';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 
-const ElectronicsCollections = () => {
-    const [activeCategory, setActiveCategory] = useState('all');
+const ElectronicsCollections = ({params}) => {
+  const type = decodeURIComponent(use(params).type);
+  console.log(type)
+    const [activeCategory, setActiveCategory] = useState((type).toLocaleLowerCase());
     const [isLoading, setIsLoading] = useState(true);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [products, setproducts] = useState([])

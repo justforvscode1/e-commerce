@@ -40,7 +40,7 @@ export default function ProductPage({ params }) {
   }, [])
 
   const updateQuantity = (id, newQuantity, stock) => {
-    if (newQuantity<0) {
+    if (newQuantity < 0) {
       return
     }
     if (newQuantity > stock) {

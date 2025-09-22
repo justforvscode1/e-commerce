@@ -3,10 +3,12 @@ import Navbar from '@/components/Navbar';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ToastContainer, toast } from 'react-toastify';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 
-const FashionCollections = () => {
-    const [activeCategory, setActiveCategory] = useState('all');
+const FashionCollections = ({params}) => {
+    const type = decodeURIComponent(use(params).Ftype);
+      console.log(type)
+    const [activeCategory, setActiveCategory] = useState(type.toLocaleLowerCase());
     const [isLoading, setIsLoading] = useState(true);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [products, setproducts] = useState([])
@@ -141,7 +143,7 @@ const FashionCollections = () => {
                                         className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
                                     />
 
-                                  
+
                                 </div></Link>
 
                                 <div className="p-6">
