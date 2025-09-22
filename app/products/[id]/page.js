@@ -10,6 +10,8 @@ import Link from 'next/link';
 
 
 export default function ProductPage({ params }) {
+  const id = decodeURIComponent(use(params).id);
+
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -37,7 +39,7 @@ export default function ProductPage({ params }) {
     }
     gettheproducts()
 
-  }, [])
+  }, [id])
 
   const updateQuantity = (id, newQuantity, stock) => {
     if (newQuantity < 0) {
@@ -67,7 +69,6 @@ export default function ProductPage({ params }) {
 
   };
 
-  const id = decodeURIComponent(use(params).id);
   useEffect(() => {
 
 

@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 const Navbar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(null);
@@ -167,7 +168,7 @@ const Navbar = () => {
                             {filteredProducts.map((product, index) => (
                                 <Link key={product._id} href={`/products/${product.id}`}><div className="hover:translate-y-0.5 hover:shadow-2xl bg-white border border-gray-200 rounded-lg shadow-sm transition-shadow duration-200 overflow-hidden">
                                     <div className="aspect-w-16 aspect-h-9">
-                                        <img
+                                        <Image height={500} width={500}
                                             src={product.image[0]}
                                             alt={product.name}
                                             className="w-full h-32 object-cover"

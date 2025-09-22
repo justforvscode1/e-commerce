@@ -1,4 +1,5 @@
 "use client"
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
 export default function ShipperDashboard() {
@@ -542,7 +543,7 @@ export default function ShipperDashboard() {
                                 className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
                               >
                                 <div className="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
-                                  <img
+                                  <Image width={500} height={500}
                                     src={item.image[0]}
                                     alt={item.name}
                                     className="w-full h-full object-cover"
