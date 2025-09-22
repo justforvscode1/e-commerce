@@ -26,7 +26,6 @@ export default function ProductPage({ params }) {
 
       const allproducts = await fetch("/api/products")
       const response = await allproducts.json()
-      console.log(response)
       const productdata = response.filter(items => items.id == (id))
       if (!productdata) {
         notFound()
@@ -41,7 +40,9 @@ export default function ProductPage({ params }) {
   }, [])
 
   const updateQuantity = (id, newQuantity, stock) => {
-console.log(stock)
+    if (newQuantity<0) {
+      return
+    }
     if (newQuantity > stock) {
       // Set stock limit for specific item
       setlimit(prev => ({
@@ -110,7 +111,6 @@ console.log(stock)
       const response = await sending.json()
       await new Promise(resolve => setTimeout(resolve, 800));
       setIsAddingToCart(false);
-      console.log(response)
       if (response === "already added") {
         toast.info('item is aleady in the  cart')
       } else {

@@ -371,9 +371,7 @@ export default function UserOrdersDashboard() {
         throw new Error(data.error || 'Failed to cancel order');
       }
 
-      if (data.success) {
-        console.log('Order cancelled successfully:', data.message);
-        
+      if (data.success) {        
         // Update local state
         setOrders(prevOrders =>
           prevOrders.map(order =>

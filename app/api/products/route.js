@@ -17,7 +17,6 @@ export async function GET() {
 export async function POST(req) {
     try {
         const body = await req.json();
-        console.log(body)
         // ✅ You decide validation rules here
         if (!body) {
             return NextResponse.json({ error: "name and price are required" }, { status: 400 });

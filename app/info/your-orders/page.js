@@ -111,7 +111,6 @@ export default function PendingOrdersPage() {
         (async () => {
             const orders = await fetch("/api/order")
             const response = await orders.json()
-            console.log(response)
             const remain = response.filter(items => items.status != "delivered")
             setOrders(remain);
             setLoading(false);

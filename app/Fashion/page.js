@@ -16,7 +16,6 @@ const FashionCollections = () => {
 
             const allproducts = await fetch("/api/products")
             const response = await allproducts.json()
-            console.log(response)
 
 
             setproducts(response.filter(items => items.category === "fashion"))
@@ -40,7 +39,6 @@ const FashionCollections = () => {
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
             product.quantity = 1
-            console.log(product)
             const raw = JSON.stringify(product);
 
             const requestOptions = {
@@ -78,7 +76,6 @@ const FashionCollections = () => {
             const filtered = activeCategory === 'all'
                 ? products
                 : products.filter(product => product.type === activeCategory);
-            console.log(filtered)
             setFilteredProducts(filtered);
             setIsLoading(false);
         }, 300);
@@ -139,22 +136,12 @@ const FashionCollections = () => {
                             >
                                 <Link href={`/products/${product.id}`}> <div className="relative overflow-hidden">
                                     <Image width={500} height={500}
-                                        src={product.image[0]}
+                                        src={product.images[0]}
                                         alt={product.name}
                                         className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
                                     />
 
-                                    {product.isNew && (
-                                        <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                            New
-                                        </div>
-                                    )}
-
-                                    {product.originalPrice && (
-                                        <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                            Sale
-                                        </div>
-                                    )}
+                                  
                                 </div></Link>
 
                                 <div className="p-6">

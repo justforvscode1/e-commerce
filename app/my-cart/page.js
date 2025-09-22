@@ -47,7 +47,6 @@ const CartPage = () => {
         const getcartinfo = async () => {
             const cart = await fetch("/api/cart")
             const response = await cart.json()
-            console.log(response)
             setCartItems(response)
         }
 

@@ -86,7 +86,6 @@ export default function AdminProductPage() {
 
             const response = await senddata.json()
             toast.success("successfully added your product")
-            console.log(response)
         } catch (error) {
 
             toast.error(" error occured . try later")

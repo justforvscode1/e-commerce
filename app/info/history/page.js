@@ -15,7 +15,6 @@ export default function CompletedOrdersPage() {
             try {
                 const orders = await fetch("/api/order");
                 const response = await orders.json();
-                console.log(response);
                 setOrders(response);
             } catch (error) {
                 console.error('Error fetching completed orders:', error);

@@ -36,7 +36,6 @@ const CheckoutPage = () => {
         const getcartitems = async () => {
             const cart = await fetch("/api/cart")
             const response = await cart.json()
-            console.log(response)
             setorderitems(response)
         }
         getcartitems()
@@ -113,7 +112,6 @@ const CheckoutPage = () => {
                     body: JSON.stringify(finaldata)
                 })
                 const response = await sendcheckout.json()
-                console.log(response)
 
 
                 const userId = localStorage.getItem("userId")

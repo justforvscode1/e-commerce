@@ -19,7 +19,6 @@ export async function POST(req) {
     try {
         const body = await req.json();
         const { _id, ...cleanbody } = body
-        console.log(body)
         const client = await clientPromise;
         const db = await client.db("mydb");
         // ✅ You decide validation rules here
@@ -45,7 +44,6 @@ export async function DELETE(req) {
         const db = await client.db("mydb");
         const body = await req.json();
         const { id, userId } = body;
-        console.log(id)
         if (userId) {
             const results = await db.collection("cart").deleteMany({ userID:userId })
             return NextResponse.json({ results: "cart is cleared" }, { status: 200 });

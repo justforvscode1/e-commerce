@@ -18,7 +18,6 @@ const ElectronicsCollections = () => {
 
             const allproducts = await fetch("/api/products")
             const response = await allproducts.json()
-            console.log(response)
 
 
             setproducts(response.filter(items => items.category === "electronics"))
@@ -146,7 +145,7 @@ const ElectronicsCollections = () => {
                             >
                                 <Link href={`/products/${product.id}`} key={product.id}> <div className="relative overflow-hidden">
                                     <Image width={500} height={500}
-                                        src={product.image[0]}
+                                        src={product.images[0]}
                                         alt={product.name}
                                         className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
                                     />

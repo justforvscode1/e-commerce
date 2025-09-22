@@ -261,7 +261,7 @@ export default function Home() {
                     }`}
                 >
                   <div className="relative overflow-hidden rounded-t-2xl">
-                    <Image src={product.image[0]} width={500} height={500} alt="image" className="w-full h-64 bg-gradient-to-br from-gray-100 to-gray-200" />
+                    <Image src={product.images[0]} width={500} height={500} alt="image" className="w-full h-64 bg-gradient-to-br from-gray-100 to-gray-200" />
                     {/* <div className="absolute top-4 left-4">
                       <span className="bg-blue-600 text-white text-xs px-3 py-1 rounded-full font-medium">
                         {product.badge}
