@@ -1,4 +1,5 @@
 "use client"
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
 export default function UserOrdersDashboard() {
@@ -700,7 +701,7 @@ export default function UserOrdersDashboard() {
                                 className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
                               >
                                 <div className="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
-                                  <img
+                                  <Image width={500} height={500}
                                     src={item.image[0]}
                                     alt={item.name}
                                     className="w-full h-full object-cover"
@@ -777,7 +778,7 @@ export default function UserOrdersDashboard() {
                   </svg>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">No orders found</h3>
-                <p className="text-gray-600 mb-4">You haven't placed any orders yet or no orders match your filter.</p>
+                <p className="text-gray-600 mb-4">You haven&apos;t placed any orders yet or no orders match your filter.</p>
                 <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transform transition-all duration-200 hover:scale-105">
                   Start Shopping
                 </button>
@@ -802,7 +803,7 @@ export default function UserOrdersDashboard() {
                 Are you sure you want to cancel this order?
               </p>
               <p className="text-sm text-gray-500">
-                This action cannot be undone. If you've already paid, a refund will be processed within 3-5 business days.
+                This action cannot be undone. If you&apos;ve already paid, a refund will be processed within 3-5 business days.
               </p>
             </div>
 

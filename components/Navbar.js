@@ -193,7 +193,7 @@ const Navbar = () => {
             {searchQuery && filteredProducts.length === 0 && (
                 <div className="bg-white border-t border-gray-200 shadow-lg max-w-7xl mx-auto px-4">
                     <div className="py-6 text-center">
-                        <p className="text-gray-500">No products found for "{searchQuery}"</p>
+                        <p className="text-gray-500">No products found for &quot;{searchQuery}&quot;</p>
                         <p className="text-sm text-gray-400 mt-1">Try searching with different keywords</p>
                     </div>
                 </div>
