@@ -437,7 +437,7 @@ export default function PendingOrdersPage() {
                             </svg>
                         </div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">No pending orders</h3>
-                        <p className="text-gray-600">You don't have any pending orders at the moment.</p>
+                        <p className="text-gray-600">You don&lsquo;t have any pending orders at the moment.</p>
                     </div>
                 )}
             </div>
