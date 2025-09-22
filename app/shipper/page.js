@@ -320,7 +320,7 @@ export default function ShipperDashboard() {
 
             {/* Quick Stats */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">Today's Summary</h4>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Today&apos;s Summary</h4>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Pending</span>
