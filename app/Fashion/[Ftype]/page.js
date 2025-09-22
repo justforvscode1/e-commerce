@@ -16,7 +16,7 @@ const FashionCollections = ({params}) => {
     useEffect(() => {
         const gettheproducts = async () => {
 
-            const allproducts = await fetch("/api/products")
+            const allproducts = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/products`)
             const response = await allproducts.json()
 
 
