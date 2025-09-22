@@ -325,7 +325,7 @@ export default function ProductPage({ params }) {
 
               {/* Features */}
               <div className="border-t border-gray-200 pt-8 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-                <h3 className="text-xl font-bold text-gray-900 mb-6">What's Included</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-6">What&lsquo;s Included</h3>
                 <div className="space-y-4">
                   {[
                     'Premium Quality Materials',
