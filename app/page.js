@@ -87,7 +87,7 @@ export default function Home() {
 
   return (
     <div>
-      <Navbar />
+      <Navbar />++
 
 
 
@@ -119,7 +119,7 @@ export default function Home() {
                     </div>
                     <div className={`transition-all duration-700 delay-500 ${index === currentSlide ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                       }`}>
-                      <Link href={`/${slide.buttonText.slice(5,)}`} > <button className="bg-blue-600 text-white px-8 py-4 rounded-lg font-medium hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
+                      <Link href={`/${slide.buttonText.slice(5)}/all`} > <button className="bg-blue-600 text-white px-8 py-4 rounded-lg font-medium hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
                         {slide.buttonText}
                       </button></Link>
                     </div>
