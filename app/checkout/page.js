@@ -8,6 +8,7 @@ const CheckoutPage = () => {
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [newsletterSubscribe, setNewsletterSubscribe] = useState(false);
     const [orderItems, setorderitems] = useState([])
+    const [userId, setuserId] = useState(null)
     const [errorhandle, seterrorhandle] = useState(false)
     const router = useRouter()
     const [shippingForm, setShippingForm] = useState({
@@ -32,7 +33,8 @@ const CheckoutPage = () => {
 
     // Sample order data
     useEffect(() => {
-
+        const userId = localStorage.getItem("userId")
+        setuserId(userId)
         const getcartitems = async () => {
             const cart = await fetch(`/api/cart`)
             const response = await cart.json()
@@ -114,7 +116,6 @@ const CheckoutPage = () => {
                 const response = await sendcheckout.json()
 
 
-                const userId = localStorage.getItem("userId")
                 const myHeader = new Headers();
                 myHeaders.append("Content-Type", "application/json");
                 const requestOptions = {
