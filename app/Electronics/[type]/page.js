@@ -150,18 +150,7 @@ const ElectronicsCollections = ({params}) => {
                                         className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
                                     />
 
-                                    {product.isNew && (
-                                        <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                            New
-                                        </div>
-                                    )}
-
-                                    {product.originalPrice && (
-                                        <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                            Sale
-                                        </div>
-                                    )}
-
+                                   
 
                                 </div></Link>
 
