@@ -180,7 +180,7 @@ export default function Home() {
                         <p className="text-lg opacity-90 mb-2">{category.description}</p>
                         <p className="text-sm opacity-75">{category.itemCount}</p>
                         <div className="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
-                          <Link href={`/${category.name}`}>
+                          <Link href={`/${category.name}/all`}>
                             <button className="bg-white text-gray-900 px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors">
                               Explore Collection
                             </button>
