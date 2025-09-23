@@ -45,7 +45,7 @@ export async function DELETE(req) {
         const body = await req.json();
         const { id, userId } = body;
         if (userId) {
-            const results = await db.collection("cart").deleteMany({ userID:userId })
+            const results = await db.collection("cart").deleteMany({ userID: userId })
             return NextResponse.json({ results: "cart is cleared" }, { status: 200 });
         }
 
@@ -57,4 +57,29 @@ export async function DELETE(req) {
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
+}
+export async function PATCH(request) {
+    try {
+
+        const client = await clientPromise;
+        const db = await client.db("mydb");
+
+        const data = await request.json()
+        console.log(data)
+
+        if (!data.quantity) {
+            return NextResponse.json({ "error": "quantity is missing", data })
+        }
+
+        const result = await db.collection("cart").findOneAndUpdate(
+            { id: data.id },
+            { $set: { quantity: data.quantity } },
+            { returnDocument: 'after' }
+        );
+        return NextResponse.json({ "success": "true", result })
+    } catch (error) {
+        return NextResponse.json({ "internal server error": error })
+
+    }
+
 }

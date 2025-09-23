@@ -9,6 +9,7 @@ const CartPage = () => {
 
     const [promoCode, setPromoCode] = useState('');
     const [discount, setDiscount] = useState(0);
+    const [userId, setuserId] = useState()
     const [limit, setlimit] = useState({})
     const [refresh, setrefresh] = useState(true)
     const [promoApplied, setPromoApplied] = useState(false);
@@ -20,8 +21,14 @@ const CartPage = () => {
     const tax = subtotal * 0.0875; // 8.75% tax
     const total = subtotal + shipping + tax - discount;
     const router = useRouter()
-    const updateQuantity = (id, newQuantity, stock) => {
 
+    useEffect(() => {
+
+        const userid = localStorage.getItem("userId")
+        setuserId(userid)
+    }, [])
+
+    const updateQuantity = async (id, newQuantity, stock) => {
         if (newQuantity > stock) {
             // Set stock limit for specific item
             setlimit(prev => ({
@@ -37,11 +44,47 @@ const CartPage = () => {
             [id]: false
         }));
 
-        setCartItems(items =>
-            items.map(item =>
-                item.id === id ? { ...item, quantity: newQuantity } : item
-            )
-        );
+        // Update local state first for immediate UI response
+
+        // Then make API call to update server
+        try {
+            const response = await fetch(`/api/cart`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+
+                },
+                body: JSON.stringify({
+                    quantity: newQuantity,
+                    id
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update quantity');
+            }
+
+            // Optional: Handle response data if needed
+            const updatedItem = await response.json();
+            console.log('Quantity updated successfully:', updatedItem);
+            if (updatedItem.success) {
+
+                setCartItems(items =>
+                    items.map(item =>
+                        item.id === id ? { ...item, quantity: newQuantity } : item
+                    )
+                );
+            }
+        } catch (error) {
+            console.error('Error updating quantity:', error);
+
+            // Revert local state if API call fails
+            setCartItems(items =>
+                items.map(item =>
+                    item.id === id ? { ...item, quantity: item.quantity } : item
+                )
+            );
+        }
     };
     useEffect(() => {
         const getcartinfo = async () => {
@@ -101,7 +144,7 @@ const CartPage = () => {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         product.quantity = 1
-        product.userID = local
+
         const raw = JSON.stringify(product);
 
         const requestOptions = {
@@ -365,7 +408,7 @@ const CartPage = () => {
 
                             <Link href="/checkout">
                                 <button onClick={() => {
-                                  sendingorder(cartItems)
+                                    sendingorder(cartItems)
                                 }
                                 } className="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition-all duration-200 mb-3">
                                     Proceed to Checkout
