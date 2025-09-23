@@ -30,52 +30,7 @@ export default function Home() {
     }
   ];
 
-  // const featuredProducts = [
-  //     {
-  //       id: 1,
-  //       name: "Premium Wireless Headphones",
-  //       price: 299,
-  //       originalPrice: 399,
-  //       rating: 4.8,
-  //       reviews: 124,
-  //       category: "Electronics",
-  //       image: "/api/placeholder/300/300",
-  //       badge: "Best Seller"
-  //     },
-  //     {
-  //       id: 2,
-  //       name: "Designer Leather Jacket",
-  //       price: 189,
-  //       originalPrice: 249,
-  //       rating: 4.9,
-  //       reviews: 89,
-  //       category: "Fashion",
-  //       image: "/api/placeholder/300/300",
-  //       badge: "New Arrival"
-  //     },
-  //     {
-  //       id: 3,
-  //       name: "Smart Fitness Watch",
-  //       price: 229,
-  //       originalPrice: 299,
-  //       rating: 4.7,
-  //       reviews: 156,
-  //       category: "Electronics",
-  //       image: "/api/placeholder/300/300",
-  //       badge: "Trending"
-  //     },
-  //     {
-  //       id: 4,
-  //       name: "Minimalist Handbag",
-  //       price: 129,
-  //       originalPrice: 179,
-  //       rating: 4.8,
-  //       reviews: 201,
-  //       category: "Fashion",
-  //       image: "/api/placeholder/300/300",
-  //       badge: "Limited"
-  //     }
-  //   ];
+
 
   const categories = [
     {
@@ -96,16 +51,20 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
-      const gettheitems = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/products`)
+      const gettheitems = await fetch(`/api/products`)
       const itmes = await gettheitems.json()
-      setfeaturedProducts(itmes.slice(itmes.length - 4))
+      if (itmes) {
+        setfeaturedProducts(itmes.slice(itmes.length - 4))
+      } else{
+        console.log("items is empty")
+      }
 
     })()
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [heroSlides]);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

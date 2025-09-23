@@ -26,7 +26,7 @@ export default function ProductPage({ params }) {
   useEffect(() => {
     const gettheproducts = async () => {
 
-      const allproducts = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/products`)
+      const allproducts = await fetch(`/api/products`)
       const response = await allproducts.json()
       const productdata = response.filter(items => items.id == (id))
       if (!productdata) {
@@ -108,7 +108,7 @@ export default function ProductPage({ params }) {
         redirect: "follow"
       };
 
-      const sending = await fetch("http://localhost:3000/api/cart", requestOptions)
+      const sending = await fetch("/api/cart", requestOptions)
       const response = await sending.json()
       await new Promise(resolve => setTimeout(resolve, 800));
       setIsAddingToCart(false);

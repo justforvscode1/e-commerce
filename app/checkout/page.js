@@ -34,7 +34,7 @@ const CheckoutPage = () => {
     useEffect(() => {
 
         const getcartitems = async () => {
-            const cart = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/cart`)
+            const cart = await fetch(`/api/cart`)
             const response = await cart.json()
             setorderitems(response)
         }
@@ -123,7 +123,7 @@ const CheckoutPage = () => {
                     body: JSON.stringify({ userId }),
                 };
 
-                fetch(`${process.env.NEXT_PUBLIC_HOST}/api/cart`, requestOptions)
+                fetch(`/api/cart`, requestOptions)
                 toast.success("Your order has been placed")
                 setTimeout(() => {
 

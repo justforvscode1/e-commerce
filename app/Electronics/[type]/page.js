@@ -1,5 +1,4 @@
 "use client"
-"use client"
 import Navbar from '@/components/Navbar';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -17,7 +16,7 @@ const ElectronicsCollections = ({params}) => {
     useEffect(() => {
         const gettheproducts = async () => {
 
-            const allproducts = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/products`)
+            const allproducts = await fetch(`/api/products`)
             const response = await allproducts.json()
 
 

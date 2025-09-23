@@ -45,7 +45,7 @@ const CartPage = () => {
     };
     useEffect(() => {
         const getcartinfo = async () => {
-            const cart = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/cart`)
+            const cart = await fetch(`/api/cart`)
             const response = await cart.json()
             setCartItems(response)
         }
@@ -73,7 +73,7 @@ const CartPage = () => {
                 body: JSON.stringify({ id }),
             };
 
-            fetch(`${process.env.NEXT_PUBLIC_HOST}/api/cart`, requestOptions)
+            fetch(`/api/cart`, requestOptions)
             toast.success("successfully deleted ")
             setrefresh(prev => !prev)
 

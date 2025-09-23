@@ -16,7 +16,7 @@ const FashionCollections = ({params}) => {
     useEffect(() => {
         const gettheproducts = async () => {
 
-            const allproducts = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/products`)
+            const allproducts = await fetch(`/api/products`)
             const response = await allproducts.json()
 
 
@@ -50,7 +50,7 @@ const FashionCollections = ({params}) => {
                 redirect: "follow"
             };
 
-            const adding = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/cart`, requestOptions)
+            const adding = await fetch(`/api/cart`, requestOptions)
             const response = await adding.json()
             if (response === "already added") {
                 toast.info('item is aleady in the  cart')
