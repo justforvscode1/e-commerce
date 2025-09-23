@@ -139,23 +139,6 @@ const CartPage = () => {
         }
     };
 
-    const sendingorder = async (product) => {
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        product.quantity = 1
-
-        const raw = JSON.stringify(product);
-
-        const requestOptions = {
-            method: "POST",
-            headers: myHeaders,
-            body: raw,
-            redirect: "follow"
-        };
-
-        const adding = await fetch("/api/order", requestOptions)
-        const response = await adding.json()
-    }
     const removePromo = () => {
         setDiscount(0);
         setPromoApplied(false);

@@ -128,7 +128,7 @@ const CheckoutPage = () => {
                 toast.success("Your order has been placed")
                 setTimeout(() => {
 
-                    router.push("/settings")
+                    router.push("/info/your-orders")
                 }, 1000);
             }
         } catch (error) {
