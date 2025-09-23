@@ -97,6 +97,23 @@ const CartPage = () => {
         }
     };
 
+    const sendingorder = async (product) => {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        product.quantity = 1
+        product.userID = local
+        const raw = JSON.stringify(product);
+
+        const requestOptions = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow"
+        };
+
+        const adding = await fetch("/api/order", requestOptions)
+        const response = await adding.json()
+    }
     const removePromo = () => {
         setDiscount(0);
         setPromoApplied(false);
@@ -347,7 +364,10 @@ const CartPage = () => {
                             </div>
 
                             <Link href="/checkout">
-                                <button className="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition-all duration-200 mb-3">
+                                <button onClick={() => {
+                                  sendingorder(cartItems)
+                                }
+                                } className="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition-all duration-200 mb-3">
                                     Proceed to Checkout
                                 </button> </Link>
 
