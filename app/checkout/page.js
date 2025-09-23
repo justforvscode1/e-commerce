@@ -36,7 +36,7 @@ const CheckoutPage = () => {
         const userId = localStorage.getItem("userId")
         setuserId(userId)
         const getcartitems = async () => {
-            const cart = await fetch(`/api/cart`)
+            const cart = await fetch(`/api/order`)
             const response = await cart.json()
             setorderitems(response)
         }
