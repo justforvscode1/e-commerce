@@ -37,7 +37,6 @@ export async function PATCH(request) {
 
 
         const data = await request.json()
-        console.log(data)
         if (!data.status) {
             return NextResponse.json({ "error": "status is missing", data })
         }

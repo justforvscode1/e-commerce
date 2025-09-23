@@ -7,7 +7,6 @@ import React, { useState, useEffect, use } from 'react';
 
 const FashionCollections = ({params}) => {
     const type = decodeURIComponent(use(params).Ftype);
-      console.log(type)
     const [activeCategory, setActiveCategory] = useState(type.toLocaleLowerCase());
     const [isLoading, setIsLoading] = useState(true);
     const [filteredProducts, setFilteredProducts] = useState([]);

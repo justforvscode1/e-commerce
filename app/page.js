@@ -56,7 +56,7 @@ export default function Home() {
       if (itmes) {
         setfeaturedProducts(itmes.slice(itmes.length - 4))
       } else{
-        console.log("items is empty")
+        console.error("items is empty")
       }
 
     })()

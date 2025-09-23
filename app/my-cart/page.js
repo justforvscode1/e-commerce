@@ -66,7 +66,6 @@ const CartPage = () => {
 
             // Optional: Handle response data if needed
             const updatedItem = await response.json();
-            console.log('Quantity updated successfully:', updatedItem);
             if (updatedItem.success) {
 
                 setCartItems(items =>

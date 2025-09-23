@@ -65,7 +65,6 @@ export async function PATCH(request) {
         const db = await client.db("mydb");
 
         const data = await request.json()
-        console.log(data)
 
         if (!data.quantity) {
             return NextResponse.json({ "error": "quantity is missing", data })
