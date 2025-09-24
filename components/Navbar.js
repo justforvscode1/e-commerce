@@ -165,7 +165,7 @@ const Navbar = () => {
                             </p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
-                            {filteredProducts.map((product, index) => (
+                            {filteredProducts.map((product) => (
                                 <Link key={product._id} href={`/products/${product.id}`}><div className="hover:translate-y-0.5 hover:shadow-2xl bg-white border border-gray-200 rounded-lg shadow-sm transition-shadow duration-200 overflow-hidden">
                                     <div className="aspect-w-16 aspect-h-9">
                                         <Image height={500} width={500}

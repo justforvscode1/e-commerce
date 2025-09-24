@@ -258,9 +258,7 @@ export default function ProductPage({ params }) {
                   <span className="text-sm text-gray-500">
                     ({product.reviewCount} reviews)
                   </span>
-                  <button className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200 hover:underline">
-                    Write a Review
-                  </button>
+                 
                 </div>
               </div>
 
