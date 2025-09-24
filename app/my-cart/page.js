@@ -389,10 +389,7 @@ const CartPage = () => {
                             </div>
 
                             <Link href="/checkout">
-                                <button onClick={() => {
-                                    sendingorder(cartItems)
-                                }
-                                } className="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition-all duration-200 mb-3">
+                                <button className="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold hover:bg-gray-800 transition-all duration-200 mb-3">
                                     Proceed to Checkout
                                 </button> </Link>
 

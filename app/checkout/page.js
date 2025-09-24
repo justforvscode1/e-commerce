@@ -125,6 +125,7 @@ const CheckoutPage = () => {
                 };
 
                 fetch(`/api/cart`, requestOptions)
+                // const responose= check``
                 toast.success("Your order has been placed")
                 setTimeout(() => {
 

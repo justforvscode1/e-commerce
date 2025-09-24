@@ -116,7 +116,7 @@ export default function PendingOrdersPage() {
             setLoading(false);
 
         })()
-    }, [orders]);
+    }, []);
 
     const toggleOrderExpansion = (orderId) => {
         setExpandedOrder(expandedOrder === orderId ? null : orderId);
@@ -217,7 +217,7 @@ export default function PendingOrdersPage() {
                             <div className="ml-4">
                                 <p className="text-sm font-medium text-gray-600">Total Value</p>
                                 <p className="text-2xl font-bold text-gray-900">
-                                    ${orders.reduce((sum, order) => sum + order.total / 100, 0).toFixed(2)}
+                                    ${orders.reduce((sum, order) => sum + order.total ,0).toFixed(2)}
                                 </p>
                             </div>
                         </div>
