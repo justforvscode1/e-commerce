@@ -9,102 +9,7 @@ export default function PendingOrdersPage() {
     const [orderdata, setorderdata] = useState([])
     const [expandedOrder, setExpandedOrder] = useState(null);
 
-    // Mock data matching your database structure
-    // const orderdata = [
-    //     {
-    //         _id: { $oid: "68caf9f90f9c43759ebdd631" },
-    //         orderId: "19594959-6073-49c4-b045-cacf5673c4ae",
-    //         userid: "ec6e2f87-02a9-4278-a0ee-6e1f27e61ba3",
-    //         status: "pending",
-    //         createdat: "2025-09-17T18:12:06.822Z",
-    //         tax: 15399.7375,
-    //         subtotal: 175997,
-    //         total: 191396.7375,
-    //         shippingForm: {
-    //             firstName: "Waleed",
-    //             lastName: "Ahmad",
-    //             email: "a@gmail.com",
-    //             phone: "agasga",
-    //             address: "afafaf",
-    //             apartment: "afaf",
-    //             city: "faf",
-    //             state: "CA",
-    //             zipCode: "sfasfasf",
-    //             country: "United States"
-    //         },
-    //         shippingCost: 0,
-    //         paymentMethod: "cod",
-    //         shippingMethod: "standard",
-    //         orderItems: [
-    //             {
-    //                 _id: "68c9c85287cb51996e68c835",
-    //                 id: "b2d4e6f8-1c3a-4e7b-9d2f-8a5c1e4b7d9a",
-    //                 name: "Premium Leather Handbag",
-    //                 price: 15999,
-    //                 originalPrice: 22999,
-    //                 rating: 4.8,
-    //                 reviewCount: 342,
-    //                 category: "fashion",
-    //                 brand: "Michael Kors",
-    //                 type: "accessories",
-    //                 isNew: false,
-    //                 inStock: true,
-    //                 stockCount: 28,
-    //                 description: "Elegant leather handbag with spacious compartments and gold-tone hardware. Perfect for work or special occasions.",
-    //                 image: ["https://images.unsplash.com/photo-1584916201218-119fc747c2f9?w=400&h=500&fit=crop"],
-    //                 images: [
-    //                     "https://images.unsplash.com/photo-1584916201218-119fc747c2f9?w=600&h=600&fit=crop",
-    //                     "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9c?w=600&h=600&fit=crop"
-    //                 ],
-    //                 quantity: 1
-    //             },
-    //             {
-    //                 _id: "68c9cccb87cb51996e68c839",
-    //                 id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-    //                 name: "Leather Handbag",
-    //                 price: 9999,
-    //                 originalPrice: 13999,
-    //                 rating: 4.8,
-    //                 reviewCount: 310,
-    //                 category: "fashion",
-    //                 brand: "Michael Kors",
-    //                 type: "accessories",
-    //                 isNew: true,
-    //                 inStock: true,
-    //                 stockCount: 12,
-    //                 description: "Premium leather handbag with spacious compartments and elegant design, perfect for work or casual outings.",
-    //                 image: ["https://images.unsplash.com/photo-1584916201218-119fc747c2f9?w=400&h=500&fit=crop"],
-    //                 images: [
-    //                     "https://images.unsplash.com/photo-1584916201218-119fc747c2f9?w=600&h=600&fit=crop",
-    //                     "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9c?w=600&h=600&fit=crop"
-    //                 ],
-    //                 quantity: 1
-    //             },
-    //             {
-    //                 _id: "68caca4a0f9c43759ebdd630",
-    //                 id: "d1a3b5c7-e9f2-4d6a-b8c1-5e7f9a2d4c6b",
-    //                 name: "iPhone 15 Pro",
-    //                 price: 149999,
-    //                 originalPrice: 159999,
-    //                 rating: 4.6,
-    //                 reviewCount: 1234,
-    //                 category: "electronics",
-    //                 brand: "Apple",
-    //                 type: "smartphones",
-    //                 isNew: true,
-    //                 inStock: true,
-    //                 stockCount: 45,
-    //                 description: "Latest iPhone with A17 Pro chip, titanium design, advanced camera system, and all-day battery life.",
-    //                 image: ["https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&h=500&fit=crop"],
-    //                 images: [
-    //                     "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=600&h=600&fit=crop",
-    //                     "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&h=600&fit=crop"
-    //                 ],
-    //                 quantity: 1
-    //             }
-    //         ]
-    //     }
-    // ];
+    
 
     useEffect(() => {
         // Simulate API call
@@ -340,7 +245,7 @@ export default function PendingOrdersPage() {
                                                         <Image
                                                             width={500}
                                                             height={500}
-                                                            src={item.image[0]}
+                                                            src={item.image}
                                                             alt={item.name}
                                                             className="w-full h-full object-cover"
                                                             onError={(e) => {
