@@ -132,7 +132,7 @@ export default function PendingOrdersPage() {
 
     // Helper function to convert cents to dollars
     const formatPrice = (priceInCents) => {
-        return (priceInCents / 100).toFixed(2);
+        return (priceInCents);
     };
 
     // Helper function to format shipping address
