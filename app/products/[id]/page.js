@@ -87,7 +87,8 @@ export default function ProductPage({ params }) {
     try {
       const local = localStorage.getItem("userId")
       if (!local) {
-        const ifnot = localStorage.setItem("userId", crypto.randomUUID())
+        const ifnot = crypto.randomUUID()
+        localStorage.setItem("userId", ifnot)
         products[0].userID = ifnot
 
       } else {

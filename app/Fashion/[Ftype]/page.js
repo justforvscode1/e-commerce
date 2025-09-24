@@ -29,8 +29,9 @@ const FashionCollections = ({params}) => {
     const addtocart = async (product) => {
         try {
             const local = localStorage.getItem("userId")
-            if (!local) {
-                const ifnot = localStorage.setItem("userId", crypto.randomUUID())
+           if (!local) {
+                const ifnot =  crypto.randomUUID()
+                localStorage.setItem("userId",ifnot)
                 product.userID = ifnot
 
             } else {
