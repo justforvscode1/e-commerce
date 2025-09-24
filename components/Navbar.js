@@ -169,7 +169,7 @@ const Navbar = () => {
                                 <Link key={product._id} href={`/products/${product.id}`}><div className="hover:translate-y-0.5 hover:shadow-2xl bg-white border border-gray-200 rounded-lg shadow-sm transition-shadow duration-200 overflow-hidden">
                                     <div className="aspect-w-16 aspect-h-9">
                                         <Image height={500} width={500}
-                                            src={product.image[0]}
+                                            src={product.image}
                                             alt={product.name}
                                             className="w-full h-32 object-cover"
                                         />
