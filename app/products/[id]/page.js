@@ -13,7 +13,9 @@ export default function ProductPage({ params }) {
   const id = decodeURIComponent(use(params).id);
 
   const router = useRouter();
+  const [selectedSize, setSelectedSize] = useState();
   const [quantity, setQuantity] = useState(1);
+  const [color, setcolor] = useState()
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [pictureno, setpictureno] = useState(0)
   const [desclength, setdesclength] = useState(250)
@@ -42,7 +44,7 @@ export default function ProductPage({ params }) {
   }, [id])
 
   const updateQuantity = (id, newQuantity, stock) => {
-    if (newQuantity < 0) {
+    if (newQuantity < 1) {
       return
     }
     if (newQuantity > stock) {
@@ -100,6 +102,14 @@ export default function ProductPage({ params }) {
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       products[0].quantity = quantity
+
+      if (color != '') {
+        products[0].color = color
+      }
+      if (selectedSize != '') {
+
+        products[0].size = selectedSize
+      }
       const raw = JSON.stringify(products[0]);
 
       const requestOptions = {
@@ -238,7 +248,7 @@ export default function ProductPage({ params }) {
                       </span>
                     )}
                   </div>
-                  
+
                 </div>
 
                 <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">{product.name}</h1>
@@ -254,7 +264,7 @@ export default function ProductPage({ params }) {
                   <span className="text-sm text-gray-500">
                     ({product.reviewCount} reviews)
                   </span>
-                 
+
                 </div>
               </div>
 
@@ -274,7 +284,7 @@ export default function ProductPage({ params }) {
               {/* Quantity Selector */}
               <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">Quantity</label>
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-4 mb-5">
                   <button
                     onClick={() => updateQuantity(product.id, quantity - 1, product.stockCount)}
                     className="w-12 h-12 rounded-xl border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 hover:scale-105 active:scale-95"
@@ -294,6 +304,40 @@ export default function ProductPage({ params }) {
                   </button>
                 </div>
                 <div className={`text-center text-red-500 mt-2 ${limit[product._id] ? "block" : "hidden"}`}>owner only have ${product.stockCount} items</div>
+                <div className='pb-5'>
+                  {product.size && Array.isArray(product.size) && product.size.length > 0 ? (
+                    product.size.map((size) => (
+                      <span
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        className={`px-4 py-2 font-bold mr-2 mb-2 inline-block rounded cursor-pointer transition-all ${
+                          selectedSize === size
+                            ? 'border-2 border-blue-500 bg-blue-500 text-white'
+                            : 'border border-gray-300 bg-white hover:border-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        {size}
+                      </span>
+                    ))
+                  ) : null}
+                </div>
+                <div>
+                  {product.color && Array.isArray(product.color) && product.color.length > 0 ? (
+                    product.color.map((colors) => (
+                      <span
+                        key={colors}
+                        onClick={() => setcolor(colors)}
+                        className={`px-4 py-2 font-bold mr-2 mb-2 inline-block rounded cursor-pointer transition-all ${
+                          color === colors
+                            ? 'border-2 border-blue-500 bg-blue-500 text-white'
+                            : 'border border-gray-300 bg-white hover:border-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        {colors}
+                      </span>
+                    ))
+                  ) : null}
+                </div>
               </div>
 
               {/* Action Buttons */}
@@ -349,4 +393,3 @@ export default function ProductPage({ params }) {
   );
 }
 
-// Generate metadata for SEO

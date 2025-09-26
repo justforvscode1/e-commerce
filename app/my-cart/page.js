@@ -236,7 +236,6 @@ const CartPage = () => {
                                                     <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
                                                         <span>Color: {item.color}</span>
                                                         <span>Size: {item.size}</span>
-                                                        <span>SKU: {item.sku}</span>
                                                     </div>
                                                 </div>
                                                 <button
