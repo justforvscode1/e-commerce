@@ -18,7 +18,7 @@ const CartPage = () => {
     const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const savings = cartItems.reduce((sum, item) => sum + ((item.originalPrice - item.price) * item.quantity), 0);
     const shipping = subtotal > 150 ? 0 : 12.99;
-    const tax = subtotal * 0.0875; // 8.75% tax
+    const tax = (subtotal * 0.0875).toFixed(2) // 8.75% tax
     const total = subtotal + shipping + tax - discount;
     const router = useRouter()
 
