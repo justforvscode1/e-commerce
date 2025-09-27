@@ -1,5 +1,6 @@
-
 "use client"
+
+
 import Navbar from "@/components/Navbar";
 import Image from "next/image";
 import Link from "next/link";
@@ -55,7 +56,7 @@ export default function Home() {
       const itmes = await gettheitems.json()
       if (itmes) {
         setfeaturedProducts(itmes.slice(itmes.length - 4))
-      } else{
+      } else {
         console.error("items is empty")
       }
 
