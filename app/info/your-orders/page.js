@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react';
 export default function PendingOrdersPage() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [orderdata, setorderdata] = useState([])
     const [expandedOrder, setExpandedOrder] = useState(null);
 
     
@@ -213,7 +212,7 @@ export default function PendingOrdersPage() {
                                         </div>
                                         <div className="text-center">
                                             <p className="text-sm text-gray-600">Tax</p>
-                                            <p className="text-lg font-semibold text-gray-900">${order.tax}</p>
+                                            <p className="text-lg font-semibold text-gray-900">${order.tax.toFixed(1)}</p>
                                         </div>
                                         <div className="text-center">
                                             <p className="text-sm text-gray-600">Shipping</p>
