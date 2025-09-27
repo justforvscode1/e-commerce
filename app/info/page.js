@@ -36,7 +36,6 @@ export default function AccountPage() {
         // In a real Next.js app, you'd use router.push(href)
         window.location.href = href;
     };
-
     return (
         <div className="min-h-screen bg-white animate-fadeIn">
             {/* Header */}

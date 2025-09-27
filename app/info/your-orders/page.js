@@ -35,11 +35,6 @@ export default function PendingOrdersPage() {
         });
     };
 
-    // Helper function to convert cents to dollars
-    const formatPrice = (priceInCents) => {
-        return (priceInCents);
-    };
-
     // Helper function to format shipping address
     const formatShippingAddress = (shippingForm) => {
         return `${shippingForm.address}${shippingForm.apartment ? ', ' + shippingForm.apartment : ''}, ${shippingForm.city}, ${shippingForm.state} ${shippingForm.zipCode}, ${shippingForm.country}`;
@@ -122,7 +117,7 @@ export default function PendingOrdersPage() {
                             <div className="ml-4">
                                 <p className="text-sm font-medium text-gray-600">Total Value</p>
                                 <p className="text-2xl font-bold text-gray-900">
-                                    ${orders.reduce((sum, order) => sum + order.total ,0).toFixed(2)}
+                                    ${orders.reduce((sum, order) => sum + order.total, 0).toFixed(2)}
                                 </p>
                             </div>
                         </div>
@@ -183,7 +178,7 @@ export default function PendingOrdersPage() {
                                             </div>
                                             <div>
                                                 <span className="font-medium">Total:</span>
-                                                <span className="text-lg font-bold text-gray-900 ml-1">${formatPrice(order.total)}</span>
+                                                <span className="text-lg font-bold text-gray-900 ml-1">${order.total}</span>
                                             </div>
                                             <div>
                                                 <span className="font-medium">Est. Delivery:</span> {formatDate(getEstimatedDelivery(order.createdat, order.shippingMethod))}
@@ -214,21 +209,21 @@ export default function PendingOrdersPage() {
                                     <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
                                         <div className="text-center">
                                             <p className="text-sm text-gray-600">Subtotal</p>
-                                            <p className="text-lg font-semibold text-gray-900">${formatPrice(order.subtotal)}</p>
+                                            <p className="text-lg font-semibold text-gray-900">${order.subtotal}</p>
                                         </div>
                                         <div className="text-center">
                                             <p className="text-sm text-gray-600">Tax</p>
-                                            <p className="text-lg font-semibold text-gray-900">${formatPrice(order.tax)}</p>
+                                            <p className="text-lg font-semibold text-gray-900">${order.tax}</p>
                                         </div>
                                         <div className="text-center">
                                             <p className="text-sm text-gray-600">Shipping</p>
                                             <p className="text-lg font-semibold text-gray-900">
-                                                {order.shippingCost === 0 ? 'Free' : `${formatPrice(order.shippingCost)}`}
+                                                {order.shippingCost === 0 ? 'Free' : `$${order.shippingCost}`}
                                             </p>
                                         </div>
                                         <div className="text-center">
                                             <p className="text-sm text-gray-600">Total</p>
-                                            <p className="text-xl font-bold text-gray-900">${formatPrice(order.total)}</p>
+                                            <p className="text-xl font-bold text-gray-900">${order.total}</p>
                                         </div>
                                     </div>
 
@@ -283,11 +278,11 @@ export default function PendingOrdersPage() {
                                                     </div>
                                                     <div className="text-right flex-shrink-0">
                                                         {item.originalPrice > item.price && (
-                                                            <p className="text-sm text-gray-400 line-through">${formatPrice(item.originalPrice)}</p>
+                                                            <p className="text-sm text-gray-400 line-through">${item.originalPrice}</p>
                                                         )}
-                                                        <p className="font-semibold text-gray-900">${formatPrice(item.price)}</p>
+                                                        <p className="font-semibold text-gray-900">${item.price}</p>
                                                         <p className="text-sm text-gray-600">
-                                                            Total: ${formatPrice(item.price * item.quantity)}
+                                                            Total: ${item.price * item.quantity}
                                                         </p>
                                                     </div>
                                                 </div></Link>
