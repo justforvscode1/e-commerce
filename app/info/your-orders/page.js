@@ -87,12 +87,20 @@ export default function PendingOrdersPage() {
                 {/* Header */}
                 <div className="mb-8 transform transition-all duration-500 animate-fadeIn">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Pending Orders</h1>
-                    <p className="text-gray-600">Track your orders that are currently being processed</p>
+                    
+                    {/* Add this new button */}
+                    <Link href="/cancel">
+                        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transform transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center">
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+Cancel / Track  your orders                         </button>
+                    </Link>
                 </div>
 
                 {/* Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
                         <div className="flex items-center">
                             <div className="p-3 bg-blue-500 rounded-lg">
                                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,7 +114,7 @@ export default function PendingOrdersPage() {
                         </div>
                     </div>
 
-                    <div className="bg-gray-50 border border-gray-100 rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                    <div className="bg-gray-50 border border-gray-100 rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
                         <div className="flex items-center">
                             <div className="p-3 bg-gray-700 rounded-lg">
                                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,7 +130,7 @@ export default function PendingOrdersPage() {
                         </div>
                     </div>
 
-                    <div className="bg-green-50 border border-green-100 rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                    <div className="bg-green-50 border border-green-100 rounded-xl p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
                         <div className="flex items-center">
                             <div className="p-3 bg-green-500 rounded-lg">
                                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -200,7 +208,7 @@ export default function PendingOrdersPage() {
 
                             {/* Expanded Order Details */}
                             <div
-                                className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedOrder === order.orderId ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+                                className={` transition-all duration-300 ease-in-out ${expandedOrder === order.orderId ? 'h-auto opacity-100' : 'max-h-0 opacity-0'
                                     }`}
                             >
                                 <div className="px-6 pb-6 border-t border-gray-100">
@@ -235,7 +243,7 @@ export default function PendingOrdersPage() {
 
                                                     className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
                                                 >
-                                                    <div className="w-20 h-20 bg-white rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+                                                    <div className="w-20 h-20 bg-white rounded-lg  border border-gray-200 flex-shrink-0">
                                                         <Image
                                                             width={500}
                                                             height={500}
@@ -256,11 +264,7 @@ export default function PendingOrdersPage() {
                                                     <div className="flex-1">
                                                         <div className="flex items-center space-x-2 mb-1">
                                                             <h5 className="font-medium text-gray-900">{item.name}</h5>
-                                                            {item.isNew && (
-                                                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                                    New
-                                                                </span>
-                                                            )}
+                                                            
                                                         </div>
                                                         <p className="text-sm text-gray-600 mb-1">{item.brand} • {item.category}</p>
                                                         <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
@@ -290,7 +294,7 @@ export default function PendingOrdersPage() {
                                     </div>
 
                                     {/* Customer & Shipping Info */}
-                                    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="mt-6 grid  grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
                                             <h4 className="text-md font-semibold text-gray-900 mb-3">Customer Information</h4>
                                             <div className="bg-gray-50 p-4 rounded-lg space-y-2 text-sm">
@@ -310,17 +314,7 @@ export default function PendingOrdersPage() {
                                     </div>
 
                                     {/* Action Buttons */}
-                                    <div className="mt-6 flex flex-wrap gap-3">
-                                        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transform transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                            Track Order
-                                        </button>
-                                        <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transform transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                                            Contact Support
-                                        </button>
-                                        <button className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transform transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-                                            Cancel Order
-                                        </button>
-                                    </div>
+
                                 </div>
                             </div>
                         </div>
