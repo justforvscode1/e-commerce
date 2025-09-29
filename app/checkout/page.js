@@ -8,6 +8,7 @@ const CheckoutPage = () => {
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [newsletterSubscribe, setNewsletterSubscribe] = useState(false);
     const [orderItems, setorderitems] = useState([])
+
     const [userId, setuserId] = useState(null)
     const [errorhandle, seterrorhandle] = useState(false)
     const router = useRouter()
@@ -106,6 +107,7 @@ const CheckoutPage = () => {
                 seterrorhandle(true)
             } else {
                 seterrorhandle(false)
+                setAgreedToTerms(false)
                 const myHeaders = new Headers();
                 myHeaders.append("Content-Type", "application/json");
                 const sendcheckout = await fetch("/api/order", {

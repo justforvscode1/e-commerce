@@ -90,6 +90,7 @@ export default function PendingOrdersPage() {
                     
                     {/* Add this new button */}
                     <Link href="/cancel">
+
                         <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transform transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center">
                             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -185,7 +186,7 @@ Cancel / Track  your orders                         </button>
                                             </div>
                                             <div>
                                                 <span className="font-medium">Total:</span>
-                                                <span className="text-lg font-bold text-gray-900 ml-1">${order.total}</span>
+                                                <span className="text-lg font-bold text-gray-900 ml-1">${order.total.toFixed(2)}</span>
                                             </div>
                                             <div>
                                                 <span className="font-medium">Est. Delivery:</span> {formatDate(getEstimatedDelivery(order.createdat, order.shippingMethod))}
