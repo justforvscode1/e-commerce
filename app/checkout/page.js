@@ -39,6 +39,10 @@ const CheckoutPage = () => {
         const getcartitems = async () => {
             const cart = await fetch(`/api/cart`)
             const response = await cart.json()
+            console.log(response)
+            if (response.length === 0 || !response) {
+                router.push('/404')
+            }
             setorderitems(response)
         }
         getcartitems()
@@ -129,10 +133,7 @@ const CheckoutPage = () => {
                 fetch(`/api/cart`, requestOptions)
                 // const responose= check``
                 toast.success("Your order has been placed")
-                setTimeout(() => {
-
-                    router.push("/info/your-orders")
-                }, 1000);
+                router.replace("/info/your-orders")
             }
         } catch (error) {
             toast.error("error placing your order")

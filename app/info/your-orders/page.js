@@ -8,14 +8,14 @@ export default function PendingOrdersPage() {
     const [loading, setLoading] = useState(true);
     const [expandedOrder, setExpandedOrder] = useState(null);
 
-    
+
 
     useEffect(() => {
         // Simulate API call
         (async () => {
             const orders = await fetch("/api/order")
             const response = await orders.json()
-            const remain = response.filter(items => items.status != "delivered")
+            const remain = response.filter(items => items.status === "pending" )
             setOrders(remain);
             setLoading(false);
 
@@ -87,15 +87,13 @@ export default function PendingOrdersPage() {
                 {/* Header */}
                 <div className="mb-8 transform transition-all duration-500 animate-fadeIn">
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Pending Orders</h1>
-                    
+
                     {/* Add this new button */}
                     <Link href="/cancel">
 
                         <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transform transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center">
-                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-Cancel / Track  your orders                         </button>
+
+                            Cancel / Track  your orders                         </button>
                     </Link>
                 </div>
 
@@ -168,7 +166,6 @@ Cancel / Track  your orders                         </button>
                                         <div className="flex items-center space-x-4 mb-3">
                                             <h3 className="text-lg font-semibold text-gray-900">{order.orderId.substring(0, 8).toUpperCase()}</h3>
                                             <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                                                <div className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
                                                 {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                                             </span>
 
@@ -265,7 +262,7 @@ Cancel / Track  your orders                         </button>
                                                     <div className="flex-1">
                                                         <div className="flex items-center space-x-2 mb-1">
                                                             <h5 className="font-medium text-gray-900">{item.name}</h5>
-                                                            
+
                                                         </div>
                                                         <p className="text-sm text-gray-600 mb-1">{item.brand} • {item.category}</p>
                                                         <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
