@@ -1,12 +1,11 @@
-import clientPromise from "@/lib/mongodb";
+import dbConnect from "@/lib/mongodb";
 import { NextResponse } from "next/server";
-
+import Products from "@/models/product";
 // GET all products
 export async function GET() {
     try {
-        const client = await clientPromise;
-        const db = await client.db("mydb");
-        const products = await db.collection("products").find().toArray();
+        await dbConnect();
+        const products = await Products.find({});
         return NextResponse.json(products);
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });
@@ -17,14 +16,13 @@ export async function GET() {
 export async function POST(req) {
     try {
         const body = await req.json();
+        await dbConnect();
         // ✅ You decide validation rules here
         if (!body) {
             return NextResponse.json({ error: "name and price are required" }, { status: 400 });
         }
 
-        const client = await clientPromise;
-        const db = await client.db("mydb");
-        const result = await db.collection("products").insertOne(body);
+        const result = await Products.create(body);
 
         return NextResponse.json(result, { status: 201 });
     } catch (err) {

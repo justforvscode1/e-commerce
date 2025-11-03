@@ -2,15 +2,18 @@
 import Navbar from '@/components/Navbar';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ToastContainer, toast } from 'react-toastify';
 import React, { useState, useEffect, use } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 
-const FashionCollections = ({ params }) => {
-    const type = decodeURIComponent(use(params). type);
-    const [activeCategory, setActiveCategory] = useState(type.toLocaleLowerCase());
+const CategoryWiseProducts = ({ params }) => {
+    const type = decodeURIComponent(use(params).type);
+    const Category = decodeURIComponent(use(params).category.toLocaleLowerCase());
+    console.log(Category)
+    const [activeCategory, setActiveCategory] = useState((type).toLocaleLowerCase());
     const [isLoading, setIsLoading] = useState(true);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [products, setproducts] = useState([])
+    const [categories, setcategories] = useState([])
 
     useEffect(() => {
         const gettheproducts = async () => {
@@ -19,20 +22,51 @@ const FashionCollections = ({ params }) => {
             const response = await allproducts.json()
 
 
-            setproducts(response.filter(items => items.category === "fashion"))
+            setproducts(response.filter(items => items.category === Category))
         }
+
         gettheproducts()
 
+
     }, [])
+    useEffect(() => {
+        if (Category === "fashion") {
+            setcategories([
+                { id: 'all', name: 'All Collections', count: products.length },
+                { id: 'men', name: 'Men', count: products.filter(p => p.productType === 'men').length },
+                { id: 'women', name: 'Women', count: products.filter(p => p.productType === 'women').length },
+                { id: 'kids', name: 'Kids', count: products.filter(p => p.productType === 'kids').length },
+                { id: 'accessories', name: 'Accessories', count: products.filter(p => p.productType === 'accessories').length }
+            ])
+        } else {
+            setcategories(
+                [
+                    { id: 'all', name: 'All Electronics', count: products.length },
+                    { id: 'laptops', name: 'Laptops', count: products.filter(p => p.productType === 'laptops').length },
+                    { id: 'smartphones', name: 'Smartphones', count: products.filter(p => p.productType === 'smartphones').length },
+                    { id: 'headphones', name: 'Headphones', count: products.filter(p => p.productType === 'headphones').length },
+                    { id: 'cameras', name: 'Cameras', count: products.filter(p => p.productType === 'cameras').length },
 
-    const categories = [
-        { id: 'all', name: 'All Collections', count: products.length },
-        { id: 'men', name: 'Men', count: products.filter(p => p.productType === 'men').length },
-        { id: 'women', name: 'Women', count: products.filter(p => p.productType === 'women').length },
-        { id: 'kids', name: 'Kids', count: products.filter(p => p.productType === 'kids').length },
-        { id: 'accessories', name: 'Accessories', count: products.filter(p => p.productType === 'accessories').length }
-    ];
+                ]
+            )
+        }
+    }, [products, activeCategory])
 
+
+
+
+    //    const categories = [
+    //         { id: 'all', name: 'All Electronics', count: products.length },
+    //         { id: 'laptops', name: 'Laptops', count: products.filter(p => p.productType === 'laptops').length },
+    //         { id: 'smartphones', name: 'Smartphones', count: products.filter(p => p.productType === 'smartphones').length },
+    //         { id: 'headphones', name: 'Headphones', count: products.filter(p => p.productType === 'headphones').length },
+    //         { id: 'cameras', name: 'Cameras', count: products.filter(p => p.productType === 'cameras').length },
+    //         { id: 'alll', name: 'All Collections', count: products.length },
+    //         { id: 'men', name: 'Men', count: products.filter(p => p.productType === 'men').length },
+    //         { id: 'women', name: 'Women', count: products.filter(p => p.productType === 'women').length },
+    //         { id: 'kids', name: 'Kids', count: products.filter(p => p.productType === 'kids').length },
+    //         { id: 'accessories', name: 'Accessories', count: products.filter(p => p.productType === 'accessories').length }
+    //     ];
     useEffect(() => {
         // Simulate loading
         setIsLoading(true);
@@ -49,11 +83,18 @@ const FashionCollections = ({ params }) => {
         setActiveCategory(type);
     };
 
+
     return (<>
         <ToastContainer />
         <div className="min-h-screen bg-gray-50">
             <Navbar />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Header Section */}
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl font-bold text-gray-900 mb-4">{Category} Collections</h1>
+                    <p className="text-lg text-gray-600">Discover the latest in technology and innovation</p>
+                </div>
+
                 {/* Category Filter */}
                 <div className="mb-8">
                     <div className="flex flex-wrap justify-center gap-4">
@@ -90,9 +131,7 @@ const FashionCollections = ({ params }) => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {filteredProducts.map((product, index) => (
-
-                            <Link href={`/products/${product.productid}`} key={product.productid}><div
-
+                            <Link href={`/products/${product.productid}`} key={product.productid}> <div
                                 className="group bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
                                 style={{
                                     animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
@@ -104,6 +143,7 @@ const FashionCollections = ({ params }) => {
                                         alt={product.name}
                                         className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
                                     /> */}
+
 
 
                                 </div>
@@ -119,22 +159,19 @@ const FashionCollections = ({ params }) => {
                                     {/* Rating */}
                                     <div className="flex items-center mb-3">
                                         <div className="flex items-center">
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <svg
-                                                    key={star}
-                                                    className={`w-4 h-4 ${star <= Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-300'} fill-current`}
-                                                    viewBox="0 0 20 20"
-                                                >
-                                                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                                                </svg>
-                                            ))}
+                                            <svg
+                                                className={`w-4 h-4 ${1 <= Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-300'} fill-current`}
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                                            </svg>
                                         </div>
                                         <span className="ml-2 text-sm text-gray-600">
                                             {product.rating} ({product.reviewCount} reviews)
                                         </span>
                                     </div>
 
-                                    <div className="flex items-center ">
+                                    <div className="flex items-center">
                                         <div className="flex items-center space-x-2">
                                             <span className="text-2xl font-bold text-gray-900">
                                                 ${product.variants[0].price}
@@ -150,7 +187,6 @@ const FashionCollections = ({ params }) => {
                                     </div>
                                 </div>
                             </div></Link>
-
                         ))}
                     </div>
                 </div>
@@ -158,11 +194,11 @@ const FashionCollections = ({ params }) => {
                 {filteredProducts.length === 0 && !isLoading && (
                     <div className="text-center py-16">
                         <div className="text-gray-400 mb-4">
-                            <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                            </svg>
+                            {/* <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                            </svg> */}
                         </div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">No {Category} products found</h3>
                         <p className="text-gray-500">Try selecting a different category.</p>
                     </div>
                 )}
@@ -173,4 +209,4 @@ const FashionCollections = ({ params }) => {
     );
 };
 
-export default FashionCollections;
+export default CategoryWiseProducts;

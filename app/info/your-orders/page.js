@@ -1,4 +1,5 @@
 "use client"
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -7,27 +8,34 @@ export default function PendingOrdersPage() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [expandedOrder, setExpandedOrder] = useState(null);
-
+    const { data, status } = useSession()
 
 
     useEffect(() => {
         // Simulate API call
-        (async () => {
-            const orders = await fetch("/api/order")
-            const response = await orders.json()
-            const remain = response.filter(items => items.status === "pending" )
-            setOrders(remain);
-            setLoading(false);
 
+        (async () => {
+            if (status === "authenticated") {
+                const orders = await fetch(`/api/order/${data.user.id}`)
+                const response = await orders.json()
+                console.log(response)
+                const remain = response.filter(items => items.status === "pending")
+                setOrders(remain);
+                setLoading(false);
+
+            }
         })()
-    }, []);
+    }, [status]);
 
     const toggleOrderExpansion = (orderId) => {
         setExpandedOrder(expandedOrder === orderId ? null : orderId);
     };
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
+        if (!dateString) return '—';
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return '—';
+        return date.toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -36,7 +44,7 @@ export default function PendingOrdersPage() {
 
     // Helper function to format shipping address
     const formatShippingAddress = (shippingForm) => {
-        return `${shippingForm.address}${shippingForm.apartment ? ', ' + shippingForm.apartment : ''}, ${shippingForm.city}, ${shippingForm.state} ${shippingForm.zipCode}, ${shippingForm.country}`;
+        return `${shippingForm.address}${shippingForm.apartment ? ', ' + shippingForm.apartment : ''}, ${shippingForm.city}, ${shippingForm.state} ${shippingForm.zipCode}`;
     };
 
     // Helper function to calculate estimated delivery (7 days from order date)
@@ -139,7 +147,7 @@ export default function PendingOrdersPage() {
                             <div className="ml-4">
                                 <p className="text-sm font-medium text-green-600">Items</p>
                                 <p className="text-2xl font-bold text-gray-900">
-                                    {orders.reduce((sum, order) => sum + order.orderItems.length, 0)}
+                                    {orders.reduce((sum, order) => sum + order.orderedItems.length, 0)}
                                 </p>
                             </div>
                         </div>
@@ -179,14 +187,14 @@ export default function PendingOrdersPage() {
                                         </div>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
                                             <div>
-                                                <span className="font-medium">Order Date:</span> {formatDate(order.createdat)}
+                                                <span className="font-medium">Order Date:</span> {formatDate(order.createdAt)}
                                             </div>
                                             <div>
                                                 <span className="font-medium">Total:</span>
                                                 <span className="text-lg font-bold text-gray-900 ml-1">${order.total.toFixed(2)}</span>
                                             </div>
                                             <div>
-                                                <span className="font-medium">Est. Delivery:</span> {formatDate(getEstimatedDelivery(order.createdat, order.shippingMethod))}
+                                                <span className="font-medium">Est. Delivery:</span> {formatDate(getEstimatedDelivery(order.createdAt, order.shippingMethod))}
                                             </div>
                                         </div>
                                     </div>
@@ -214,7 +222,7 @@ export default function PendingOrdersPage() {
                                     <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
                                         <div className="text-center">
                                             <p className="text-sm text-gray-600">Subtotal</p>
-                                            <p className="text-lg font-semibold text-gray-900">${order.subtotal}</p>
+                                            <p className="text-lg font-semibold text-gray-900">${order.subtotal.toFixed(2)}</p>
                                         </div>
                                         <div className="text-center">
                                             <p className="text-sm text-gray-600">Tax</p>
@@ -228,21 +236,21 @@ export default function PendingOrdersPage() {
                                         </div>
                                         <div className="text-center">
                                             <p className="text-sm text-gray-600">Total</p>
-                                            <p className="text-xl font-bold text-gray-900">${order.total}</p>
+                                            <p className="text-xl font-bold text-gray-900">${order.total.toFixed(2)}</p>
                                         </div>
                                     </div>
 
                                     {/* Items */}
                                     <div className="mt-6">
-                                        <h4 className="text-md font-semibold text-gray-900 mb-4">Order Items ({order.orderItems.length})</h4>
+                                        <h4 className="text-md font-semibold text-gray-900 mb-4">Order Items ({order.orderedItems.length})</h4>
                                         <div className="space-y-3">
-                                            {order.orderItems.map((item) => (
-                                                <Link href={`/products/${item.id}`} key={item._id}> <div
+                                            {order.orderedItems.map((item) => (
+                                                <Link href={`/products/${item.productId}`} key={item._id}> <div
 
                                                     className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
                                                 >
                                                     <div className="w-20 h-20 bg-white rounded-lg  border border-gray-200 flex-shrink-0">
-                                                        <Image
+                                                        {/* <Image
                                                             width={500}
                                                             height={500}
                                                             src={item.image}
@@ -252,7 +260,7 @@ export default function PendingOrdersPage() {
                                                                 e.target.style.display = 'none';
                                                                 e.target.nextElementSibling.style.display = 'flex';
                                                             }}
-                                                        />
+                                                        /> */}
                                                         <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg hidden items-center justify-center">
                                                             <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"></path>
@@ -265,7 +273,15 @@ export default function PendingOrdersPage() {
 
                                                         </div>
                                                         <p className="text-sm text-gray-600 mb-1">{item.brand} • {item.category}</p>
-                                                        <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                                                        <p className="text-sm text-gray-600"><b>Quantity</b>: {item.quantity}</p>
+                                                        <div className="flex flex-wrap gap-2 mb-2">
+                                                            {Object.entries(item.selectedVariant).map(([key, value]) => (
+                                                                <div key={key} className="flex items-center gap-2 text:[8px] rounded-lg">
+                                                                    <p><b>{key}</b>:</p>
+                                                                    <p>{value}</p>
+                                                                </div>
+                                                            ))}
+                                                        </div>
                                                         <div className="flex items-center mt-1">
                                                             <div className="flex items-center text-yellow-400">
                                                                 {[...Array(5)].map((_, i) => (
@@ -279,11 +295,11 @@ export default function PendingOrdersPage() {
                                                     </div>
                                                     <div className="text-right flex-shrink-0">
                                                         {item.originalPrice > item.price && (
-                                                            <p className="text-sm text-gray-400 line-through">${item.originalPrice}</p>
+                                                            <p className="text-sm text-gray-400 line-through">${item.originalPrice.toFixed(2)}</p>
                                                         )}
-                                                        <p className="font-semibold text-gray-900">${item.price}</p>
+                                                        <p className="font-semibold text-gray-900">${item.price.toFixed(2)}</p>
                                                         <p className="text-sm text-gray-600">
-                                                            Total: ${item.price * item.quantity}
+                                                            Total: ${(item.price * item.quantity).toFixed(2)}
                                                         </p>
                                                     </div>
                                                 </div></Link>

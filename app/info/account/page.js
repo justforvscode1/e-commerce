@@ -59,23 +59,30 @@ export default function AdminProductPage() {
     };
 
     const generateProductObject = async () => {
+       
         const product = {
-            id: formData.id || `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-            name: formData.name,
-            price: parseInt(formData.price) || 0,
-            originalPrice: parseInt(formData.originalPrice) || 0,
-            rating: parseFloat(formData.rating) || 0,
-            reviewCount: parseInt(formData.reviewCount) || 0,
-            category: formData.category,
-            brand: formData.brand,
-            type: formData.type,
-            isNew: formData.isNew,
-            inStock: formData.inStock,
-            stockCount: parseInt(formData.stockCount) || 0,
-            description: formData.description,
-            image: formData.image.filter(img => img.trim() !== ''),
-            images: formData.images.filter(img => img.trim() !== '')
-        };
+            productid: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+            name: "Premium Leather Jacket",
+            description: "High-quality genuine leather jacket for men",
+            category: "fashion",
+            productType: "men",
+            brand: "UrbanStyle",
+            variants: {
+                options: {
+                    size: {
+                        S: { price: 199, stockCount: 15, images: ["jackets-black.jpg"] },
+                        M: { price: 199, stockCount: 20, images: ["jacketm-black.jpg"] },
+                        L: { price: 209, stockCount: 18, images: ["jacketl-black.jpg"] },
+                        XL: { price: 219, stockCount: 12, images: ["jacketxl-black.jpg"] }
+                    },
+                    color: {
+                        black: { "price": 0, "stockCount": 25, "images": ["jacket-black-front.jpg", "jacket-black-back.jpg"] },
+                        brown: { "price": 10, "stockCount": 20, "images": ["jacket-brown-front.jpg", "jacket-brown-back.jpg"] },
+                        navy: { "price": 15, "stockCount": 15, "images": ["jacket-navy-front.jpg", "jacket-navy-back.jpg"] }
+                    }
+                }
+            }
+        }
         try {
             const senddata = await fetch("/api/products", {
                 method: "POST",

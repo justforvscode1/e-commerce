@@ -5,13 +5,14 @@ import Link from 'next/link';
 import React, { useState, useEffect, use } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 
-const ElectronicsCollections = ({params}) => {
-  const type = decodeURIComponent(use(params).type);
+const CategoryWiseProducts = ({ params }) => {
+    const type = decodeURIComponent(use(params).type);
+    const Category = decodeURIComponent(use(params).category);
+    console.log(Category)
     const [activeCategory, setActiveCategory] = useState((type).toLocaleLowerCase());
     const [isLoading, setIsLoading] = useState(true);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [products, setproducts] = useState([])
-
 
     useEffect(() => {
         const gettheproducts = async () => {
@@ -20,7 +21,7 @@ const ElectronicsCollections = ({params}) => {
             const response = await allproducts.json()
 
 
-            setproducts(response.filter(items => items.category === "electronics"))
+            setproducts(response.filter(items => items.category === Category))
         }
 
         gettheproducts()
@@ -28,52 +29,19 @@ const ElectronicsCollections = ({params}) => {
 
     }, [])
 
-    const addtocart = async (product) => {
-        try {
-            const local = localStorage.getItem("userId")
-            if (!local) {
-                const ifnot =  crypto.randomUUID()
-                localStorage.setItem("userId",ifnot)
-                product.userID = ifnot
 
-            } else {
-
-                product.userID = local
-            }
-
-            const myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/json");
-            product.quantity = 1
-            product.userID = local
-            const raw = JSON.stringify(product);
-
-            const requestOptions = {
-                method: "POST",
-                headers: myHeaders,
-                body: raw,
-                redirect: "follow"
-            };
-
-            const adding = await fetch("/api/cart", requestOptions)
-            const response = await adding.json()
-
-            if (response === "already added") {
-                toast.info('item is aleady in the  cart')
-            } else {
-                toast.success('successfully added to cart')
-            }
-        } catch (error) {
-            toast.error("something went wrong")
-            console.error("error occured", error)
-        }
-    }
 
     const categories = [
         { id: 'all', name: 'All Electronics', count: products.length },
-        { id: 'laptops', name: 'Laptops', count: products.filter(p => p.type === 'laptops').length },
-        { id: 'smartphones', name: 'Smartphones', count: products.filter(p => p.type === 'smartphones').length },
-        { id: 'headphones', name: 'Headphones', count: products.filter(p => p.type === 'headphones').length },
-        { id: 'cameras', name: 'Cameras', count: products.filter(p => p.type === 'cameras').length }
+        { id: 'laptops', name: 'Laptops', count: products.filter(p => p.productType === 'laptops').length },
+        { id: 'smartphones', name: 'Smartphones', count: products.filter(p => p.productType === 'smartphones').length },
+        { id: 'headphones', name: 'Headphones', count: products.filter(p => p.productType === 'headphones').length },
+        { id: 'cameras', name: 'Cameras', count: products.filter(p => p.productType === 'cameras').length },
+        { id: 'all', name: 'All Collections', count: products.length },
+        { id: 'men', name: 'Men', count: products.filter(p => p.productType === 'men').length },
+        { id: 'women', name: 'Women', count: products.filter(p => p.productType === 'women').length },
+        { id: 'kids', name: 'Kids', count: products.filter(p => p.productType === 'kids').length },
+        { id: 'accessories', name: 'Accessories', count: products.filter(p => p.productType === 'accessories').length }
     ];
     useEffect(() => {
         // Simulate loading
@@ -81,7 +49,7 @@ const ElectronicsCollections = ({params}) => {
         setTimeout(() => {
             const filtered = activeCategory === 'all'
                 ? products
-                : products.filter(product => product.type === activeCategory);
+                : products.filter(product => product.productType === activeCategory);
             setFilteredProducts(filtered);
             setIsLoading(false);
         }, 300);
@@ -117,7 +85,7 @@ const ElectronicsCollections = ({params}) => {
                                     animation: activeCategory === category.id ? 'pulse 2s infinite' : 'none'
                                 }}
                             >
-                                {category.name}
+                                {category.name}sdfsd
                                 <span className="ml-2 text-sm opacity-75">({category.count})</span>
                             </button>
                         ))}
@@ -138,22 +106,22 @@ const ElectronicsCollections = ({params}) => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {filteredProducts.map((product, index) => (
-                            <div key={product.id}
+                            <Link href={`/products/${product.productid}`} key={product.productid}> <div
                                 className="group bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
                                 style={{
                                     animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
                                 }}
                             >
-                                <Link href={`/products/${product.id}`} key={product.id}> <div className="relative overflow-hidden">
-                                    <Image width={500} height={500}
+                                <div className="relative overflow-hidden">
+                                    {/* <Image width={500} height={500}
                                         src={product.images[0]}
                                         alt={product.name}
                                         className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
-                                    />
+                                    /> */}
 
-                                   
 
-                                </div></Link>
+
+                                </div>
 
                                 <div className="p-6">
                                     <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-300">
@@ -174,31 +142,26 @@ const ElectronicsCollections = ({params}) => {
                                             </svg>
                                         </div>
                                         <span className="ml-2 text-sm text-gray-600">
-                                            {product.rating} ({product.reviews} reviews)
+                                            {product.rating} ({product.reviewCount} reviews)
                                         </span>
                                     </div>
 
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex items-center">
                                         <div className="flex items-center space-x-2">
-                                            <span className="text-xl font-bold text-gray-900">
-                                                ${product.price}
+                                            <span className="text-2xl font-bold text-gray-900">
+                                                ${product.variants[0].price}
                                             </span>
                                             {product.originalPrice && (
-                                                <span className="text-sm text-gray-500 line-through">
-                                                    ${product.originalPrice}
+                                                <span className=" text-gray-500 line-through">
+                                                    ${product.variants[0].salePrice}
                                                 </span>
                                             )}
                                         </div>
 
-                                        <button onClick={() => {
-                                            addtocart(product)
-                                        }
-                                        } className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transform transition-all duration-300 hover:scale-105">
-                                            + Cart
-                                        </button>
+
                                     </div>
                                 </div>
-                            </div>
+                            </div></Link>
                         ))}
                     </div>
                 </div>
@@ -221,4 +184,4 @@ const ElectronicsCollections = ({params}) => {
     );
 };
 
-export default ElectronicsCollections;
+export default CategoryWiseProducts;

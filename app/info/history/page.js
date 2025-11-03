@@ -1,4 +1,5 @@
 "use client"
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -8,12 +9,14 @@ export default function CompletedOrdersPage() {
     const [loading, setLoading] = useState(true);
     const [expandedOrder, setExpandedOrder] = useState(null);
     const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'delivered', 'cancelled'
-
+const {data, status}= useSession()
     useEffect(() => {
         // Simulate API call for completed orders
+        if (status==='authenticated') {
         (async () => {
-            try {
-                const orders = await fetch("/api/order");
+                
+                try {
+                    const orders = await fetch(`/api/order/${data.user.id}`);
                 const response = await orders.json();
                 setOrders(response);
             } catch (error) {
@@ -24,7 +27,8 @@ export default function CompletedOrdersPage() {
                 setLoading(false);
             }
         })();
-    }, []);
+        }
+    }, [status]);
 
     const toggleOrderExpansion = (orderId) => {
         setExpandedOrder(expandedOrder === orderId ? null : orderId);
@@ -39,9 +43,7 @@ export default function CompletedOrdersPage() {
     };
 
     // Helper function to convert cents to dollars
-    const formatPrice = (priceInCents) => {
-        return (priceInCents / 100).toFixed(2);
-    };
+    
 
     // Helper function to format shipping address
     const formatShippingAddress = (shippingForm) => {
@@ -99,7 +101,7 @@ export default function CompletedOrdersPage() {
     // Calculate stats
     const deliveredOrders = orders.filter(order => order.status.toLowerCase() === 'delivered');
     const cancelledOrders = orders.filter(order => order.status.toLowerCase() === 'cancelled');
-    const totalValue = orders.reduce((sum, order) => sum + order.total / 100, 0);
+    const totalValue = orders.reduce((sum, order) => sum + order.total, 0);
 
     if (loading) {
         return (
@@ -261,7 +263,7 @@ export default function CompletedOrdersPage() {
                                                 </div>
                                                 <div>
                                                     <span className="font-medium">Total:</span>
-                                                    <span className="text-lg font-bold text-gray-900 ml-1">${formatPrice(order.total)}</span>
+                                                    <span className="text-lg font-bold text-gray-900 ml-1">${order.total.toFixed(2)}</span>
                                                 </div>
                                                 <div>
                                                     <span className="font-medium">
@@ -295,33 +297,33 @@ export default function CompletedOrdersPage() {
                                         <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
                                             <div className="text-center">
                                                 <p className="text-sm text-gray-600">Subtotal</p>
-                                                <p className="text-lg font-semibold text-gray-900">${formatPrice(order.subtotal)}</p>
+                                                <p className="text-lg font-semibold text-gray-900">${order.subtotal.toFixed(2)}</p>
                                             </div>
                                             <div className="text-center">
                                                 <p className="text-sm text-gray-600">Tax</p>
-                                                <p className="text-lg font-semibold text-gray-900">${formatPrice(order.tax)}</p>
+                                                <p className="text-lg font-semibold text-gray-900">${order.tax.toFixed(2)}</p>
                                             </div>
                                             <div className="text-center">
                                                 <p className="text-sm text-gray-600">Shipping</p>
                                                 <p className="text-lg font-semibold text-gray-900">
-                                                    {order.shippingCost === 0 ? 'Free' : `$${formatPrice(order.shippingCost)}`}
+                                                    {order.shippingCost === 0 ? 'Free' : `$${order.shippingCost.toFixed(2)}`}
                                                 </p>
                                             </div>
                                             <div className="text-center">
                                                 <p className="text-sm text-gray-600">Total</p>
-                                                <p className="text-xl font-bold text-gray-900">${formatPrice(order.total)}</p>
+                                                <p className="text-xl font-bold text-gray-900">${order.total.toFixed(2)}</p>
                                             </div>
                                         </div>
 
                                         {/* Items */}
                                         <div className="mt-6">
-                                            <h4 className="text-md font-semibold text-gray-900 mb-4">Order Items ({order.orderItems.length})</h4>
+                                            <h4 className="text-md font-semibold text-gray-900 mb-4">Order Items ({order.orderedItems.length})</h4>
                                             <div className="space-y-3">
-                                                {order.orderItems.map((item) => (
+                                                {order.orderedItems.map((item) => (
                                                     <Link href={`/products/${item.id}`} key={item._id}>
                                                         <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
                                                             <div className="w-20 h-20 bg-white rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
-                                                                <Image
+                                                                {/* <Image
                                                                     width={500}
                                                                     height={500}
                                                                     src={item.image[0]}
@@ -331,7 +333,7 @@ export default function CompletedOrdersPage() {
                                                                         e.target.style.display = 'none';
                                                                         e.target.nextElementSibling.style.display = 'flex';
                                                                     }}
-                                                                />
+                                                                /> */}
                                                                 <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg hidden items-center justify-center">
                                                                     <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"></path>
@@ -362,11 +364,11 @@ export default function CompletedOrdersPage() {
                                                             </div>
                                                             <div className="text-right flex-shrink-0">
                                                                 {item.originalPrice > item.price && (
-                                                                    <p className="text-sm text-gray-400 line-through">${formatPrice(item.originalPrice)}</p>
+                                                                    <p className="text-sm text-gray-400 line-through">${item.originalPrice.toFixed(2)}</p>
                                                                 )}
-                                                                <p className="font-semibold text-gray-900">${formatPrice(item.price)}</p>
+                                                                <p className="font-semibold text-gray-900">${item.price.toFixed(2)}</p>
                                                                 <p className="text-sm text-gray-600">
-                                                                    Total: ${formatPrice(item.price * item.quantity)}
+                                                                    Total: ${(item.price * item.quantity).toFixed(2)}
                                                                 </p>
                                                             </div>
                                                         </div>
