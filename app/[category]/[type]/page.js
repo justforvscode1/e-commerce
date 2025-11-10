@@ -8,7 +8,6 @@ import { toast, ToastContainer } from 'react-toastify';
 const CategoryWiseProducts = ({ params }) => {
     const type = decodeURIComponent(use(params).type);
     const Category = decodeURIComponent(use(params).category.toLocaleLowerCase());
-    console.log(Category)
     const [activeCategory, setActiveCategory] = useState((type).toLocaleLowerCase());
     const [isLoading, setIsLoading] = useState(true);
     const [filteredProducts, setFilteredProducts] = useState([]);

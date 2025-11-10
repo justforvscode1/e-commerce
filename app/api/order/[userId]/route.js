@@ -17,7 +17,7 @@ export async function GET(req, { params }) {
 // POST create order
 export async function POST(req, { params }) {
     try {
-        const { userId } = await params;
+        const  {userId}  = await params;
         const body = await req.json();
         
         // Validation

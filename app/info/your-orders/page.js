@@ -214,7 +214,7 @@ export default function PendingOrdersPage() {
 
                             {/* Expanded Order Details */}
                             <div
-                                className={` transition-all duration-300 ease-in-out ${expandedOrder === order.orderId ? 'h-auto opacity-100' : 'max-h-0 opacity-0'
+                                className={` ${expandedOrder === order.orderId ? 'block' : 'hidden'
                                     }`}
                             >
                                 <div className="px-6 pb-6 border-t border-gray-100">
@@ -249,7 +249,7 @@ export default function PendingOrdersPage() {
 
                                                     className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
                                                 >
-                                                    <div className="w-20 h-20 bg-white rounded-lg  border border-gray-200 flex-shrink-0">
+                                                    <div className=" bg-white rounded-lg  border border-gray-200 flex-shrink-0">
                                                         {/* <Image
                                                             width={500}
                                                             height={500}

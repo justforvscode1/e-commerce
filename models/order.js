@@ -29,7 +29,7 @@ const orderSchema = new Schema({
   paymentMethod: {
     type: String,
     required: true,
-    enum: ['cod', 'stripe', 'card'], // Only these three
+    enum: ['cod', 'card'], // Only these three
     default: 'cod'
   },
   // PAYMENT FIELDS (Optional for COD, required for stripe/card)

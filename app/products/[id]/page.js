@@ -105,7 +105,7 @@ function getAvailableOptions(variants, attributeType, currentAttributes) {
 }
 
 export default function ProductPage({ params }) {
-  const {data, status}= useSession()
+  const { data, status } = useSession()
   const router = useRouter();
   const id = decodeURIComponent(use(params).id);
   const [selectedAttributes, setSelectedAttributes] = useState({});
@@ -116,7 +116,7 @@ export default function ProductPage({ params }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [availableAttributes, setAvailableAttributes] = useState({});
-  const [CombinationError , setCombinationError ] = useState('')
+  const [CombinationError, setCombinationError] = useState('')
 
   // Get product data
   useEffect(() => {
@@ -174,11 +174,11 @@ export default function ProductPage({ params }) {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Product Not Found</h2>
           <p className="text-gray-600 mb-6">{message}</p>
           <div className="space-x-4">
-            
-              <button onClick={router.back} className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                Go back
-              </button>
-           
+
+            <button onClick={router.back} className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+              Go back
+            </button>
+
             {onRetry && (
               <button
                 onClick={onRetry}
@@ -263,34 +263,44 @@ export default function ProductPage({ params }) {
 
   const addingtocart = async () => {
     const productdata = {
-      productId:product.productid,
-      userId:data?.user?.id,
+      productId: product.productid,
+      userId: data?.user?.id,
       name: product.name,
       brand: product.brand,
-      image:images[0],
+      image: images[0],
       price,
       quantity,
       stockCount,
       selectedVariant: selectedAttributes,
       salePrice,
     }
-    const sendingcartproduct= await fetch(`/api/cart/${data.user.id}`, {
+    const sendingcartproduct = await fetch(`/api/cart/${data.user.id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify(productdata)
     })
-    const response= await sendingcartproduct.json()
-    if (sendingcartproduct.ok) {
-      toast.success('successfully added in the cart',{
-        position: "top-center"})
+    const response = await sendingcartproduct.json()
+    console.log(response)
+    if (response.error === "product already in the cart") {
+      toast.info('product is already in cart', {
+        position: "top-center"
+      })
+    } else if (response.message === "sucessfully added in the cart") {
+      toast.success("product added in cart", {
+        position: "top-center"
+      })
+    } else {
+      toast.error("error adding in cart", {
+        position: "top-center"
+      })
     }
   }
   return (
     <>
       <ToastContainer />
-        <Navbar/>
+      <Navbar />
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
@@ -350,7 +360,7 @@ export default function ProductPage({ params }) {
             {/* Product Info - Right Side with Better Padding */}
             <div className="lg:pl-8 space-y-8">
 
-           
+
               {/* Brand */}
               {product.brand && (
                 <div className="text-lg font-semibold text-blue-600 mb-2">
@@ -439,7 +449,7 @@ export default function ProductPage({ params }) {
                   })}
                 </div>
               )}
- <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 space-y-6">
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 space-y-6">
                 {/* Quantity Selector */}
                 <div className="space-y-3">
                   <label className="block text-sm font-semibold text-gray-700">Quantity</label>
@@ -503,7 +513,7 @@ export default function ProductPage({ params }) {
               </div>
 
               {/* Quantity & Add to Cart */}
-             
+
             </div>
           </div>
         </div>

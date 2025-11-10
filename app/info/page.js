@@ -27,7 +27,7 @@ export default function AccountPage() {
             title: 'Account Settings',
             description: 'Manage your profile and preferences',
             icon: '👤',
-            href: '/info/account',
+            href: '/info/profile',
             color: 'blue'
         }
     ];
