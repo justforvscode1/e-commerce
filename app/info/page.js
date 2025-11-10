@@ -1,5 +1,6 @@
 "use client"
 import Navbar from '@/components/Navbar';
+import Link from 'next/link';
 import { useState } from 'react';
 
 export default function AccountPage() {
@@ -120,9 +121,9 @@ export default function AccountPage() {
                     <div className="text-center">
                         <p className="text-gray-600 text-sm">
                             Need help?
-                            <a href="/support" className="text-blue-600 hover:text-blue-700 font-medium ml-1">
+                            <Link href="/support" className="text-blue-600 hover:text-blue-700 font-medium ml-1">
                                 Contact Support
-                            </a>
+                            </Link>
                         </p>
                     </div>
                 </div>

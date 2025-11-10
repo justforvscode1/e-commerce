@@ -108,7 +108,7 @@ export default function CompletedOrdersPage() {
 
                 {/* Elegant Filter Tabs */}
                 <div className="mb-10 opacity-0 animate-[fadeIn_0.6s_ease-out_0.2s_forwards]">
-                    <div className="flex space-x-1 bg-slate-100/80 backdrop-blur-sm rounded-xl p-1.5 inline-flex">
+                    <div className=" space-x-1 bg-slate-100/80 backdrop-blur-sm rounded-xl p-1.5 inline-flex">
                         {[
                             { key: 'all', label: 'All Orders', count: orders.length },
                             { key: 'delivered', label: 'Delivered', count: deliveredOrders.length },
