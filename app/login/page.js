@@ -120,7 +120,7 @@ if (email.trim()==='' || password.trim()==='') {
                             </div>
                         )}
                     <div className="mt-6 text-center text-sm text-gray-600">
-                        Don't have an account?{' '}
+                        Don't have an account?
                         <Link href="/register" className="font-semibold text-purple-600 hover:text-purple-700 transition-colors">
                             Register
                         </Link>
