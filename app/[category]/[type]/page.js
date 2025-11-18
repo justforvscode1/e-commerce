@@ -94,25 +94,43 @@ const CategoryWiseProducts = ({ params }) => {
                     <p className="text-lg text-gray-600">Discover the latest in technology and innovation</p>
                 </div>
 
-                {/* Category Filter */}
+                {/* Category Filter (responsive) */}
                 <div className="mb-8">
-                    <div className="flex flex-wrap justify-center gap-4">
-                        {categories.map((category) => (
-                            <button
-                                key={category.id}
-                                onClick={() => handleCategoryChange(category.id)}
-                                className={`px-6 py-3 rounded-full font-medium transition-all duration-300 transform hover:scale-105 ${activeCategory === category.id
-                                    ? 'bg-black text-white shadow-lg'
-                                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'
-                                    }`}
-                                style={{
-                                    animation: activeCategory === category.id ? 'pulse 2s infinite' : 'none'
-                                }}
-                            >
-                                {category.name}
-                                <span className="ml-2 text-sm opacity-75">({category.count})</span>
-                            </button>
-                        ))}
+                    {/* Native select for small screens */}
+                    <div className="block sm:hidden px-4">
+                        <label htmlFor="category-select" className="sr-only">Filter by category</label>
+                        <select
+                            id="category-select"
+                            value={activeCategory}
+                            onChange={(e) => handleCategoryChange(e.target.value)}
+                            className="w-full bg-white border border-gray-200 rounded-full px-4 py-2 text-sm"
+                        >
+                            {categories.map(cat => (
+                                <option key={cat.id} value={cat.id}>{`${cat.name} (${cat.count})`}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* horizontal pill buttons for sm+ screens */}
+                    <div className="hidden sm:block -mx-4 sm:mx-0 px-4 sm:px-0">
+                        <div className="flex items-center overflow-x-auto space-x-3 py-2 justify-center md:space-x-4">
+                            {categories.map((category) => (
+                                <button
+                                    key={category.id}
+                                    onClick={() => handleCategoryChange(category.id)}
+                                    className={`inline-flex whitespace-nowrap items-center px-4 md:px-6 py-2 md:py-3 rounded-full text-sm md:text-base font-medium transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 ${activeCategory === category.id
+                                        ? 'bg-black text-white shadow-lg'
+                                        : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'
+                                        }`}
+                                    style={{
+                                        animation: activeCategory === category.id ? 'pulse 2s infinite' : 'none'
+                                    }}
+                                >
+                                    <span className="truncate">{category.name}</span>
+                                    <span className="ml-2 text-sm opacity-75">({category.count})</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 

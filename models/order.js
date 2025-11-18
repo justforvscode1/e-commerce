@@ -47,7 +47,7 @@ const orderSchema = new Schema({
   paymentStatus: {
     type: String,
     required: true,
-    enum: ['pending', 'processing', 'completed', 'failed', 'refunded', 'requires_payment_method'],
+    enum: ['pending', 'paid', 'failed', 'refunded'],
     default: 'pending'
   },
   paymentDate: {

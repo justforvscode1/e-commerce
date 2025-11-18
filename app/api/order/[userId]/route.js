@@ -19,7 +19,7 @@ export async function POST(req, { params }) {
     try {
         const  {userId}  = await params;
         const body = await req.json();
-        
+        console.log(body);
         // Validation
         if (!body) {
             return NextResponse.json({ error: "body is required" }, { status: 400 });

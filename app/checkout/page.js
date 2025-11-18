@@ -3,15 +3,23 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast, ToastContainer } from 'react-toastify';
 import { useSession } from 'next-auth/react';
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import PaymentForm from '@/components/paymentForm';
+const stripePromise = loadStripe(
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+);
+
 const CheckoutPage = () => {
     const [paymentMethod, setPaymentMethod] = useState('card');
+    const [pendingOrderId, setPendingOrderId] = useState(null);
     const [shippingMethod, setShippingMethod] = useState('standard');
     const { data, status } = useSession()
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [newsletterSubscribe, setNewsletterSubscribe] = useState(false);
     const [orderItems, setorderitems] = useState([])
-
     const [errorhandle, seterrorhandle] = useState(false)
+    const [isProcessingPayment, setIsProcessingPayment] = useState(false);
     const router = useRouter()
     const [shippingForm, setShippingForm] = useState({
         firstName: '',
@@ -24,23 +32,15 @@ const CheckoutPage = () => {
         state: '',
         zipCode: '',
     });
-
-    const [cardForm, setCardForm] = useState({
-        cardNumber: '',
-        expiryDate: '',
-        cvv: '',
-        cardholderName: ''
-    });
-
-    // Sample order data
     useEffect(() => {
         if (status === "authenticated" && data) {
-
             const getcartitems = async () => {
-                const cart = await fetch(`/api/cart/${data.user.id}`)
-                const response = await cart.json()
-                // console.log(response)
-                setorderitems(response)
+                const response = await fetch(`/api/cart/${data.user.id}`)
+                const cartData = await response.json()
+                // Remove userId from each item
+                const cleanedItems = cartData.map(({ userId, ...item }) => item)
+                setorderitems(cleanedItems)
+                console.log(cleanedItems)
             }
             getcartitems()
         }
@@ -55,100 +55,145 @@ const CheckoutPage = () => {
         setShippingForm(prev => ({ ...prev, [field]: value }));
     };
 
-    const handleCardChange = (field, value) => {
-        setCardForm(prev => ({ ...prev, [field]: value }));
-    };
     const handleback = () => {
         router.back()
     }
 
-    const formatCardNumber = (value) => {
-        const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-        const matches = v.match(/\d{4,16}/g);
-        const match = matches && matches[0] || '';
-        const parts = [];
-        for (let i = 0, len = match.length; i < len; i += 4) {
-            parts.push(match.substring(i, i + 4));
-        }
-        if (parts.length) {
-            return parts.join(' ');
-        } else {
-            return v;
-        }
-    };
-
-    const formatExpiryDate = (value) => {
-        const v = value.replace(/\D/g, '');
-        if (v.length >= 2) {
-            return v.substring(0, 2) + '/' + v.substring(2, 4);
-        }
-        return v;
-    };
     const generateOrderId = () => {
-        const timestamp = Date.now().toString(36); // Base36 for shorter string
-        const random = Math.random().toString(36).substr(2, 9); // Random part
+        const timestamp = Date.now().toString(36);
+        const random = Math.random().toString(36).substr(2, 9);
         return `ORD-${timestamp}-${random}`.toUpperCase();
     };
-    const handlePlaceOrder = async () => {
+
+    const createOrderInDatabase = async (orderId, paymentStatus) => {
+        const finaldata = {
+            orderId,
+            orderedItems: orderItems,
+            paymentMethod,
+            paymentStatus,
+            status: 'pending',
+            shippingForm,
+            shippingMethod,
+            shippingCost,
+            subtotal,
+            tax,
+            total,
+        };
+
         try {
+            const myHeaders = new Headers();
+            myHeaders.append('Content-Type', 'application/json');
+            const sendcheckout = await fetch(`/api/order/${data.user.id}`, {
+                method: 'POST',
+                headers: myHeaders,
+                body: JSON.stringify(finaldata),
+            });
 
+            const response = await sendcheckout.json();
+            console.log('createOrder response', response);
 
-            const finaldata = {
-                orderId: generateOrderId(),
-                orderedItems: orderItems,
-                paymentMethod,
-                paymentStatus: "pending",
-                status: "pending",
-                shippingCost,
-                shippingForm,
-                shippingMethod,
-                subtotal,
-                tax,
-                total,
+            if (!sendcheckout.ok) {
+                return { ok: false, error: response?.error || 'Failed to create order' };
             }
+
+            // On successful order creation, clear user's cart
+            const myHeader = new Headers();
+            myHeader.append('Content-Type', 'application/json');
+            const requestOptions = {
+                method: 'DELETE',
+                headers: myHeader,
+                body: JSON.stringify({ userId: data.user.id }),
+            };
+
+            const check = await fetch(`/api/cart/${data.user.id}`, requestOptions);
+            const responses = await check.json();
+            console.log('clearCart response', responses);
+
+            if (!check.ok) {
+                return { ok: false, error: responses?.error || 'Order created but failed to clear cart' };
+            }
+
+            return { ok: true, data: response };
+        } catch (err) {
+            console.error('createOrderInDatabase error', err);
+            return { ok: false, error: err?.message || String(err) };
+        }
+    };
+
+    // Return orderId string to proceed to payment, or false to abort
+    const handlePlaceOrder = async () => {
+        console.log("placing order")
+        try {
             const isEmptyField = Object.values(shippingForm).some(field =>
                 field.trim() === ''
             );
-            // console.log(finaldata)
+
             if (isEmptyField) {
                 seterrorhandle(true)
-            } else {
-                seterrorhandle(false)
-                setAgreedToTerms(false)
-                const myHeaders = new Headers();
-                myHeaders.append("Content-Type", "application/json");
-                const sendcheckout = await fetch(`/api/order/${data.user.id}`, {
-                    method: "POST",
-                    headers: myHeaders,
-                    body: JSON.stringify(finaldata)
-                })
-                const response = await sendcheckout.json()
-                console.log(response)
-                if (sendcheckout.ok) {
-                    
-                const myHeader = new Headers();
-                myHeaders.append("Content-Type", "application/json");
-                const requestOptions = {
-                    method: "DELETE",
-                    headers: myHeader,
-                    body: JSON.stringify({userId: data.user.id} ),
-                };
-
-                const check = await fetch(`/api/cart/${data.user.id}`, requestOptions)
-                const responses = await check.json()
-            console.log(responses)
-        
-                if (check.ok) {
-                    toast.success("Your order has been placed")
-                    router.replace("/info/your-orders")
-
-                }
+                return false;
             }
+
+            // Validation passed
+            seterrorhandle(false)
+            setAgreedToTerms(false)
+
+            // If COD, create order immediately with pending payment status and do NOT proceed to payment
+            if (paymentMethod === 'cod') {
+                const orderId = generateOrderId();
+                await createOrderInDatabase(orderId, 'pending');
+                return false;
             }
+
+            // If online payment, generate and return orderId so payment form can proceed
+            if (paymentMethod === 'card') {
+                const orderId = generateOrderId();
+                setPendingOrderId(orderId);
+                // set processing flag - actual DB create happens after payment success
+                setIsProcessingPayment(true);
+                return orderId;
+            }
+
+            // default: do not proceed
+            return false;
         } catch (error) {
             console.log(error)
-            toast.error("error placing your order")
+            toast.error("error placing your order", {
+                position: "top-center"
+            })
+            setIsProcessingPayment(false);
+            return false;
         }
+    };
+
+    // Called when Stripe payment succeeds. `orderIdFromForm` is the id we generated before payment.
+    const handleStripePaymentSuccess = async (paymentIntentId, orderIdFromForm) => {
+        try {
+            const orderId = orderIdFromForm || pendingOrderId || generateOrderId();
+            const result = await createOrderInDatabase(orderId, 'paid');
+            if (result.ok) {
+                toast.success('Your order has been placed', { position: 'top-center' });
+                // clear pending order id and processing flag
+                setPendingOrderId(null);
+                setIsProcessingPayment(false);
+                router.replace('/info/your-orders');
+            } else {
+                console.error('Order created fail:', result);
+                toast.error(result.error || 'Order creation failed after payment', { position: 'top-center' });
+                setIsProcessingPayment(false);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error('Error completing order after payment', { position: 'top-center' });
+            setIsProcessingPayment(false);
+        }
+    };
+
+    const handleStripePaymentError = (errorMessage) => {
+        toast.error(errorMessage, {
+            position: "top-center"
+        });
+        console.log(errorMessage);
+        setIsProcessingPayment(false);
     };
 
     return (<>
@@ -168,7 +213,6 @@ const CheckoutPage = () => {
                         </div>
                         <div className="flex items-center space-x-2 text-sm text-gray-500">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
                             Secure Checkout
                         </div>
@@ -375,13 +419,13 @@ const CheckoutPage = () => {
                             </div>
 
                             <div className="space-y-4 mb-6">
-                                <div className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === 'online' ? 'border-gray-900 bg-gray-50' : 'border-gray-200'}`}
-                                    onClick={() => setPaymentMethod('online')}>
+                                <div className={`border-2 rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === 'card' ? 'border-gray-900 bg-gray-50' : 'border-gray-200'}`}
+                                    onClick={() => setPaymentMethod('card')}>
                                     <div className="flex items-center">
                                         <input
                                             type="radio"
-                                            checked={paymentMethod === 'online'}
-                                            onChange={() => setPaymentMethod('online')}
+                                            checked={paymentMethod === 'card'}
+                                            onChange={() => setPaymentMethod('card')}
                                             className="mr-3"
                                         />
                                         <div className="flex items-center">
@@ -413,64 +457,11 @@ const CheckoutPage = () => {
                                 </div>
                             </div>
 
-                            {/* Payment Method Details */}
-                            <div className={`transition-all duration-300 ease-in-out ${paymentMethod === 'online' ? 'opacity-100 max-h-[400px]' : 'opacity-0 max-h-0 overflow-hidden'}`}>
-                                <div className="space-y-4 pt-4 border-t border-gray-200">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Card Number *</label>
-                                        <input
-                                            type="text"
-                                            value={cardForm.cardNumber}
-                                            onChange={(e) => handleCardChange('cardNumber', formatCardNumber(e.target.value))}
-                                            placeholder="1234 5678 9012 3456"
-                                            maxLength={19}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
-                                            required
-                                        />
-                                    </div>
+                            {/* Stripe Payment Form */}
 
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Expiry Date *</label>
-                                            <input
-                                                type="text"
-                                                value={cardForm.expiryDate}
-                                                onChange={(e) => handleCardChange('expiryDate', formatExpiryDate(e.target.value))}
-                                                placeholder="MM/YY"
-                                                maxLength={5}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">CVV *</label>
-                                            <input
-                                                type="text"
-                                                value={cardForm.cvv}
-                                                onChange={(e) => handleCardChange('cvv', e.target.value.replace(/\D/g, '').slice(0, 4))}
-                                                placeholder="123"
-                                                maxLength={4}
-                                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
 
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Cardholder Name *</label>
-                                        <input
-                                            type="text"
-                                            value={cardForm.cardholderName}
-                                            onChange={(e) => handleCardChange('cardholderName', e.target.value)}
-                                            placeholder="John Doe"
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className={`transition-all duration-300 ease-in-out ${paymentMethod === 'cod' ? 'opacity-100 max-h-32' : 'opacity-0 max-h-0 overflow-hidden'}`}>
+                            {/* COD Notice */}
+                            {paymentMethod === 'cod' && (
                                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
                                     <div className="flex items-center">
                                         <svg className="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -482,11 +473,8 @@ const CheckoutPage = () => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
-
-                        {/* Terms and Newsletter */}
-
                     </div>
 
                     {/* Right Column - Order Summary */}
@@ -497,7 +485,7 @@ const CheckoutPage = () => {
                             {/* Order Items */}
                             <div className="space-y-4 mb-6">
                                 {orderItems.map((item) => (
-                                    <div key={item.productId} className="flex items-center space-x-4 pb-4 border-b border-gray-100 last:border-b-0">
+                                    <div key={item._id} className="flex items-center space-x-4 pb-4 border-b border-gray-100 last:border-b-0">
                                         <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
                                             <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -527,7 +515,7 @@ const CheckoutPage = () => {
                                         {shippingCost === 0 ? (
                                             <span className="text-green-600">FREE</span>
                                         ) : (
-                                            `$${shippingCost.toFixed(2)}`
+                                            `${shippingCost.toFixed(2)}`
                                         )}
                                     </span>
                                 </div>
@@ -544,13 +532,27 @@ const CheckoutPage = () => {
                             </div>
 
                             {/* Place Order Button */}
-                            <button
+                            {paymentMethod === 'card' ? (
+                                <Elements stripe={stripePromise}>
+                                            <PaymentForm
+                                                orderId={pendingOrderId}
+                                        amount={total}
+                                        email={shippingForm.email}
+                                                onSuccess={handleStripePaymentSuccess}
+                                        onError={handleStripePaymentError}
+                                        isProcessing={isProcessingPayment}
+                                        agreedToTerms={agreedToTerms}
+                                        handlePlaceOrder={handlePlaceOrder}
+                                        createOrderInDatabase={createOrderInDatabase}
+                                    />
+                                </Elements>
+                            ) : (<button
                                 onClick={handlePlaceOrder}
-                                disabled={!agreedToTerms}
+                                disabled={!agreedToTerms || isProcessingPayment}
                                 className="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 mb-4"
                             >
-                                {paymentMethod === 'cod' ? 'Place Order (COD)' : `Pay $${total.toFixed(2)}`}
-                            </button>
+                                {paymentMethod === 'cod' ? 'Place Order (COD)' : `Pay ${total.toFixed(2)}`}
+                            </button>)}
 
                             {/* Security Info */}
                             <div className="text-center">
@@ -565,7 +567,7 @@ const CheckoutPage = () => {
                                 </p>
                             </div>
                         </div>
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-6">
                             <div className="space-y-4">
                                 <label className="flex items-start">
                                     <input
