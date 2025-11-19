@@ -61,7 +61,10 @@ export default function Home() {
       try {
         const gettheitems = await fetch(`/api/products`)
         const items = await gettheitems.json()
-        setFeaturedProducts(items)
+        if (items.length > 0) {
+          setFeaturedProducts(items)
+          
+        }
 
       } catch (error) {
         console.error("Error fetching products:", error)
