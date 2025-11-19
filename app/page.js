@@ -61,8 +61,8 @@ export default function Home() {
       try {
         const gettheitems = await fetch(`/api/products`)
         const items = await gettheitems.json()
-        if (items.length > 0) {
-          setFeaturedProducts(items)
+        if (Array.isArray(items) && items.length > 4) {
+          setFeaturedProducts(items.slice(-4))
           
         }
 
@@ -222,7 +222,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              { (featuredProducts.slice(-4)).map((product, index) => {
+              { featuredProducts.map((product, index) => {
                 return (
                 <Link key={ product.productid } href={ `/products/${product.productid}` }> <div
                   className={ `group bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 ${isVisible['section-products']
