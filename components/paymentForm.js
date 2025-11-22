@@ -6,8 +6,8 @@ import {
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js';
-import { ToastContainer,toast } from 'react-toastify';
-export default function PaymentForm({ orderId, amount, email, onSuccess, onError , handlePlaceOrder,createOrderInDatabase, agreedToTerms}) {
+import { ToastContainer, toast } from 'react-toastify';
+export default function PaymentForm({ orderId, amount, email, onSuccess, onError, handlePlaceOrder, createOrderInDatabase, agreedToTerms }) {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -91,49 +91,50 @@ export default function PaymentForm({ orderId, amount, email, onSuccess, onError
 
   return (
     <>
-    <ToastContainer />
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="border border-gray-300 rounded-lg p-4">
-        <CardElement
-          options={{
-            style: {
-              base: {
-                fontSize: '16px',
-                color: '#424770',
-                '::placeholder': {
-                  color: '#aab7c4',
+      <ToastContainer />
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="border border-gray-300 rounded-lg p-4">
+          <CardElement
+            options={{
+              style: {
+                base: {
+                  fontSize: '16px',
+                  color: '#424770',
+                  '::placeholder': {
+                    color: '#aab7c4',
+                  },
+                },
+                invalid: {
+                  color: '#9e2146',
                 },
               },
-              invalid: {
-                color: '#9e2146',
-              },
-            },
-               hidePostalCode: true,
-          }}
-        />
-      </div>
+              disableLink: true
 
-      {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-800 text-sm">{error}</p>
+            }}
+          />
         </div>
-      )}
-      {success && (
-         <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-        <p className="text-green-800 font-semibold">✓ Payment successful!</p>
-        <p className="text-green-700 text-sm mt-1">Thank you for your purchase.</p>
-      </div>
-      )}
 
-      <button 
-        type="submit"
-    
-        disabled={!stripe || loading || !agreedToTerms}
-        className="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 mb-4"
-      >
-        {loading ? 'Processing...' : `Pay $${amount.toFixed(2)}`}
-      </button>
-    </form>
+        {error && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-800 text-sm">{error}</p>
+          </div>
+        )}
+        {success && (
+          <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-green-800 font-semibold">✓ Payment successful!</p>
+            <p className="text-green-700 text-sm mt-1">Thank you for your purchase.</p>
+          </div>
+        )}
+
+        <button
+          type="submit"
+
+          disabled={!stripe || loading || !agreedToTerms}
+          className="w-full bg-gray-900 text-white py-4 rounded-lg font-semibold hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 mb-4"
+        >
+          {loading ? 'Processing...' : `Pay $${amount.toFixed(2)}`}
+        </button>
+      </form>
     </>
   );
 }

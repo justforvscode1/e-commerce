@@ -141,6 +141,11 @@ const CheckoutPage = () => {
             if (paymentMethod === 'cod') {
                 const orderId = generateOrderId();
                 await createOrderInDatabase(orderId, 'pending');
+                toast.success('Your order has been placed ', { position: 'top-center' });
+                setTimeout(() => {
+                    
+                    router.replace('/info/order-data');
+                }, 1000);
                 return false;
             }
 
@@ -175,7 +180,7 @@ const CheckoutPage = () => {
                 // clear pending order id and processing flag
                 setPendingOrderId(null);
                 setIsProcessingPayment(false);
-                router.replace('/info/your-orders');
+                router.replace('/info/history');
             } else {
                 console.error('Order created fail:', result);
                 toast.error(result.error || 'Order creation failed after payment', { position: 'top-center' });

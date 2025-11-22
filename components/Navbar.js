@@ -55,7 +55,7 @@ const Navbar = () => {
                                 onMouseLeave={() => setIsDropdownOpen(null)} >
 
                                 <button className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 py-2">
-                                    <Link key={category.name} href={`/${category.name}/all`}><span>{category.name}</span></Link>
+                                    <Link key={category.name} href={`/products/${category.name}/all`}><span>{category.name}</span></Link>
                                     <svg className={`w-4 h-4 transition-transform duration-300 ${isDropdownOpen === category.name ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                     </svg>
@@ -70,7 +70,7 @@ const Navbar = () => {
                                         {category.items.map((item, index) => (
                                             <a
                                                 key={item}
-                                                href={`/${category.name}/${item}`}
+                                                href={`/products/${category.name}/${item}`}
                                                 className={`block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 transform ${isDropdownOpen === category.name
                                                     ? 'translate-x-0 opacity-100'
                                                     : 'translate-x-2 opacity-0'
@@ -153,13 +153,13 @@ const Navbar = () => {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
                             {filteredProducts.map((product) => (
-                                <Link key={product._id} href={`/products/${product.id}`}><div className="hover:translate-y-0.5 hover:shadow-2xl bg-white border border-gray-200 rounded-lg shadow-sm transition-shadow duration-200 overflow-hidden">
+                                <Link key={product._id} href={`/product/${product.productid}`}><div className="hover:translate-y-0.5 hover:shadow-2xl bg-white border border-gray-200 rounded-lg shadow-sm transition-shadow duration-200 overflow-hidden">
                                     <div className="aspect-w-16 aspect-h-9">
-                                        {/* <Image height={500} width={500}
-                                            src={product.image}
+                                        <Image height={500} width={500}
+                                            src={product.variants[0].images[0]}
                                             alt={product.name}
-                                            className="w-full h-32 object-cover"
-                                        /> */}
+                                            className="w-full h-32 object-contain"
+                                        />
                                     </div>
                                     <div className="p-4">
                                         <h3 className="font-semibold text-gray-900 text-sm mb-1 truncate">

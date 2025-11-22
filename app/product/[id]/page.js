@@ -309,7 +309,7 @@ export default function ProductPage({ params }) {
             <div className="space-y-6">
               <div className="aspect-square bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden group relative">
                 {images.length > 0 ? (
-                  <div>heelol</div>
+                  <Image src={images[pictureno]} alt={`Product Image ${pictureno + 1}`} width={500} height={500} className="w-full h-150 bg-gradient-to-br from-gray-100 to-gray-200" />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                     <span className="text-gray-400 text-lg">No Image Available</span>
@@ -351,6 +351,7 @@ export default function ProductPage({ params }) {
                         : 'border-gray-200 hover:border-gray-300 hover:shadow-lg'
                         }`}
                     >
+                      <Image src={img} alt={`Thumbnail ${idx + 1}`} width={100} height={100} className="w-full h-full object-cover" />
                     </button>
                   ))}
                 </div>

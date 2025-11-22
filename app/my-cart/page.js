@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast, ToastContainer } from 'react-toastify';
 import { useSession, signIn, signOut } from "next-auth/react"
+import Image from 'next/image';
 const CartPage = () => {
     const { data, status } = useSession();
     const [cartItems, setCartItems] = useState([]);
@@ -17,9 +18,8 @@ const CartPage = () => {
     const subtotal = cartItems?.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const savings = cartItems?.reduce((sum, item) => sum + ((item.originalPrice - item.price) * item.quantity), 0);
     // const savings = 1
-    const shipping = subtotal > 150 ? 0 : 12.99;
     const tax = (subtotal * 0.0875) // 8.75% tax
-    const total = subtotal + shipping + tax - discount;
+    const total = subtotal  + tax - discount;
     const router = useRouter()
 
     useEffect(() => {
@@ -139,7 +139,7 @@ const CartPage = () => {
             setDiscount(25);
             setPromoApplied(true);
         } else if (code === 'FREESHIP') {
-            setDiscount(shipping);
+            // setDiscount(shipping);
             setPromoApplied(true);
         }
     };
@@ -237,12 +237,19 @@ const CartPage = () => {
                                         {/* Product Image */}
                                         <div className="flex-shrink-0">
                                             <div className="w-44 h-44 bg-gray-100 rounded-lg overflow-hidden shadow-md border border-gray-200">
-                                                <Link href={`/products/${item.productId}`}>
-                                                    <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center hover:from-gray-300 hover:to-gray-400 transition-colors cursor-pointer">
+                                                <Link href={`/product/${item.productId}`}>
+                                                    {/* <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center hover:from-gray-300 hover:to-gray-400 transition-colors cursor-pointer">
                                                         <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                         </svg>
-                                                    </div>
+                                                    </div> */}
+                                                    <Image
+                                                        src={item.image}
+                                                        alt={item.name}
+                                                        width={176}
+                                                        height={176}
+                                                        className="object-cover w-full h-full"
+                                                    />
                                                 </Link>
                                             </div>
                                         </div>
@@ -381,32 +388,6 @@ const CartPage = () => {
                                     <span className="text-gray-600">Subtotal ({cartItems.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
                                     <span className="font-medium">${subtotal.toFixed(2)}</span>
                                 </div>
-
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600">Shipping</span>
-                                    <span className="font-medium">
-                                        {shipping === 0 ? (
-                                            <span className="text-green-600">FREE</span>
-                                        ) : (
-                                            `$${shipping.toFixed(2)}`
-                                        )}
-                                    </span>
-                                </div>
-
-                                {shipping > 0 && subtotal < 150 && (
-                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                                        <p className="text-sm text-blue-800">
-                                            Add ${(150 - subtotal).toFixed(2)} more for free shipping
-                                        </p>
-                                        <div className="w-full bg-blue-100 rounded-full h-2 mt-2">
-                                            <div
-                                                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                                                style={{ width: `${(subtotal / 150) * 100}%` }}
-                                            ></div>
-                                        </div>
-                                    </div>
-                                )}
-
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Tax</span>
                                     <span className="font-medium">${tax.toFixed(2)}</span>

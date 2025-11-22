@@ -5,6 +5,31 @@ import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
+// SVG Icons
+const ProfileIcon = ({ className = "w-5 h-5" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+  </svg>
+);
+
+const SecurityIcon = ({ className = "w-5 h-5" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+  </svg>
+);
+
+const ActivityIcon = ({ className = "w-5 h-5" }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+  </svg>
+);
+
+const VerifiedIcon = ({ className = "w-4 h-4" }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 20 20">
+    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+  </svg>
+);
+
 export default function AccountProfile() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -14,23 +39,20 @@ export default function AccountProfile() {
 
   useEffect(() => {
     if (status === 'loading') return;
-
-
+    if (!session) {
+      router.push('/auth/signin');
+      return;
+    }
     fetchUserProfile();
-  }, [status]);
+  }, [status, session]);
 
   const fetchUserProfile = async () => {
     try {
       setIsLoading(true);
       const response = await fetch('/api/user/profile');
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch profile data');
-      }
-
+      if (!response.ok) throw new Error('Failed to fetch profile data');
       const userData = await response.json();
       setUser(userData);
-      console.log(userData)
     } catch (error) {
       console.error('Error fetching profile:', error);
     } finally {
@@ -62,11 +84,6 @@ export default function AccountProfile() {
           <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
         </svg>
       ),
-      discord: (
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.8 8.18 1.8 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.029a19.94 19.94 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.055c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.419c0 1.334-.956 2.419-2.157 2.419zm7.974 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.419c0 1.334-.946 2.419-2.157 2.419z" />
-        </svg>
-      ),
       credentials: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -87,135 +104,188 @@ export default function AccountProfile() {
     );
   }
 
-  if (!session) {
-    return null;
-  }
+  const tabs = [
+    { id: 'profile', name: 'Profile', icon: ProfileIcon },
+    { id: 'security', name: 'Security', icon: SecurityIcon },
+    { id: 'activity', name: 'Activity', icon: ActivityIcon },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
-
-
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        {/* Profile Header */}
-        <div className="bg-white rounded-lg border border-gray-200 p-8 mb-8">
-          <div className="flex items-start space-x-6">
-            {/* Profile Image */}
-            <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center overflow-hidden">
-                {user?.profileImage || session.user?.image ? (
-                  <Image
-                    src={user?.profileImage || session.user?.image}
-                    alt="Profile"
-                    width={80}
-                    height={80}
-                    className="rounded-full object-cover"
-                  />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Account Status</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  {user?.isActive ? 'Active' : 'Inactive'}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+                <div className={`w-3 h-3 rounded-full ${user?.isActive ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Email Verification</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  {user?.isEmailVerified ? 'Verified' : 'Pending'}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                {user?.isEmailVerified ? (
+                  <VerifiedIcon className="w-6 h-6 text-blue-600" />
                 ) : (
-                  <span className="text-2xl font-light text-gray-600">
-                    {user?.firstName?.[0]?.toUpperCase() || session.user?.name?.[0]?.toUpperCase()}
-                  </span>
+                  <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
                 )}
               </div>
             </div>
-
-            {/* Profile Info */}
-            <div className="flex-1">
-              <h1 className="text-2xl font-light text-gray-900 mb-2">
-                {user?.firstName && user?.lastName
-                  ? `${user.firstName} ${user.lastName}`
-                  : session.user?.name || 'User'
-                }
-              </h1>
-              <p className="text-gray-600 mb-4">{session.user?.email}</p>
-
-              <div className="flex flex-wrap gap-2">
-                {user?.isEmailVerified && (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
-                    Verified
-                  </span>
-                )}
-                {user?.isActive && (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
-                    Active
-                  </span>
-                )}
-                {user?.createdAt && (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-600 border border-gray-200">
-                    Member since {formatDate(user.createdAt)}
-                  </span>
-                )}
+          </div>
+          
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Member Since</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">
+                  {user?.createdAt ? new Date(user.createdAt).getFullYear() : 'N/A'}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar Navigation */}
-          <div className="lg:col-span-1">
-            <nav className="bg-white rounded-lg border border-gray-200 p-6 space-y-1 sticky top-8">
-              {[
-                { id: 'profile', name: 'Profile Information' },
-                { id: 'security', name: 'Security' },
-                { id: 'activity', name: 'Activity' },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${activeTab === tab.id
-                      ? 'bg-gray-50 text-gray-900 font-medium'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+          {/* Sidebar */}
+          <div className="xl:col-span-1 space-y-6">
+            {/* Profile Card */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="text-center">
+                <div className="relative inline-block mb-4">
+                  <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden mx-auto">
+                    {user?.profileImage || session.user?.image ? (
+                      <Image
+                        src={user?.profileImage || session.user?.image}
+                        alt="Profile"
+                        width={80}
+                        height={80}
+                        className="rounded-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-2xl font-light text-gray-600">
+                        {user?.firstName?.[0]?.toUpperCase() || session.user?.name?.[0]?.toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  {user?.isEmailVerified && (
+                    <div className="absolute bottom-0 right-0 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center border-2 border-white">
+                      <VerifiedIcon className="w-3 h-3 text-white" />
+                    </div>
+                  )}
+                </div>
+                
+                <h2 className="text-xl font-bold text-gray-900 mb-1">
+                  {user?.firstName && user?.lastName
+                    ? `${user.firstName} ${user.lastName}`
+                    : session.user?.name || 'User'
+                  }
+                </h2>
+                <p className="text-gray-600 text-sm mb-4">{session.user?.email}</p>
+                
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {user?.isActive && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                      Active
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Navigation */}
+            <nav className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h3 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">Navigation</h3>
+              <div className="space-y-2">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-left transition-colors ${
+                      activeTab === tab.id
+                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
-                >
-                  {tab.name}
-                </button>
-              ))}
+                  >
+                    <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-blue-600' : 'text-gray-400'}`} />
+                    <span className="font-medium">{tab.name}</span>
+                  </button>
+                ))}
+              </div>
             </nav>
           </div>
 
-          {/* Content Area */}
-          <div className="lg:col-span-3">
-            {/* Profile Information Tab */}
+          {/* Main Content */}
+          <div className="xl:col-span-3">
+            {/* Profile Tab */}
             {activeTab === 'profile' && (
-              <div className="bg-white rounded-lg border border-gray-200 p-8">
-                <h2 className="text-lg font-medium text-gray-900 mb-6">Profile Information</h2>
-
-                <div className="space-y-6">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div className="p-8 border-b border-gray-200">
+                  <h2 className="text-2xl font-bold text-gray-900">Profile Information</h2>
+                  <p className="text-gray-600 mt-2">Manage your personal information and account details</p>
+                </div>
+                
+                <div className="p-8 space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-3">
                         First Name
                       </label>
-                      <div className="p-3 text-gray-900 bg-gray-50 rounded border border-gray-200 text-sm">
+                      <div className="p-4 text-gray-900 bg-gray-50 rounded-lg border border-gray-200 text-sm font-medium">
                         {user?.firstName || 'Not provided'}
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-3">
                         Last Name
                       </label>
-                      <div className="p-3 text-gray-900 bg-gray-50 rounded border border-gray-200 text-sm">
+                      <div className="p-4 text-gray-900 bg-gray-50 rounded-lg border border-gray-200 text-sm font-medium">
                         {user?.lastName || 'Not provided'}
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
                       Email Address
                     </label>
-                    <div className="p-3 text-gray-900 bg-gray-50 rounded border border-gray-200 text-sm flex items-center justify-between">
-                      <span>{session.user?.email}</span>
-                      {user?.isEmailVerified && (
-                        <span className="text-green-600 text-xs font-medium">Verified</span>
-                      )}
+                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-gray-900 font-medium">{session.user?.email}</span>
+                        {user?.isEmailVerified && (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                            <VerifiedIcon className="w-3 h-3 mr-1" />
+                            Verified
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-gray-200">
-                    <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-                      Edit Profile
+                  <div className="pt-6 border-t border-gray-200">
+                    <button className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                      Edit Profile Information
                     </button>
                   </div>
                 </div>
@@ -224,43 +294,43 @@ export default function AccountProfile() {
 
             {/* Security Tab */}
             {activeTab === 'security' && (
-              <div className="bg-white rounded-lg border border-gray-200 p-8">
-                <h2 className="text-lg font-medium text-gray-900 mb-6">Security Settings</h2>
-
-                <div className="space-y-6">
-                  {/* Authentication Methods */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div className="p-8 border-b border-gray-200">
+                  <h2 className="text-2xl font-bold text-gray-900">Security Settings</h2>
+                  <p className="text-gray-600 mt-2">Manage your connected accounts and security preferences</p>
+                </div>
+                
+                <div className="p-8 space-y-8">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-700 mb-4">Connected Accounts</h3>
-                    <div className="space-y-3">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Connected Accounts</h3>
+                    <div className="space-y-4">
                       {Object.entries(user?.linkedAccounts || {}).map(([provider, connected]) => (
-                        connected ? (
-                          <div key={provider} className="flex items-center justify-between p-4 bg-gray-50 rounded border border-gray-200">
-
-                           <div className="flex items-center space-x-3">
-                              <div className="flex items-center justify-center w-8 h-8 bg-white rounded border border-gray-200">
+                        connected && (
+                          <div key={provider} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="flex items-center space-x-4">
+                              <div className="w-10 h-10 bg-white rounded-lg border border-gray-200 flex items-center justify-center">
                                 {getProviderIcon(provider)}
                               </div>
                               <div>
-                                <p className="text-sm font-medium text-gray-900 capitalize">
+                                <p className="font-medium text-gray-900 capitalize">
                                   {provider === 'credentials' ? 'Email & Password' : provider}
                                 </p>
-                                <p className="text-xs text-gray-500">
-                                  {connected ? 'Connected' : 'Not connected'}
-                                </p>
+                                <p className="text-sm text-gray-500">Connected</p>
                               </div>
                             </div>
-
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                              Active
+                            </span>
                           </div>
-                        ):''
+                        )
                       ))}
                     </div>
                   </div>
 
-                  {/* Password Section */}
                   {user?.hasPassword && (
                     <div className="pt-6 border-t border-gray-200">
-                      <h3 className="text-sm font-medium text-gray-700 mb-4">Password</h3>
-                      <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Password</h3>
+                      <button className="px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors duration-200">
                         Change Password
                       </button>
                     </div>
@@ -271,27 +341,37 @@ export default function AccountProfile() {
 
             {/* Activity Tab */}
             {activeTab === 'activity' && user && (
-              <div className="bg-white rounded-lg border border-gray-200 p-8">
-                <h2 className="text-lg font-medium text-gray-900 mb-6">Account Activity</h2>
-
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 bg-gray-50 rounded border border-gray-200">
-                      <h3 className="text-sm font-medium text-gray-700 mb-1">Last Login</h3>
-                      <p className="text-sm text-gray-900">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div className="p-8 border-b border-gray-200">
+                  <h2 className="text-2xl font-bold text-gray-900">Account Activity</h2>
+                  <p className="text-gray-600 mt-2">View your account activity and important dates</p>
+                </div>
+                
+                <div className="p-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
+                      <h3 className="text-sm font-medium text-gray-700 mb-2">Last Login</h3>
+                      <p className="text-lg font-semibold text-gray-900">
                         {user.lastLogin ? formatDate(user.lastLogin) : 'Never'}
                       </p>
                     </div>
 
-                    <div className="p-4 bg-gray-50 rounded border border-gray-200">
-                      <h3 className="text-sm font-medium text-gray-700 mb-1">Account Created</h3>
-                      <p className="text-sm text-gray-900">{formatDate(user.createdAt)}</p>
+                    <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
+                      <h3 className="text-sm font-medium text-gray-700 mb-2">Account Created</h3>
+                      <p className="text-lg font-semibold text-gray-900">{formatDate(user.createdAt)}</p>
                     </div>
-                  </div>
 
-                  <div className="p-4 bg-gray-50 rounded border border-gray-200">
-                    <h3 className="text-sm font-medium text-gray-700 mb-1">Last Updated</h3>
-                    <p className="text-sm text-gray-900">{formatDate(user.updatedAt)}</p>
+                    <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
+                      <h3 className="text-sm font-medium text-gray-700 mb-2">Last Updated</h3>
+                      <p className="text-lg font-semibold text-gray-900">{formatDate(user.updatedAt)}</p>
+                    </div>
+
+                    <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
+                      <h3 className="text-sm font-medium text-gray-700 mb-2">Email Status</h3>
+                      <p className="text-lg font-semibold text-gray-900">
+                        {user.isEmailVerified ? 'Verified' : 'Not Verified'}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

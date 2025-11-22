@@ -148,18 +148,18 @@ const CategoryWiseProducts = ({ params }) => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {filteredProducts.map((product, index) => (
-                            <Link href={`/products/${product.productid}`} key={product.productid}> <div
+                            <Link href={`/product/${product.productid}`} key={product.productid}> <div
                                 className="group bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
                                 style={{
                                     animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
                                 }}
                             >
                                 <div className="relative overflow-hidden">
-                                    {/* <Image width={500} height={500}
-                                        src={product.images[0]}
+                                    <Image width={500} height={500}
+                                        src={product.variants[0].images[0]}
                                         alt={product.name}
                                         className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
-                                    /> */}
+                                    />
 
 
 
