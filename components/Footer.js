@@ -62,7 +62,7 @@ export default function Footer() {
               <li>
                 <Link href="/deals" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
                   <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2 group-hover:bg-blue-600"></span>
-                  Today's Deals
+                  Today&lsquo;s Deals
                 </Link>
               </li>
               <li>

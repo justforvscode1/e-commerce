@@ -28,7 +28,7 @@ export default function CompletedOrdersPage() {
                 }
             })();
         }
-    }, [status]);
+    }, [status , data]);
 
     const toggleOrderExpansion = (orderId) => {
         setExpandedOrder(expandedOrder === orderId ? null : orderId);

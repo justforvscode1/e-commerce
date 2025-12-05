@@ -49,7 +49,7 @@ export default function AccountProfile() {
       return;
     }
     fetchUserProfile();
-  }, [status, session]);
+  }, [status, session,router]);
 
   const fetchUserProfile = async () => {
     try {
@@ -469,7 +469,7 @@ export default function AccountProfile() {
 
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Type "delete" to confirm
+                  Type &quot;delete&quot; to confirm
                 </label>
                 <input
                   type="text"

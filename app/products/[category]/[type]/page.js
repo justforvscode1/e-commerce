@@ -25,7 +25,7 @@ const CategoryWiseProducts = ({ params }) => {
         gettheproducts()
 
 
-    }, [])
+    }, [Category])
     useEffect(() => {
         if (Category === "fashion") {
             setcategories([
@@ -47,7 +47,7 @@ const CategoryWiseProducts = ({ params }) => {
                 ]
             )
         }
-    }, [products, activeCategory])
+    }, [products, activeCategory, Category])
 
 
 
@@ -152,11 +152,11 @@ const CategoryWiseProducts = ({ params }) => {
                                 }}
                             >
                                 <div className="relative overflow-hidden">
-                                   <Image width={500} height={500}
+                                    <Image width={500} height={500}
                                         src={product.variants[0].images[0]}
                                         alt={product.name}
                                         className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
-                                     /> 
+                                    />
 
 
 

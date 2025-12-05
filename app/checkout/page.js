@@ -44,7 +44,7 @@ const CheckoutPage = () => {
             }
             getcartitems()
         }
-    }, [status])
+    }, [status,data])
 
     const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const shippingCost = shippingMethod === 'express' ? 24.99 : shippingMethod === 'overnight' ? 49.99 : 0;
