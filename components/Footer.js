@@ -1,3 +1,6 @@
+
+import Link from 'next/link';
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -45,34 +48,34 @@ export default function Footer() {
             <h4 className="text-gray-900 text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               <li>
-                <a href="/products" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
+                <Link href="/products" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
                   <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2 group-hover:bg-blue-600"></span>
                   Products
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/categories" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
+                <Link href="/categories" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
                   <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2 group-hover:bg-blue-600"></span>
                   Categories
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/deals" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
+                <Link href="/deals" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
                   <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2 group-hover:bg-blue-600"></span>
                   Today's Deals
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/about" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
+                <Link href="/about" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
                   <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2 group-hover:bg-blue-600"></span>
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/blog" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
+                <Link href="/blog" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
                   <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2 group-hover:bg-blue-600"></span>
                   Blog
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -82,34 +85,34 @@ export default function Footer() {
             <h4 className="text-gray-900 text-lg font-semibold mb-4">Customer Service</h4>
             <ul className="space-y-2">
               <li>
-                <a href="/contact" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
+                <Link href="/contact" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
                   <span className="w-1.5 h-1.5 bg-purple-400 rounded-full mr-2 group-hover:bg-purple-600"></span>
                   Contact Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/shipping" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
+                <Link href="/shipping" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
                   <span className="w-1.5 h-1.5 bg-purple-400 rounded-full mr-2 group-hover:bg-purple-600"></span>
                   Shipping Info
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/returns" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
+                <Link href="/returns" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
                   <span className="w-1.5 h-1.5 bg-purple-400 rounded-full mr-2 group-hover:bg-purple-600"></span>
                   Returns & Exchanges
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/faq" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
+                <Link href="/faq" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
                   <span className="w-1.5 h-1.5 bg-purple-400 rounded-full mr-2 group-hover:bg-purple-600"></span>
                   FAQ
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/track-order" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
+                <Link href="/track-order" className="text-sm text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center group">
                   <span className="w-1.5 h-1.5 bg-purple-400 rounded-full mr-2 group-hover:bg-purple-600"></span>
                   Track Order
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -181,15 +184,15 @@ export default function Footer() {
               © {currentYear} ShopLux. All rights reserved.
             </p>
             <div className="flex flex-wrap justify-center gap-6 text-sm">
-              <a href="/privacy" className="text-gray-600 hover:text-blue-600 transition-colors">
+              <Link href="/privacy" className="text-gray-600 hover:text-blue-600 transition-colors">
                 Privacy Policy
-              </a>
-              <a href="/terms" className="text-gray-600 hover:text-blue-600 transition-colors">
+              </Link>
+              <Link href="/terms" className="text-gray-600 hover:text-blue-600 transition-colors">
                 Terms of Service
-              </a>
-              <a href="/cookies" className="text-gray-600 hover:text-blue-600 transition-colors">
+              </Link>
+              <Link href="/cookies" className="text-gray-600 hover:text-blue-600 transition-colors">
                 Cookie Policy
-              </a>
+              </Link>
             </div>
             <div className="flex gap-4 mt-4 md:mt-0">
               <svg className="h-8 shadow-sm rounded" viewBox="0 0 48 32" fill="none">
