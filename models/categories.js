@@ -1,9 +1,13 @@
 import { Schema, model, models } from "mongoose";
 
 const categorieSchema = new Schema({
-    name: { type: String, required: true },               // e.g. "Laptops"
-    parent: { type: String, default: null },              // null = top-level category
-    count: { type: Number, default: 0 },                  // product count
+    name: { type: String, required: true },          //like sports     
+    items: [ {type: String, required: true} ],     //crickrt etc        
     description: { type: String },
     image: { type: String },
 }, { timestamps: true });
+
+const Categorie = models.Categorie || model("Categorie", categorieSchema);
+
+
+export default Categorie ;

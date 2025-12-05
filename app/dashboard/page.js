@@ -19,6 +19,7 @@ export default function CompletedOrdersPage() {
                     const orders = await fetch(`/api/order/${data.user.id}`);
                     const response = await orders.json();
                     setOrders(response);
+                    console.log('Fetched completed orders:', response);
                 } catch (error) {
                     console.error('Error fetching completed orders:', error);
                     setOrders([]);
@@ -43,14 +44,14 @@ export default function CompletedOrdersPage() {
         console.log("Selected filter:", filter);
     };
 
-   const formatDate = (dateString) => {
-    if (!dateString) return 'Never';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+    const formatDate = (dateString) => {
+        if (!dateString) return 'Never';
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    };
 
     const formatShippingAddress = (shippingForm) => {
         return `${shippingForm.address}${shippingForm.apartment ? ', ' + shippingForm.apartment : ''}, ${shippingForm.city}, ${shippingForm.state} ${shippingForm.zipCode}`;
@@ -134,25 +135,52 @@ export default function CompletedOrdersPage() {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="relative w-16 h-16 mx-auto mb-6">
-                        <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-200 rounded-full"></div>
-                        <div className="absolute top-0 left-0 w-full h-full border-4 border-[#155dfc] rounded-full border-t-transparent animate-spin"></div>
-                    </div>
-                    <p className="text-gray-600 font-medium animate-pulse">Loading your orders...</p>
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600 text-lg">Loading your orders...</p>
                 </div>
             </div>
         );
     }
 
-    return (
+    return (<>
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between h-16">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 className="text-xl font-bold text-gray-900">My Dashboard</h1>
+                            <p className="text-xs text-gray-500">Manage your orders and account</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        {/* <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              </button> */}
+                        <Link href="/dashboard/profile" className="flex items-center gap-2">
+                            <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm cursor-pointer hover:shadow-lg transition-shadow">
+                                {data?.user?.name ? data.user.name.charAt(0).toUpperCase() : 'U'}
+                            </div>
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        </header>
         <div className="min-h-screen bg-gray-50 relative">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
                 {/* Header */}
                 <div className="mb-10 opacity-0 animate-fadeIn">
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h1 className="text-4xl font-bold text-gray-900 mb-2 tracking-tight animate-slideDown">
-                                Order History
+                                Your All Orders
                                 <span className="block w-20 h-1 bg-[#155dfc] mt-3 rounded-full"></span>
                             </h1>
                             <p className="text-gray-600 animate-slideUp">Track and manage all your purchases</p>
@@ -176,9 +204,8 @@ export default function CompletedOrdersPage() {
                                 </span>
                             </div>
                             <svg
-                                className={`w-5 h-5 text-gray-500 transform transition-transform duration-300 ${
-                                    showFilterDropdown ? 'rotate-180' : ''
-                                }`}
+                                className={`w-5 h-5 text-gray-500 transform transition-transform duration-300 ${showFilterDropdown ? 'rotate-180' : ''
+                                    }`}
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -191,11 +218,10 @@ export default function CompletedOrdersPage() {
                         <div
                             role="listbox"
                             aria-label="Order status filter"
-                            className={`absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 transition-all duration-300 transform origin-top ${
-                                showFilterDropdown
-                                    ? 'opacity-100 scale-100 translate-y-0'
-                                    : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
-                            }`}
+                            className={`absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 transition-all duration-300 transform origin-top ${showFilterDropdown
+                                ? 'opacity-100 scale-100 translate-y-0'
+                                : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
+                                }`}
                         >
                             {[
                                 { key: 'all', label: 'All Orders', count: orders.length },
@@ -209,19 +235,17 @@ export default function CompletedOrdersPage() {
                                     role="option"
                                     aria-selected={statusFilter === tab.key}
                                     onClick={() => handleFilterSelect(tab.key)}
-                                    className={`w-full flex items-center justify-between px-4 py-3 text-left transition-all duration-200 ${
-                                        statusFilter === tab.key
-                                            ? 'bg-blue-50 text-[#155dfc]'
-                                            : 'text-gray-700 hover:bg-gray-50'
-                                    } ${index !== 0 ? 'border-t border-gray-100' : ''}`}
+                                    className={`w-full flex items-center justify-between px-4 py-3 text-left transition-all duration-200 ${statusFilter === tab.key
+                                        ? 'bg-blue-50 text-[#155dfc]'
+                                        : 'text-gray-700 hover:bg-gray-50'
+                                        } ${index !== 0 ? 'border-t border-gray-100' : ''}`}
                                 >
                                     <span className="font-medium">{tab.label}</span>
                                     <span
-                                        className={`text-xs px-2 py-1 rounded-full ${
-                                            statusFilter === tab.key
-                                                ? 'bg-[#155dfc] text-white'
-                                                : 'bg-gray-200 text-gray-600'
-                                        }`}
+                                        className={`text-xs px-2 py-1 rounded-full ${statusFilter === tab.key
+                                            ? 'bg-[#155dfc] text-white'
+                                            : 'bg-gray-200 text-gray-600'
+                                            }`}
                                     >
                                         {tab.count}
                                     </span>
@@ -242,18 +266,16 @@ export default function CompletedOrdersPage() {
                             <button
                                 key={tab.key}
                                 onClick={() => setStatusFilter(tab.key)}
-                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 flex items-center ${
-                                    statusFilter === tab.key
-                                        ? 'bg-[#155dfc] text-white shadow-sm transform scale-105'
-                                        : 'text-gray-600 hover:text-gray-900 hover:bg-white'
-                                }`}
+                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 flex items-center ${statusFilter === tab.key
+                                    ? 'bg-[#155dfc] text-white shadow-sm transform scale-105'
+                                    : 'text-gray-600 hover:text-gray-900 hover:bg-white'
+                                    }`}
                             >
                                 {tab.label}
-                                <span className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
-                                    statusFilter === tab.key
-                                        ? 'bg-blue-100 text-[#155dfc]'
-                                        : 'bg-gray-200 text-gray-500'
-                                }`}>
+                                <span className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${statusFilter === tab.key
+                                    ? 'bg-blue-100 text-[#155dfc]'
+                                    : 'bg-gray-200 text-gray-500'
+                                    }`}>
                                     {tab.count}
                                 </span>
                             </button>
@@ -353,9 +375,8 @@ export default function CompletedOrdersPage() {
                                     </div>
                                     <div className="ml-2 md:ml-4">
                                         <svg
-                                            className={`w-5 h-5 text-[#155dfc] transform transition-transform duration-300 ${
-                                                expandedOrder === order.orderId ? 'rotate-180' : ''
-                                            }`}
+                                            className={`w-5 h-5 text-[#155dfc] transform transition-transform duration-300 ${expandedOrder === order.orderId ? 'rotate-180' : ''
+                                                }`}
                                             fill="none"
                                             stroke="currentColor"
                                             viewBox="0 0 24 24"
@@ -368,11 +389,10 @@ export default function CompletedOrdersPage() {
 
                             {/* Expanded Order Details */}
                             <div
-                                className={`transition-all duration-500 overflow-hidden ${
-                                    expandedOrder === order.orderId
-                                        ? 'max-h-[2000px] opacity-100'
-                                        : 'max-h-0 opacity-0'
-                                }`}
+                                className={`transition-all duration-500 overflow-hidden ${expandedOrder === order.orderId
+                                    ? 'max-h-[2000px] opacity-100'
+                                    : 'max-h-0 opacity-0'
+                                    }`}
                             >
                                 <div className="px-4 md:px-6 pb-6 border-t border-gray-200">
                                     {/* Order Items */}
@@ -383,48 +403,62 @@ export default function CompletedOrdersPage() {
                                         </h4>
                                         <div className="space-y-3">
                                             {order.orderedItems?.map((item, itemIndex) => (
-                                                <Link href={`/product/${item.productId}`} key={item._id}>
-                                                    <div className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-200 hover:shadow-sm transition-all duration-300 transform hover:-translate-y-0.5">
-                                                        <div className="w-16 h-16 bg-blue-50 rounded-lg flex-shrink-0 flex items-center justify-center border border-blue-100 transform transition-transform duration-300 hover:scale-105">
-                                                            <svg className="w-6 h-6 text-[#155dfc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <div key={item._id} className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-200 hover:shadow-sm transition-all duration-300 transform hover:-translate-y-0.5">
+                                                    <div className="w-16 h-16 bg-blue-50 rounded-lg flex-shrink-0 flex items-center justify-center border border-blue-100 transform transition-transform duration-300 hover:scale-105">
+                                                        {/* <svg className="w-6 h-6 text-[#155dfc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
-                                                            </svg>
-                                                        </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <h5 className="font-bold text-gray-900 mb-1 truncate">{item.name}</h5>
-                                                            <p className="text-sm text-gray-600 mb-2 truncate">{item.brand} • {item.category}</p>
-                                                            <p className="text-sm text-gray-600 mb-2">Quantity: {item.quantity}</p>
+                                                            </svg> */}
+                                                        <Link href={`/product/${item.productId}`} >
+                                                            <Image src={item.image} alt={item.name} width={60} height={60} className="w-16 h-16 object-contain rounded-md" />
+                                                        </Link>
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h5 className="font-bold text-gray-900 mb-1 truncate">{item.name}</h5>
+                                                        <p className="text-sm text-gray-600 mb-2 truncate">{item.brand} • {item.category}</p>
+                                                        <p className="text-sm text-gray-600 mb-2">Quantity: {item.quantity}</p>
+                                                        <div className="flex items-center">
                                                             <div className="flex items-center">
-                                                                <div className="flex items-center">
-                                                                    {[...Array(5)].map((_, i) => (
-                                                                        <svg
-                                                                            key={i}
-                                                                            className={`w-3 h-3 ${
-                                                                                i < Math.floor(item.rating || 0)
-                                                                                    ? 'text-amber-500'
-                                                                                    : 'text-gray-300'
+                                                                {[...Array(5)].map((_, i) => (
+                                                                    <svg
+                                                                        key={i}
+                                                                        className={`w-3 h-3 ${i < Math.floor(item.rating || 0)
+                                                                            ? 'text-amber-500'
+                                                                            : 'text-gray-300'
                                                                             }`}
-                                                                            fill="currentColor"
-                                                                            viewBox="0 0 20 20"
-                                                                        >
-                                                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                                        </svg>
-                                                                    ))}
-                                                                </div>
-                                                                <span className="text-sm text-gray-600 ml-2">({item.reviewCount || 0})</span>
+                                                                        fill="currentColor"
+                                                                        viewBox="0 0 20 20"
+                                                                    >
+                                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                                    </svg>
+                                                                ))}
                                                             </div>
-                                                        </div>
-                                                        <div className="text-right flex-shrink-0">
-                                                            {item.originalPrice > item.price && (
-                                                                <p className="text-sm text-gray-400 line-through">${item.originalPrice?.toFixed(2)}</p>
-                                                            )}
-                                                            <p className="font-bold text-gray-900">${item.price?.toFixed(2)}</p>
-                                                            <p className="text-sm text-gray-600 mt-1">
-                                                                ${((item.price || 0) * (item.quantity || 0)).toFixed(2)}
-                                                            </p>
+                                                            <span className="text-sm text-gray-600 ml-2">({item.reviewCount || 0})</span>
                                                         </div>
                                                     </div>
-                                                </Link>
+                                                    <div className="text-right flex-shrink-0">
+                                                        {item.originalPrice > item.price && (
+                                                            <p className="text-sm text-gray-400 line-through">${item.originalPrice?.toFixed(2)}</p>
+                                                        )}
+                                                        <p className="font-bold text-gray-900">${item.price?.toFixed(2)}</p>
+                                                        <p className="text-sm text-gray-600 mt-1">
+                                                            ${((item.price || 0) * (item.quantity || 0)).toFixed(2)}
+                                                        </p>
+
+                                                        {/* Action buttons for delivered items */}
+                                                        {order.status.toLowerCase() === 'delivered' && (
+                                                            <div className="mt-3 flex flex-col gap-2">
+                                                                <Link href={`/review-order/${item.productId}`}
+                                                                    className="w-full px-2 py-1.5 bg-blue-50 text-blue-600 rounded-md text-xs font-medium hover:bg-blue-100 transition-colors border border-blue-200">
+                                                                    Give Review
+
+                                                                </Link>
+                                                                <button className="w-full px-2 py-1.5 bg-red-50 text-red-600 rounded-md text-xs font-medium hover:bg-red-100 transition-colors border border-red-200">
+                                                                    Return Item
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             ))}
                                         </div>
                                     </div>
@@ -482,19 +516,13 @@ export default function CompletedOrdersPage() {
                                     <div className="mt-6 flex flex-wrap gap-2">
                                         {order.status.toLowerCase() === 'delivered' && (
                                             <>
-                                                <button className="px-4 py-2 bg-[#155dfc] text-white rounded-lg hover:bg-[#124fd0] transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm">
-                                                    Reorder
-                                                </button>
+
                                                 <button className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-all duration-300 transform hover:-translate-y-0.5 text-sm">
                                                     Return Items
                                                 </button>
                                             </>
                                         )}
-                                        {order.status.toLowerCase() === 'cancelled' && (
-                                            <button className="px-4 py-2 bg-[#155dfc] text-white rounded-lg hover:bg-[#124fd0] transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm">
-                                                Reorder
-                                            </button>
-                                        )}
+
                                         {order.status.toLowerCase() === 'pending' && (
                                             <button className="px-4 py-2 bg-[#155dfc] text-white rounded-lg hover:bg-[#124fd0] transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm">
                                                 Track Order
@@ -540,7 +568,7 @@ export default function CompletedOrdersPage() {
                                         statusFilter === 'cancelled' ? "You don't have any cancelled orders" :
                                             "You don't have any returned orders"}
                         </p>
-                        
+
                     </div>
                 )}
             </div>
@@ -582,5 +610,6 @@ export default function CompletedOrdersPage() {
                 }
             `}</style>
         </div>
+    </>
     );
 }

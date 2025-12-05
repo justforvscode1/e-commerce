@@ -17,14 +17,14 @@ export async function GET(req, { params }) {
 // POST create order
 export async function POST(req, { params }) {
     try {
-        const  {userId}  = await params;
+        const { userId } = await params;
         const body = await req.json();
         console.log(body);
         // Validation
         if (!body) {
             return NextResponse.json({ error: "body is required" }, { status: 400 });
         }
-        
+
         // Validate required fields
         if (!body.orderId) {
             return NextResponse.json({ error: "orderId is required" }, { status: 400 });
@@ -46,22 +46,37 @@ export async function POST(req, { params }) {
 export async function PATCH(request, { params }) {
     try {
         const data = await request.json();
-        
+
         if (!data.status) {
             return NextResponse.json({ error: "status is missing" }, { status: 400 });
         }
         if (!data.orderId) {
             return NextResponse.json({ error: "orderId is missing" }, { status: 400 });
         }
-        
+
         await dbConnect();
         const result = await Order.findOneAndUpdate(
             { orderId: data.orderId },
             { $set: { status: data.status } },
             { returnDocument: 'after', new: true }
         );
-        
+
         return NextResponse.json({ success: true, result });
+    } catch (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
+export async function DELETE(req,{params}) {
+    try {
+        await dbConnect();
+        const UserId = await req.json();
+        console.log(UserId)
+        if (!UserId) {
+            return NextResponse.json({ error: "userId is required" }, { status: 400 });
+
+        }
+        await Order.deleteMany({  UserId });
+        return NextResponse.json({ message: "user orders has been deleted" }, { status: 200 })
     } catch (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

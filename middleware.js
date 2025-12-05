@@ -36,5 +36,5 @@ export const middleware = withAuth(
 
 export const config = {
     matcher: [
-        "/((?!api|Electronics|Fashion|_next/static|_next/image|favicon.ico|products).*)"],
+        "/((?!api|product|_next/static|_next/image|favicon.ico|products|fashion|electronics).*)"],
 };

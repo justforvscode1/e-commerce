@@ -38,7 +38,7 @@ export async function POST(req, { params }) {
 
         const result = await Cart.create(body);
 
-        return NextResponse.json({message:"sucessfully added in the cart", status: 201 })
+        return NextResponse.json({ message: "sucessfully added in the cart", status: 201 })
 
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });
@@ -47,8 +47,7 @@ export async function POST(req, { params }) {
 export async function DELETE(req, { params }) {
     try {
         await dbConnect();
-
-        const  {userId}  = await req.json()
+        const userId =(await params).userId
         if (!userId) {
             return NextResponse.json({ error: "userId is missing" }, { status: 400 });
 

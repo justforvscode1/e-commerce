@@ -10,7 +10,7 @@ export default function UserOrdersDashboard() {
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [cancelModal, setCancelModal] = useState({ show: false, orderId: null });
-  
+
   useEffect(() => {
     if (status === "authenticated") {
       const fetchUserOrders = async () => {
@@ -50,7 +50,7 @@ export default function UserOrdersDashboard() {
   };
 
   const formatPrice = (priceInCents) => {
-    return (priceInCents / 100).toFixed(2);
+    return priceInCents.toFixed(2);
   };
 
   const formatShippingAddress = (shippingForm) => {
@@ -183,7 +183,7 @@ export default function UserOrdersDashboard() {
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-64 mb-2"></div>
             <div className="h-4 bg-gray-200 rounded w-96 mb-8"></div>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
               <div className="lg:col-span-1">
                 <div className="bg-gray-50 rounded-lg p-6 h-64"></div>
@@ -214,7 +214,7 @@ export default function UserOrdersDashboard() {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg border border-gray-200 p-6 sticky top-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-6">Order Summary</h3>
-              
+
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-3 border-b border-gray-100">
                   <span className="text-sm font-medium text-gray-600">Active</span>
@@ -222,21 +222,21 @@ export default function UserOrdersDashboard() {
                     {orders.filter(o => ['pending', 'assigned', 'out_for_delivery'].includes(o.status)).length}
                   </span>
                 </div>
-                
+
                 <div className="flex justify-between items-center py-3 border-b border-gray-100">
                   <span className="text-sm font-medium text-gray-600">Delivered</span>
                   <span className="text-lg font-semibold text-emerald-600">
                     {orders.filter(o => o.status === 'delivered').length}
                   </span>
                 </div>
-                
+
                 <div className="flex justify-between items-center py-3 border-b border-gray-100">
                   <span className="text-sm font-medium text-gray-600">Cancelled</span>
                   <span className="text-lg font-semibold text-gray-600">
                     {orders.filter(o => o.status === 'cancelled').length}
                   </span>
                 </div>
-                
+
                 <div className="flex justify-between items-center py-3">
                   <span className="text-sm font-bold text-gray-900">Total Orders</span>
                   <span className="text-lg font-bold text-gray-900">{orders.length}</span>
@@ -261,11 +261,10 @@ export default function UserOrdersDashboard() {
                   <button
                     key={filter.key}
                     onClick={() => setStatusFilter(filter.key)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      statusFilter === filter.key
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${statusFilter === filter.key
                         ? 'bg-gray-900 text-white'
                         : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     {filter.label} ({filter.count})
                   </button>
@@ -303,7 +302,7 @@ export default function UserOrdersDashboard() {
                           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                             <div>
                               <p className="text-gray-600">Order Date</p>
-                              <p className="font-medium text-gray-900">{formatDate(order.createdat)}</p>
+                              <p className="font-medium text-gray-900">{formatDate(order.createdAt)}</p>
                             </div>
                             <div>
                               <p className="text-gray-600">Items</p>
@@ -351,17 +350,15 @@ export default function UserOrdersDashboard() {
                           <div className="relative flex justify-between">
                             {progressSteps.map((step, index) => (
                               <div key={step.key} className="flex flex-col items-center">
-                                <div className={`w-3 h-3 rounded-full border-2 z-10 ${
-                                  step.active 
-                                    ? step.cancelled 
-                                      ? 'bg-red-500 border-red-500' 
+                                <div className={`w-3 h-3 rounded-full border-2 z-10 ${step.active
+                                    ? step.cancelled
+                                      ? 'bg-red-500 border-red-500'
                                       : 'bg-gray-900 border-gray-900'
                                     : 'bg-white border-gray-300'
-                                }`}></div>
+                                  }`}></div>
                                 <div className="mt-2 text-xs text-center">
-                                  <div className={`font-medium ${
-                                    step.active ? 'text-gray-900' : 'text-gray-500'
-                                  }`}>
+                                  <div className={`font-medium ${step.active ? 'text-gray-900' : 'text-gray-500'
+                                    }`}>
                                     {step.label}
                                   </div>
                                   {step.date && (
@@ -378,9 +375,8 @@ export default function UserOrdersDashboard() {
 
                       {/* Expanded Order Details */}
                       <div
-                        className={`overflow-hidden transition-all duration-300 ${
-                          expandedOrder === order.orderId ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
-                        }`}
+                        className={`overflow-hidden transition-all duration-300 ${expandedOrder === order.orderId ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+                          }`}
                       >
                         <div className="border-t border-gray-200 pt-6">
                           {/* Order Items */}
@@ -390,16 +386,14 @@ export default function UserOrdersDashboard() {
                               {order.orderedItems.map((item) => (
                                 <div key={item._id} className="flex items-center gap-4 py-3 border-b border-gray-100 last:border-b-0">
                                   <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    {/* <Image
-                                      src={item.image[0]}
+                                    <Image
+                                      src={item.image}
                                       alt={item.name}
-                                      width={64}
-                                      height={64}
-                                      className="rounded-lg object-cover"
-                                    /> */}
-                                    <div className="text-gray-400 text-xs text-center">
-                                      Image
-                                    </div>
+                                      width={176}
+                                      height={176}
+                                      className="object-cover w-full h-full"
+                                    />
+                                   
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <h5 className="font-medium text-gray-900 truncate">{item.name}</h5>
@@ -448,9 +442,8 @@ export default function UserOrdersDashboard() {
                                   </div>
                                 </div>
                                 <div className="mt-3 pt-3 border-t border-gray-200">
-                                  <p className={`text-sm font-medium ${
-                                    order.paymentMethod === 'cod' ? 'text-amber-600' : 'text-emerald-600'
-                                  }`}>
+                                  <p className={`text-sm font-medium ${order.paymentMethod === 'cod' ? 'text-amber-600' : 'text-emerald-600'
+                                    }`}>
                                     {order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Paid with Card'}
                                   </p>
                                 </div>
@@ -475,8 +468,8 @@ export default function UserOrdersDashboard() {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">No Orders Found</h3>
                 <p className="text-gray-600 mb-6">
-                  {statusFilter === 'all' 
-                    ? "You haven't placed any orders yet." 
+                  {statusFilter === 'all'
+                    ? "You haven't placed any orders yet."
                     : `No ${statusFilter} orders found.`}
                 </p>
                 <button className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium">

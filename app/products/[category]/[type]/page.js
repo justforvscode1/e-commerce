@@ -3,8 +3,6 @@ import Navbar from '@/components/Navbar';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState, useEffect, use } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
-
 const CategoryWiseProducts = ({ params }) => {
     const type = decodeURIComponent(use(params).type);
     const Category = decodeURIComponent(use(params).category.toLocaleLowerCase());
@@ -84,7 +82,6 @@ const CategoryWiseProducts = ({ params }) => {
 
 
     return (<>
-        <ToastContainer />
         <div className="min-h-screen bg-gray-50">
             <Navbar />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -155,11 +152,11 @@ const CategoryWiseProducts = ({ params }) => {
                                 }}
                             >
                                 <div className="relative overflow-hidden">
-                                    <Image width={500} height={500}
+                                   <Image width={500} height={500}
                                         src={product.variants[0].images[0]}
                                         alt={product.name}
                                         className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
-                                    />
+                                     /> 
 
 
 

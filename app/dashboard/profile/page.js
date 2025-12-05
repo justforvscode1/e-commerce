@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn, useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { toast } from 'react-hot-toast';
 
 // SVG Icons
 const ProfileIcon = ({ className = "w-5 h-5" }) => (
@@ -32,10 +33,14 @@ const VerifiedIcon = ({ className = "w-4 h-4" }) => (
 
 export default function AccountProfile() {
   const { data: session, status } = useSession();
+  // console.log(session)
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('profile');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmInput, setDeleteConfirmInput] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -69,6 +74,50 @@ export default function AccountProfile() {
     });
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut({ redirect: true, callbackUrl: '/' });
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Error logging out');
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmInput.toLowerCase() !== 'delete') {
+      toast.error('Please type "delete" to confirm');
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      const response = await fetch('/api/user/profile', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(session.user.email)
+      });
+      const check = await response.json()
+      console.log(check)
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete account');
+      }
+
+      toast.success('Account deleted successfully');
+
+      setTimeout(() => {
+        signOut({ redirect: true,callbackUrl: '/'  });
+      }, 1000);
+    } catch (error) {
+      console.error('Delete account error:', error);
+      toast.error(error.message || 'Error deleting account');
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+      setDeleteConfirmInput('');
+    }
+  };
+
   const getProviderIcon = (provider) => {
     const icons = {
       google: (
@@ -95,12 +144,12 @@ export default function AccountProfile() {
 
   if (status === 'loading' || isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600 text-sm">Loading profile...</p>
-        </div>
+       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600 text-lg">Loading your info...</p>
       </div>
+    </div>
     );
   }
 
@@ -128,7 +177,7 @@ export default function AccountProfile() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
@@ -148,7 +197,7 @@ export default function AccountProfile() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
@@ -194,7 +243,7 @@ export default function AccountProfile() {
                     </div>
                   )}
                 </div>
-                
+
                 <h2 className="text-xl font-bold text-gray-900 mb-1">
                   {user?.firstName && user?.lastName
                     ? `${user.firstName} ${user.lastName}`
@@ -202,7 +251,7 @@ export default function AccountProfile() {
                   }
                 </h2>
                 <p className="text-gray-600 text-sm mb-4">{session.user?.email}</p>
-                
+
                 <div className="flex flex-wrap gap-2 justify-center">
                   {user?.isActive && (
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
@@ -221,11 +270,10 @@ export default function AccountProfile() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-left transition-colors ${
-                      activeTab === tab.id
-                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                    }`}
+                    className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-left transition-colors ${activeTab === tab.id
+                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      }`}
                   >
                     <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-blue-600' : 'text-gray-400'}`} />
                     <span className="font-medium">{tab.name}</span>
@@ -233,6 +281,9 @@ export default function AccountProfile() {
                 ))}
               </div>
             </nav>
+
+            {/* Account Actions */}
+
           </div>
 
           {/* Main Content */}
@@ -244,7 +295,7 @@ export default function AccountProfile() {
                   <h2 className="text-2xl font-bold text-gray-900">Profile Information</h2>
                   <p className="text-gray-600 mt-2">Manage your personal information and account details</p>
                 </div>
-                
+
                 <div className="p-8 space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -283,10 +334,33 @@ export default function AccountProfile() {
                     </div>
                   </div>
 
-                  <div className="pt-6 border-t border-gray-200">
-                    <button className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200">
-                      Edit Profile Information
-                    </button>
+                  <div className="space-y-3 p-4">
+                    <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Actions</h3>
+                    <div className="pt-6 border-t border-gray-200 flex gap-3">
+                      <button className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                        Edit Profile Information
+                      </button>
+
+                      <button
+                        onClick={handleLogout}
+                        className="px-4 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center space-x-2"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        <span>Logout</span>
+                      </button>
+
+                      <button
+                        onClick={() => setShowDeleteModal(true)}
+                        className="px-4 py-3 bg-red-50 text-red-600 font-medium rounded-lg hover:bg-red-100 border border-red-200 transition-colors duration-200 flex items-center justify-center space-x-2"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        <span>Delete Account</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -299,7 +373,7 @@ export default function AccountProfile() {
                   <h2 className="text-2xl font-bold text-gray-900">Security Settings</h2>
                   <p className="text-gray-600 mt-2">Manage your connected accounts and security preferences</p>
                 </div>
-                
+
                 <div className="p-8 space-y-8">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Connected Accounts</h3>
@@ -346,7 +420,7 @@ export default function AccountProfile() {
                   <h2 className="text-2xl font-bold text-gray-900">Account Activity</h2>
                   <p className="text-gray-600 mt-2">View your account activity and important dates</p>
                 </div>
-                
+
                 <div className="p-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
@@ -378,6 +452,57 @@ export default function AccountProfile() {
             )}
           </div>
         </div>
+
+        {/* Delete Account Modal */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-lg">
+              <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4v2m0 0v2m0-2h2m0 0h2m-2 0h-2" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">Delete Account</h3>
+              <p className="text-gray-600 text-sm text-center mb-6">
+                This action cannot be undone. All your data will be permanently deleted.
+              </p>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Type "delete" to confirm
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmInput}
+                  onChange={(e) => setDeleteConfirmInput(e.target.value)}
+                  placeholder="Type 'delete' here"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setDeleteConfirmInput('');
+                  }}
+                  disabled={isDeleting}
+                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={isDeleting || deleteConfirmInput.toLowerCase() !== 'delete'}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isDeleting ? 'Deleting...' : 'Delete Account'}
+                </button>
+              </div>
+            </div>
+
+          </div>
+        )}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { useSession, signIn, signOut } from "next-auth/react"
 import Image from 'next/image';
 const CartPage = () => {
@@ -119,11 +119,12 @@ const CartPage = () => {
             };
 
             const deleting = await fetch(`/api/cart/${data.user.id}`, requestOptions)
+            const response= await deleting.json()
             toast.error("successfully deleted ", {
                 position: "top-center",
             })
             setrefresh(prev => !prev)
-            console.log(deleting)
+            console.log(response)
         } catch (error) {
             toast.error("something wemt wrong ")
             console.error("error occured", error)
@@ -154,17 +155,14 @@ const CartPage = () => {
     }
 
     if (loading || !data || !data.user) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="flex flex-col items-center">
-                    <svg className="animate-spin h-10 w-10 text-gray-900 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                    </svg>
-                    <div className="font-bold text-lg text-gray-600">Loading your cart...</div>
-                </div>
-            </div>
-        );
+       return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600 text-lg">Loading products...</p>
+      </div>
+    </div>
+  );
     }
 
     if (cartItems.length === 0) {
@@ -191,7 +189,6 @@ const CartPage = () => {
     }
 
     return (<>
-        <ToastContainer />
         <div className="min-h-screen text-black bg-gray-50">
             {/* Navigation Bar */}
             <nav className="bg-white border-b border-gray-200">
@@ -238,11 +235,7 @@ const CartPage = () => {
                                         <div className="flex-shrink-0">
                                             <div className="w-44 h-44 bg-gray-100 rounded-lg overflow-hidden shadow-md border border-gray-200">
                                                 <Link href={`/product/${item.productId}`}>
-                                                    {/* <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center hover:from-gray-300 hover:to-gray-400 transition-colors cursor-pointer">
-                                                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                        </svg>
-                                                    </div> */}
+                                                   
                                                     <Image
                                                         src={item.image}
                                                         alt={item.name}
@@ -413,27 +406,8 @@ const CartPage = () => {
                                     Proceed to Checkout
                                 </button> </Link>
 
-                            <button className="w-full text-gray-600 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors border border-gray-200">
-                                Continue Shopping
-                            </button>
-
-                            <div className="mt-6 pt-6 border-t border-gray-200">
-                                <div className="flex items-center justify-center space-x-2 text-sm text-gray-500 mb-4">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                    </svg>
-                                    256-bit SSL encryption
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-xs text-gray-400 mb-2">Accepted Payment Methods</p>
-                                    <div className="flex justify-center space-x-3 text-gray-400">
-                                        <div className="w-8 h-5 bg-gray-200 rounded flex items-center justify-center text-xs font-bold">VISA</div>
-                                        <div className="w-8 h-5 bg-gray-200 rounded flex items-center justify-center text-xs font-bold">MC</div>
-                                        <div className="w-8 h-5 bg-gray-200 rounded flex items-center justify-center text-xs font-bold">AMEX</div>
-                                        <div className="w-8 h-5 bg-gray-200 rounded flex items-center justify-center text-xs font-bold">PP</div>
-                                    </div>
-                                </div>
-                            </div>
+                            
+                           
                         </div>
                     </div>
                 </div>

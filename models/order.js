@@ -23,8 +23,7 @@ const orderSchema = new Schema({
       type: Map,
       of: String,
       default: {}
-    },
-    stockCount: { type: Number, required: true, min: 0 }
+    }
   }],
   paymentMethod: {
     type: String,

@@ -1,7 +1,7 @@
 "use client"
+import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import { signOut, useSession } from "next-auth/react";
-import Image from "next/image";
+ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -9,16 +9,14 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isVisible, setIsVisible] = useState({});
   const [featuredProducts, setFeaturedProducts] = useState([])
-  const [optiontypekeys, setoptiontypekeys] = useState([])
-  const { data, status } = useSession()
-
+  const [reviews, setreviews] = useState([])
+  // const kh= Noti
   const heroSlides = [
     {
       id: 1,
       title: "Latest Fashion Collection",
       subtitle: "Discover Your Style",
       description: "Explore premium fashion items crafted for modern lifestyle",
-      image: "/api/placeholder/800/500",
       buttonText: "Shop Fashion",
       category: "fashion"
     },
@@ -27,7 +25,6 @@ export default function Home() {
       title: "Premium Electronics",
       subtitle: "Innovation Meets Quality",
       description: "Experience cutting-edge technology with our curated electronics",
-      image: "/api/placeholder/800/500",
       buttonText: "Shop Electronics",
       category: "electronics"
     }
@@ -49,23 +46,28 @@ export default function Home() {
       color: "from-blue-400 to-indigo-400"
     }
   ];
-
-
-  // useEffect(() => {
-  //   console.log(data, status)
-  // }, [status])
+const avgrating= (e) => {
+  const filterreviews= reviews.filter(r => r.productId === e);
+  if(filterreviews.length===0) return 0;
+ const avg=  filterreviews.reduce((sum, r) => sum + r.rating, 0) / filterreviews.length;
+  return avg.toFixed(1);
+}
 
   useEffect(() => {
 
     (async () => {
       try {
         const gettheitems = await fetch(`/api/products`)
+
         const items = await gettheitems.json()
         if (Array.isArray(items) && items.length > 4) {
           setFeaturedProducts(items.slice(-4))
 
         }
-
+        const getreviews = await fetch("/api/review")
+        const reviewresponse = await getreviews.json()
+        setreviews(reviewresponse)
+        console.log("Fetched reviews:", reviewresponse)
       } catch (error) {
         console.error("Error fetching products:", error)
       }
@@ -76,7 +78,20 @@ export default function Home() {
     }, 5000);
     return () => clearInterval(interval);
   }, [heroSlides.length]);
+  const renderStars = (rating, size = 'text-lg') => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
 
+    return (
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span key={star} className={`${size} text-yellow-500`}>
+            {star <= fullStars ? '★' : (star === fullStars + 1 && hasHalfStar ? '★' : '☆')}
+          </span>
+        ))}
+      </div>
+    );
+  };
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -99,8 +114,7 @@ export default function Home() {
   return (
     <div>
       <Navbar />
-      <button onClick={() => { signOut() }}>logout</button>
-      <div className="min-h-screen bg-gray-50">
+       <div className="min-h-screen bg-gray-50">
         {/* Hero Section */}
         <section className="relative h-[600px] overflow-hidden bg-gradient-to-br from-slate-100 to-gray-200">
           {heroSlides.map((slide, index) => (
@@ -128,7 +142,7 @@ export default function Home() {
                     </div>
                     <div className={`transition-all duration-700 delay-500 ${index === currentSlide ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                       }`}>
-                      <Link href={`/${slide.buttonText.slice(5).toLowerCase()}/all`}>
+                      <Link href={`/products/${slide.buttonText.slice(5).toLowerCase()}/all`}>
                         <button className="bg-blue-600 text-white px-8 py-4 rounded-lg font-medium hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
                           {slide.buttonText}
                         </button>
@@ -143,12 +157,12 @@ export default function Home() {
                         <div className="relative bg-gradient-to-br w-full h-90  from-gray-100 to-gray-200 rounded-2xl overflow-hidden">
                           <img
                             width={500} height={500}
-                            src={ index === 0 ? '/fashion-slide.png' : "/electronics-slide.png"}
+                            src={index === 0 ? '/fashion-slide.png' : "/electronics-slide.png"}
                             alt="slide image"
                             className="object-fit w-full h-90 "
                           />
-          
-                         
+
+
                         </div>
                       </div>
                     </div>
@@ -196,12 +210,12 @@ export default function Home() {
                     <div className={`w-full h-80  relative`}>
                       <img
                         src={index === 0 ? '/fashion-section.png' : "/electronics-section.png"} alt="image"
-                    className="w-full h-80"
+                        className="w-full h-80"
                       />
                       <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all duration-300"></div>
                       <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
                         <div className="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
-                          <Link href={`product/${category.name}/all`}>
+                          <Link href={`products/${category.name}/all`}>
                             <button className="bg-white text-gray-900 px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors">
                               Explore Collection
                             </button>
@@ -243,6 +257,7 @@ export default function Home() {
                   >
                     <div className="relative overflow-hidden rounded-t-2xl h-64 bg-gradient-to-br from-gray-100 to-gray-200">
                       {productImage ? (
+                        // <div></div>
                         <Image
                           src={productImage}
                           fill
@@ -282,11 +297,11 @@ export default function Home() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <span className="text-2xl font-bold text-gray-900">${product.variants[0].price}</span>
-                          <span className="text-sm text-gray-500 line-through">${product.variants[0].salePrice}</span>
+                        { product.variants[0].salePrice && <span className="text-sm text-gray-500 line-through">${product.variants[0].salePrice}</span>}
+                          <span className=" text-gray-900 flex items-center"><span className="text-sm">⭐</span>{avgrating(product.productid)}</span>
                         </div>
-                        <button className="p-2 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors group">
-                        </button>
                       </div>
+
 
                       {/* <p className="text-sm text-gray-500 mt-2">
                       3 reviews
@@ -299,6 +314,7 @@ export default function Home() {
           </div>
         </section>
       </div>
+      <Footer/>
     </div>
   );
 }

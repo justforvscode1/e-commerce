@@ -1,7 +1,7 @@
 // app/product/[id]/page.js
 'use client';
 import { use, useEffect } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+// import { ToastContainer, toast } from 'react-toastify';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { notFound } from 'next/navigation';
@@ -9,6 +9,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import Navbar from '@/components/Navbar';
+import toast from 'react-hot-toast';
+
 // Loading Component
 function LoadingScreen() {
   return (
@@ -21,11 +23,11 @@ function LoadingScreen() {
   );
 }
 
-
 function getFirstVariant(product) {
   if (!product.variants || product.variants.length === 0) return null;
   return product.variants[0];
 }
+
 function getAvailableAttributes(variants) {
   const attributes = {};
   variants.forEach(variant => {
@@ -45,6 +47,7 @@ function getAvailableAttributes(variants) {
   });
   return result;
 }
+
 function findVariantByAttributes(variants, selectedAttributes) {
   return variants.find(variant => {
     if (!variant.attributes) return false;
@@ -62,6 +65,7 @@ function findVariantByAttributes(variants, selectedAttributes) {
     return true;
   });
 }
+
 function isCombinationAvailable(variants, attributes) {
   return variants.some(variant => {
     if (!variant.attributes) return false;
@@ -75,12 +79,7 @@ function isCombinationAvailable(variants, attributes) {
     return Object.keys(variant.attributes).length === Object.keys(attributes).length;
   });
 }
-function isAttributeValueAvailable(variants, attributeType, value) {
-  return variants.some(variant => {
-    if (!variant.attributes) return false;
-    return variant.attributes[attributeType] === value;
-  });
-}
+
 function getAvailableOptions(variants, attributeType, currentAttributes) {
   const availableOptions = new Set();
 
@@ -104,6 +103,21 @@ function getAvailableOptions(variants, attributeType, currentAttributes) {
   return Array.from(availableOptions);
 }
 
+// NEW: Find closest available variant when user clicks unavailable option
+function findClosestVariant(variants, attributeType, value) {
+  // First, try to find any variant with this attribute value
+  const variantsWithValue = variants.filter(v => 
+    v.attributes && v.attributes[attributeType] === value
+  );
+  
+  if (variantsWithValue.length > 0) {
+    return variantsWithValue[0];
+  }
+  
+  // Fallback to first variant
+  return variants[0];
+}
+
 export default function ProductPage({ params }) {
   const { data, status } = useSession()
   const router = useRouter();
@@ -117,6 +131,8 @@ export default function ProductPage({ params }) {
   const [error, setError] = useState(null);
   const [availableAttributes, setAvailableAttributes] = useState({});
   const [CombinationError, setCombinationError] = useState('')
+  const [filteredreviews, setfilteredreviews] = useState([])
+  const [avgrating, setavgrating] = useState(0)
 
   // Get product data
   useEffect(() => {
@@ -130,7 +146,11 @@ export default function ProductPage({ params }) {
         if (!response.ok) {
           throw new Error('Failed to fetch products');
         }
-
+        const reviews = await fetch("/api/review")
+        const reviewResponse = await reviews.json()
+        const filteredReviews = reviewResponse.filter(r => r.productId === id);
+        setfilteredreviews(filteredReviews);
+        setavgrating(filteredReviews.reduce((sum, r) => sum + r.rating, 0) / filteredReviews.length);
         const allProducts = await response.json();
         const productData = allProducts.find(item => item.productid === id);
 
@@ -162,6 +182,7 @@ export default function ProductPage({ params }) {
 
     getProduct();
   }, [id]);
+
   function ErrorScreen({ message, onRetry }) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -174,11 +195,9 @@ export default function ProductPage({ params }) {
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Product Not Found</h2>
           <p className="text-gray-600 mb-6">{message}</p>
           <div className="space-x-4">
-
             <button onClick={router.back} className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
               Go back
             </button>
-
             {onRetry && (
               <button
                 onClick={onRetry}
@@ -192,25 +211,26 @@ export default function ProductPage({ params }) {
       </div>
     );
   }
-  // Handle attribute selection - allow any value to be clickable
+
+  // IMPROVED: Handle attribute selection with better variant switching
   const handleAttributeChange = (attributeType, value) => {
     setCombinationError('');
 
-    // Try to update with just the selected attribute
+    // Try to update with the selected attribute value
     let newAttributes = { ...selectedAttributes, [attributeType]: value };
 
     // Check if this combination exists
     if (!isCombinationAvailable(product.variants, newAttributes)) {
-      // Combination not available - find ANY available variant and switch to it
-      if (product.variants && product.variants.length > 0) {
-        const firstAvailableVariant = product.variants[0];
-        if (firstAvailableVariant && firstAvailableVariant.attributes) {
-          newAttributes = { ...firstAvailableVariant.attributes };
-        }
+      // Find the closest available variant with this attribute value
+      const closestVariant = findClosestVariant(product.variants, attributeType, value);
+      
+      if (closestVariant && closestVariant.attributes) {
+        newAttributes = { ...closestVariant.attributes };
       }
     }
 
     setSelectedAttributes(newAttributes);
+    // FIXED: Always reset to first image when changing variants
     setPictureNo(0);
   };
 
@@ -261,45 +281,80 @@ export default function ProductPage({ params }) {
   const displayPrice = salePrice || price;
   const isOnSale = !!salePrice;
 
+  const renderStars = (rating, size = 'text-lg') => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+
+    return (
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span key={star} className={`${size} text-yellow-500`}>
+            {star <= fullStars ? '★' : (star === fullStars + 1 && hasHalfStar ? '★' : '☆')}
+          </span>
+        ))}
+      </div>
+    );
+  };
+
+  // IMPROVED: Add to cart with loading state
   const addingtocart = async () => {
-    const productdata = {
-      productId: product.productid,
-      userId: data?.user?.id,
-      name: product.name,
-      brand: product.brand,
-      image: images[0],
-      price,
-      quantity,
-      stockCount,
-      selectedVariant: selectedAttributes,
-      salePrice,
+    if (!data?.user?.id) {
+      toast.error('Please login to add items to cart', {
+        position: "top-center"
+      });
+      return;
     }
-    const sendingcartproduct = await fetch(`/api/cart/${data.user.id}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(productdata)
-    })
-    const response = await sendingcartproduct.json()
-    console.log(response)
-    if (response.error === "product already in the cart") {
-      toast.info('product is already in cart', {
-        position: "top-center"
+
+    setIsAddingToCart(true);
+    
+    try {
+      const productdata = {
+        productId: product.productid,
+        userId: data.user.id,
+        name: product.name,
+        brand: product.brand,
+        image: images[0],
+        price,
+        quantity,
+        stockCount,
+        selectedVariant: selectedAttributes,
+        salePrice,
+      }
+
+      const sendingcartproduct = await fetch(`/api/cart/${data.user.id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(productdata)
       })
-    } else if (response.message === "sucessfully added in the cart") {
-      toast.success("product added in cart", {
+
+      const response = await sendingcartproduct.json()
+      
+      if (response.error === "product already in the cart") {
+        toast('Product is already in cart', {
+          position: "top-center"
+        })
+      } else if (response.message === "sucessfully added in the cart") {
+        toast.success("Product added to cart!", {
+          position: "top-center"
+        })
+      } else {
+        toast.error("Error adding to cart", {
+          position: "top-center"
+        })
+      }
+    } catch (error) {
+      toast.error("Failed to add to cart", {
         position: "top-center"
-      })
-    } else {
-      toast.error("error adding in cart", {
-        position: "top-center"
-      })
+      });
+    } finally {
+      setIsAddingToCart(false);
     }
   }
+
   return (
     <>
-      <ToastContainer />
       <Navbar />
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -309,7 +364,14 @@ export default function ProductPage({ params }) {
             <div className="space-y-6">
               <div className="aspect-square bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden group relative">
                 {images.length > 0 ? (
-                  <Image src={images[pictureno]} alt={`Product Image ${pictureno + 1}`} width={500} height={500} className="w-full h-150 bg-gradient-to-br from-gray-100 to-gray-200" />
+                   <Image 
+                    key={`${selectedVariant?.sku}-${pictureno}`}
+                    src={images[pictureno]} 
+                    alt={`Product Image ${pictureno + 1}`} 
+                    width={500} 
+                    height={500} 
+                    className="w-full h-150 bg-gradient-to-br from-gray-100 to-gray-200" 
+                  />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                     <span className="text-gray-400 text-lg">No Image Available</span>
@@ -344,12 +406,13 @@ export default function ProductPage({ params }) {
                 <div className="grid grid-cols-4 gap-4">
                   {images.map((img, idx) => (
                     <button
-                      key={idx}
+                      key={`${selectedVariant?.sku}-thumb-${idx}`}
                       onClick={() => setPictureNo(idx)}
-                      className={`aspect-square bg-white rounded-xl shadow-md border-2 overflow-hidden transition-all duration-300 ${pictureno === idx
-                        ? 'border-blue-500 ring-2 ring-blue-200 scale-105 shadow-lg'
-                        : 'border-gray-200 hover:border-gray-300 hover:shadow-lg'
-                        }`}
+                      className={`aspect-square bg-white rounded-xl shadow-md border-2 overflow-hidden transition-all duration-300 ${
+                        pictureno === idx
+                          ? 'border-blue-500 ring-2 ring-blue-200 scale-105 shadow-lg'
+                          : 'border-gray-200 hover:border-gray-300 hover:shadow-lg'
+                      }`}
                     >
                       <Image src={img} alt={`Thumbnail ${idx + 1}`} width={100} height={100} className="w-full h-full object-cover" />
                     </button>
@@ -358,10 +421,8 @@ export default function ProductPage({ params }) {
               )}
             </div>
 
-            {/* Product Info - Right Side with Better Padding */}
+            {/* Product Info - Right Side */}
             <div className="lg:pl-8 space-y-8">
-
-
               {/* Brand */}
               {product.brand && (
                 <div className="text-lg font-semibold text-blue-600 mb-2">
@@ -374,7 +435,18 @@ export default function ProductPage({ params }) {
                 <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
                   {product.name}
                 </h1>
-
+                {filteredreviews.length > 0 ? (
+                  <div className="flex items-center gap-2">
+                    {renderStars(avgrating)}
+                    <span className="text-2xl font-bold text-gray-900">{avgrating.toFixed(1)}</span>
+                    <span className="text-gray-400">|</span>
+                    <Link className="text-blue-700 underline font-medium" href={`/review/${id}`}>
+                      {filteredreviews.length} reviews
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="text-gray-500 italic">No reviews</div>
+                )}
                 {isCombinationValid ? (
                   <div className="flex items-center space-x-4">
                     <span className="text-3xl font-bold text-blue-600">${displayPrice}</span>
@@ -393,18 +465,16 @@ export default function ProductPage({ params }) {
 
                 {/* Stock status */}
                 {isCombinationValid && (
-                  <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${stockCount > 0
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
-                    }`}>
-                    <div className={`w-2 h-2 rounded-full mr-2 ${stockCount > 0 ? 'bg-green-400' : 'bg-red-400'
-                      }`}></div>
+                  <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
+                    stockCount > 0
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    <div className={`w-2 h-2 rounded-full mr-2 ${stockCount > 0 ? 'bg-green-400' : 'bg-red-400'}`}></div>
                     {stockCount > 0 ? `${stockCount} in Stock` : 'Out of Stock'}
-                  </div>
+                  </span>
                 )}
               </div>
-
-
 
               {/* Variant Selectors */}
               {Object.keys(availableAttributes).length > 0 && (
@@ -429,13 +499,14 @@ export default function ProductPage({ params }) {
                               <button
                                 key={value}
                                 onClick={() => handleAttributeChange(attributeType, value)}
-                                className={`px-5 py-3 rounded-xl border-2 font-medium transition-all duration-200 relative ${isSelected
-                                  ? 'bg-blue-600 text-white border-blue-600 shadow-lg scale-105'
-                                  : isAvailableWithCurrent
-                                    ? 'bg-white border-gray-300 text-gray-800 hover:bg-gray-50 hover:border-gray-400 hover:shadow-md hover:scale-105'
-                                    : 'bg-gray-100 border-gray-300 text-gray-600 opacity-70 hover:bg-gray-150 hover:border-gray-400 hover:scale-105'
-                                  }`}
-                                title={!isAvailableWithCurrent ? 'Not available with current selection' : ''}
+                                className={`px-5 py-3 rounded-xl border-2 font-medium transition-all duration-200 relative ${
+                                  isSelected
+                                    ? 'bg-blue-600 text-white border-blue-600 shadow-lg scale-105'
+                                    : isAvailableWithCurrent
+                                      ? 'bg-white border-gray-300 text-gray-800 hover:bg-gray-50 hover:border-gray-400 hover:shadow-md hover:scale-105'
+                                      : 'bg-gray-100 border-gray-300 text-gray-600 opacity-70 hover:bg-gray-150 hover:border-gray-400 hover:scale-105 cursor-pointer'
+                                }`}
+                                title={!isAvailableWithCurrent ? 'Click to switch to this variant' : ''}
                               >
                                 {value}
                                 {!isAvailableWithCurrent && !isSelected && (
@@ -450,6 +521,7 @@ export default function ProductPage({ params }) {
                   })}
                 </div>
               )}
+
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 space-y-6">
                 {/* Quantity Selector */}
                 <div className="space-y-3">
@@ -484,7 +556,7 @@ export default function ProductPage({ params }) {
                   )}
                 </div>
 
-                {/* Add to Cart Button */}
+                {/* Add to Cart Button with Loading State */}
                 <button
                   onClick={addingtocart}
                   disabled={isAddingToCart || stockCount === 0 || !isCombinationValid}
@@ -507,14 +579,12 @@ export default function ProductPage({ params }) {
                   )}
                 </button>
               </div>
+
               {/* Description */}
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Product Description</h3>
                 <p className="text-gray-700 leading-relaxed text-base">{product.description}</p>
               </div>
-
-              {/* Quantity & Add to Cart */}
-
             </div>
           </div>
         </div>

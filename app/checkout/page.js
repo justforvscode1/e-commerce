@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { toast, ToastContainer } from 'react-toastify';
+import toast from 'react-hot-toast';
 import { useSession } from 'next-auth/react';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -38,7 +38,7 @@ const CheckoutPage = () => {
                 const response = await fetch(`/api/cart/${data.user.id}`)
                 const cartData = await response.json()
                 // Remove userId from each item
-                const cleanedItems = cartData.map(({ userId, ...item }) => item)
+                const cleanedItems = cartData.map(({ userId, stockCount, ...item }) => item)
                 setorderitems(cleanedItems)
                 console.log(cleanedItems)
             }
@@ -66,9 +66,10 @@ const CheckoutPage = () => {
     };
 
     const createOrderInDatabase = async (orderId, paymentStatus) => {
+        const orderedItems = orderItems.map(({ _id, ...item }) => item)
         const finaldata = {
             orderId,
-            orderedItems: orderItems,
+            orderedItems: orderedItems,
             paymentMethod,
             paymentStatus,
             status: 'pending',
@@ -143,8 +144,8 @@ const CheckoutPage = () => {
                 await createOrderInDatabase(orderId, 'pending');
                 toast.success('Your order has been placed ', { position: 'top-center' });
                 setTimeout(() => {
-                    
-                    router.replace('/info/order-data');
+
+                    router.replace('/dashboard');
                 }, 1000);
                 return false;
             }
@@ -180,7 +181,7 @@ const CheckoutPage = () => {
                 // clear pending order id and processing flag
                 setPendingOrderId(null);
                 setIsProcessingPayment(false);
-                router.replace('/info/history');
+                router.replace('/dashboard');
             } else {
                 console.error('Order created fail:', result);
                 toast.error(result.error || 'Order creation failed after payment', { position: 'top-center' });
@@ -202,7 +203,6 @@ const CheckoutPage = () => {
     };
 
     return (<>
-        <ToastContainer />
         <div className="min-h-screen text-black bg-gray-50">
             {/* Header */}
             <div className="bg-white border-b border-gray-200">
@@ -539,11 +539,11 @@ const CheckoutPage = () => {
                             {/* Place Order Button */}
                             {paymentMethod === 'card' ? (
                                 <Elements stripe={stripePromise}>
-                                            <PaymentForm
-                                                orderId={pendingOrderId}
+                                    <PaymentForm
+                                        orderId={pendingOrderId}
                                         amount={total}
                                         email={shippingForm.email}
-                                                onSuccess={handleStripePaymentSuccess}
+                                        onSuccess={handleStripePaymentSuccess}
                                         onError={handleStripePaymentError}
                                         isProcessing={isProcessingPayment}
                                         agreedToTerms={agreedToTerms}
