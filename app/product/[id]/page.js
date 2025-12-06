@@ -106,14 +106,14 @@ function getAvailableOptions(variants, attributeType, currentAttributes) {
 // NEW: Find closest available variant when user clicks unavailable option
 function findClosestVariant(variants, attributeType, value) {
   // First, try to find any variant with this attribute value
-  const variantsWithValue = variants.filter(v => 
+  const variantsWithValue = variants.filter(v =>
     v.attributes && v.attributes[attributeType] === value
   );
-  
+
   if (variantsWithValue.length > 0) {
     return variantsWithValue[0];
   }
-  
+
   // Fallback to first variant
   return variants[0];
 }
@@ -223,7 +223,7 @@ export default function ProductPage({ params }) {
     if (!isCombinationAvailable(product.variants, newAttributes)) {
       // Find the closest available variant with this attribute value
       const closestVariant = findClosestVariant(product.variants, attributeType, value);
-      
+
       if (closestVariant && closestVariant.attributes) {
         newAttributes = { ...closestVariant.attributes };
       }
@@ -306,7 +306,7 @@ export default function ProductPage({ params }) {
     }
 
     setIsAddingToCart(true);
-    
+
     try {
       const productdata = {
         productId: product.productid,
@@ -330,7 +330,7 @@ export default function ProductPage({ params }) {
       })
 
       const response = await sendingcartproduct.json()
-      
+
       if (response.error === "product already in the cart") {
         toast('Product is already in cart', {
           position: "top-center"
@@ -356,25 +356,26 @@ export default function ProductPage({ params }) {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+      <div className="min-h-screen bg-gray-50 py-4 sm:py-6 lg:py-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 xl:gap-16">
 
             {/* Product Images - Left Side */}
-            <div className="space-y-6">
-              <div className="aspect-square bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden group relative">
+            <div className="space-y-3 sm:space-y-4 lg:space-y-6">
+              <div className="aspect-square bg-white rounded-xl sm:rounded-2xl shadow-md sm:shadow-lg border border-gray-200 overflow-hidden group relative">
                 {images.length > 0 ? (
-                   <Image 
+                  <Image
                     key={`${selectedVariant?.sku}-${pictureno}`}
-                    src={images[pictureno]} 
-                    alt={`Product Image ${pictureno + 1}`} 
-                    width={500} 
-                    height={500} 
-                    className="w-full h-150 bg-gradient-to-br from-gray-100 to-gray-200" 
+                    src={images[pictureno]}
+                    alt={`Product Image ${pictureno + 1}`}
+                    width={500}
+                    height={500}
+                    className="w-full h-full object-cover bg-gradient-to-br from-gray-100 to-gray-200"
+                    unoptimized={images[pictureno]?.startsWith('/uploads')}
                   />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                    <span className="text-gray-400 text-lg">No Image Available</span>
+                    <span className="text-gray-400 text-sm sm:text-base lg:text-lg">No Image Available</span>
                   </div>
                 )}
 
@@ -383,38 +384,45 @@ export default function ProductPage({ params }) {
                     <button
                       onClick={() => pictureno >= 1 && setPictureNo(p => p - 1)}
                       disabled={pictureno === 0}
-                      className="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-white hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="absolute left-2 sm:left-3 lg:left-4 top-1/2 transform -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/90 backdrop-blur-sm rounded-full shadow-md sm:shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-white hover:shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                       </svg>
                     </button>
                     <button
                       onClick={() => pictureno < images.length - 1 && setPictureNo(p => p + 1)}
                       disabled={pictureno === images.length - 1}
-                      className="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-white hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="absolute right-2 sm:right-3 lg:right-4 top-1/2 transform -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-white/90 backdrop-blur-sm rounded-full shadow-md sm:shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-white hover:shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </button>
                   </>
                 )}
+
+                {/* Image counter on mobile */}
+                {images.length > 1 && (
+                  <div className="absolute bottom-2 sm:bottom-3 left-1/2 transform -translate-x-1/2 bg-black/60 text-white text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full lg:hidden">
+                    {pictureno + 1} / {images.length}
+                  </div>
+                )}
               </div>
 
+              {/* Thumbnails - Horizontal scroll on mobile, grid on larger screens */}
               {images.length > 1 && (
-                <div className="grid grid-cols-4 gap-4">
+                <div className="flex lg:grid lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 overflow-x-auto lg:overflow-visible pb-1 lg:pb-0 scrollbar-hide">
                   {images.map((img, idx) => (
                     <button
                       key={`${selectedVariant?.sku}-thumb-${idx}`}
                       onClick={() => setPictureNo(idx)}
-                      className={`aspect-square bg-white rounded-xl shadow-md border-2 overflow-hidden transition-all duration-300 ${
-                        pictureno === idx
-                          ? 'border-blue-500 ring-2 ring-blue-200 scale-105 shadow-lg'
-                          : 'border-gray-200 hover:border-gray-300 hover:shadow-lg'
-                      }`}
+                      className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 lg:w-full lg:aspect-square bg-white rounded-lg sm:rounded-xl shadow-sm sm:shadow-md border-2 overflow-hidden transition-all duration-300 ${pictureno === idx
+                        ? 'border-blue-500 ring-1 sm:ring-2 ring-blue-200 scale-105 shadow-md sm:shadow-lg'
+                        : 'border-gray-200 hover:border-gray-300 hover:shadow-md sm:hover:shadow-lg active:scale-95'
+                        }`}
                     >
-                      <Image src={img} alt={`Thumbnail ${idx + 1}`} width={100} height={100} className="w-full h-full object-cover" />
+                      <Image src={img} alt={`Thumbnail ${idx + 1}`} width={100} height={100} className="w-full h-full object-cover" unoptimized={img?.startsWith('/uploads')} />
                     </button>
                   ))}
                 </div>
@@ -422,55 +430,54 @@ export default function ProductPage({ params }) {
             </div>
 
             {/* Product Info - Right Side */}
-            <div className="lg:pl-8 space-y-8">
+            <div className="lg:pl-4 xl:pl-8 space-y-4 sm:space-y-6 lg:space-y-8">
               {/* Brand */}
               {product.brand && (
-                <div className="text-lg font-semibold text-blue-600 mb-2">
+                <div className="text-sm sm:text-base lg:text-lg font-semibold text-blue-600">
                   {product.brand}
                 </div>
               )}
 
               {/* Title & Price */}
-              <div className="space-y-4">
-                <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+              <div className="space-y-2 sm:space-y-3 lg:space-y-4">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 leading-tight">
                   {product.name}
                 </h1>
                 {filteredreviews.length > 0 ? (
-                  <div className="flex items-center gap-2">
-                    {renderStars(avgrating)}
-                    <span className="text-2xl font-bold text-gray-900">{avgrating.toFixed(1)}</span>
-                    <span className="text-gray-400">|</span>
-                    <Link className="text-blue-700 underline font-medium" href={`/review/${id}`}>
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                    {renderStars(avgrating, 'text-sm sm:text-base lg:text-lg')}
+                    <span className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">{avgrating.toFixed(1)}</span>
+                    <span className="text-gray-400 hidden sm:inline">|</span>
+                    <Link className="text-blue-700 underline font-medium text-sm sm:text-base" href={`/review/${id}`}>
                       {filteredreviews.length} reviews
                     </Link>
                   </div>
                 ) : (
-                  <div className="text-gray-500 italic">No reviews</div>
+                  <div className="text-gray-500 italic text-sm sm:text-base">No reviews yet</div>
                 )}
                 {isCombinationValid ? (
-                  <div className="flex items-center space-x-4">
-                    <span className="text-3xl font-bold text-blue-600">${displayPrice}</span>
+                  <div className="flex items-center flex-wrap gap-2 sm:gap-3 lg:gap-4">
+                    <span className="text-2xl sm:text-3xl font-bold text-blue-600">${displayPrice}</span>
                     {isOnSale && (
                       <>
-                        <span className="text-xl text-gray-500 line-through">${price}</span>
-                        <span className="text-sm font-bold bg-red-100 text-red-600 px-3 py-1 rounded-full">
+                        <span className="text-base sm:text-lg lg:text-xl text-gray-500 line-through">${price}</span>
+                        <span className="text-xs sm:text-sm font-bold bg-red-100 text-red-600 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
                           {Math.round((1 - salePrice / price) * 100)}% OFF
                         </span>
                       </>
                     )}
                   </div>
                 ) : (
-                  <div className="text-gray-500 italic">Select available options to see price</div>
+                  <div className="text-gray-500 italic text-sm sm:text-base">Select available options to see price</div>
                 )}
 
                 {/* Stock status */}
                 {isCombinationValid && (
-                  <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
-                    stockCount > 0
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    <div className={`w-2 h-2 rounded-full mr-2 ${stockCount > 0 ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                  <span className={`inline-flex items-center px-2.5 sm:px-3 lg:px-4 py-1 sm:py-1.5 lg:py-2 rounded-full text-xs sm:text-sm font-medium ${stockCount > 0
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                    }`}>
+                    <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full mr-1.5 sm:mr-2 ${stockCount > 0 ? 'bg-green-400' : 'bg-red-400'}`}></div>
                     {stockCount > 0 ? `${stockCount} in Stock` : 'Out of Stock'}
                   </span>
                 )}
@@ -478,19 +485,19 @@ export default function ProductPage({ params }) {
 
               {/* Variant Selectors */}
               {Object.keys(availableAttributes).length > 0 && (
-                <div className="space-y-6 bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Select Options</h3>
+                <div className="space-y-4 sm:space-y-5 lg:space-y-6 bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 shadow-sm border border-gray-200">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">Select Options</h3>
                   {Object.entries(availableAttributes).map(([attributeType, allValues]) => {
                     const availableOptions = getFilteredOptions(attributeType);
 
                     return (
-                      <div key={attributeType} className="space-y-3">
+                      <div key={attributeType} className="space-y-2 sm:space-y-3">
                         <div className="flex items-center justify-between">
-                          <label className="font-semibold text-gray-700 capitalize">
+                          <label className="font-semibold text-gray-700 capitalize text-sm sm:text-base">
                             {attributeType.replace(/([A-Z])/g, ' $1').toLowerCase()}
                           </label>
                         </div>
-                        <div className="flex flex-wrap gap-3">
+                        <div className="flex flex-wrap gap-2 sm:gap-3">
                           {allValues.map(value => {
                             const isSelected = selectedAttributes[attributeType] === value;
                             const isAvailableWithCurrent = availableOptions.includes(value);
@@ -499,18 +506,17 @@ export default function ProductPage({ params }) {
                               <button
                                 key={value}
                                 onClick={() => handleAttributeChange(attributeType, value)}
-                                className={`px-5 py-3 rounded-xl border-2 font-medium transition-all duration-200 relative ${
-                                  isSelected
-                                    ? 'bg-blue-600 text-white border-blue-600 shadow-lg scale-105'
-                                    : isAvailableWithCurrent
-                                      ? 'bg-white border-gray-300 text-gray-800 hover:bg-gray-50 hover:border-gray-400 hover:shadow-md hover:scale-105'
-                                      : 'bg-gray-100 border-gray-300 text-gray-600 opacity-70 hover:bg-gray-150 hover:border-gray-400 hover:scale-105 cursor-pointer'
-                                }`}
+                                className={`px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5 lg:py-3 rounded-lg sm:rounded-xl border-2 font-medium text-sm sm:text-base transition-all duration-200 relative active:scale-95 ${isSelected
+                                  ? 'bg-blue-600 text-white border-blue-600 shadow-md sm:shadow-lg scale-105'
+                                  : isAvailableWithCurrent
+                                    ? 'bg-white border-gray-300 text-gray-800 hover:bg-gray-50 hover:border-gray-400 hover:shadow-md'
+                                    : 'bg-gray-100 border-gray-300 text-gray-600 opacity-70 hover:bg-gray-150 hover:border-gray-400 cursor-pointer'
+                                  }`}
                                 title={!isAvailableWithCurrent ? 'Click to switch to this variant' : ''}
                               >
                                 {value}
                                 {!isAvailableWithCurrent && !isSelected && (
-                                  <span className="ml-2 text-xs inline-block">⊘</span>
+                                  <span className="ml-1 sm:ml-2 text-xs inline-block">⊘</span>
                                 )}
                               </button>
                             );
@@ -522,36 +528,36 @@ export default function ProductPage({ params }) {
                 </div>
               )}
 
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 space-y-6">
+              <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 shadow-sm border border-gray-200 space-y-4 sm:space-y-5 lg:space-y-6">
                 {/* Quantity Selector */}
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   <label className="block text-sm font-semibold text-gray-700">Quantity</label>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2 sm:space-x-3 lg:space-x-4">
                     <button
                       onClick={() => setQuantity(q => Math.max(1, q - 1))}
                       disabled={quantity <= 1 || !isCombinationValid}
-                      className="w-14 h-14 rounded-xl border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-lg sm:rounded-xl border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                       </svg>
                     </button>
-                    <span className="w-20 text-center font-bold text-2xl bg-gray-50 py-4 rounded-xl border-2 border-gray-200">
+                    <span className="w-14 sm:w-16 lg:w-20 text-center font-bold text-lg sm:text-xl lg:text-2xl bg-gray-50 py-2.5 sm:py-3 lg:py-4 rounded-lg sm:rounded-xl border-2 border-gray-200">
                       {quantity}
                     </span>
                     <button
                       onClick={() => setQuantity(q => Math.min(stockCount, q + 1))}
                       disabled={quantity >= stockCount || !isCombinationValid}
-                      className="w-14 h-14 rounded-xl border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-lg sm:rounded-xl border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                       </svg>
                     </button>
                   </div>
                   {isCombinationValid && stockCount > 0 && stockCount <= 10 && (
-                    <div className="text-center text-orange-600 text-sm font-medium bg-orange-50 py-2 px-4 rounded-lg">
-                      ⚡ Only {stockCount} left in stock - order soon!
+                    <div className="text-center text-orange-600 text-xs sm:text-sm font-medium bg-orange-50 py-1.5 sm:py-2 px-3 sm:px-4 rounded-lg">
+                      ⚡ Only {stockCount} left - order soon!
                     </div>
                   )}
                 </div>
@@ -560,20 +566,20 @@ export default function ProductPage({ params }) {
                 <button
                   onClick={addingtocart}
                   disabled={isAddingToCart || stockCount === 0 || !isCombinationValid}
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-5 px-8 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-2xl disabled:hover:scale-100 disabled:cursor-not-allowed shadow-xl text-lg"
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-3 sm:py-4 lg:py-5 px-4 sm:px-6 lg:px-8 rounded-xl sm:rounded-2xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl lg:hover:shadow-2xl active:scale-[0.98] disabled:hover:scale-100 disabled:cursor-not-allowed shadow-lg sm:shadow-xl text-sm sm:text-base lg:text-lg"
                 >
                   {isAddingToCart ? (
                     <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                      <svg className="animate-spin -ml-1 mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 text-white" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Adding to Cart...
+                      Adding...
                     </span>
                   ) : stockCount === 0 ? (
                     'Out of Stock'
                   ) : !isCombinationValid ? (
-                    'Select Available Options'
+                    'Select Options'
                   ) : (
                     'Add to Cart'
                   )}
@@ -581,14 +587,25 @@ export default function ProductPage({ params }) {
               </div>
 
               {/* Description */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Product Description</h3>
-                <p className="text-gray-700 leading-relaxed text-base">{product.description}</p>
+              <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 shadow-sm border border-gray-200">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3 lg:mb-4">Product Description</h3>
+                <p className="text-gray-700 leading-relaxed text-sm sm:text-base">{product.description}</p>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Custom scrollbar hiding styles */}
+      <style jsx global>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </>
   );
 }

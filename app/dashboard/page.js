@@ -2,7 +2,7 @@
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function CompletedOrdersPage() {
     const [orders, setOrders] = useState([]);
@@ -11,6 +11,7 @@ export default function CompletedOrdersPage() {
     const [statusFilter, setStatusFilter] = useState('all');
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
     const { data, status } = useSession();
+    const dropdownRef = useRef(null);
 
     useEffect(() => {
         if (status === 'authenticated') {
@@ -19,7 +20,6 @@ export default function CompletedOrdersPage() {
                     const orders = await fetch(`/api/order/${data.user.id}`);
                     const response = await orders.json();
                     setOrders(response);
-                    console.log('Fetched completed orders:', response);
                 } catch (error) {
                     console.error('Error fetching completed orders:', error);
                     setOrders([]);
@@ -28,7 +28,26 @@ export default function CompletedOrdersPage() {
                 }
             })();
         }
-    }, [status , data]);
+    }, [status, data]);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setShowFilterDropdown(false);
+            }
+        };
+
+        if (showFilterDropdown) {
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('touchstart', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchstart', handleClickOutside);
+        };
+    }, [showFilterDropdown]);
 
     const toggleOrderExpansion = (orderId) => {
         setExpandedOrder(expandedOrder === orderId ? null : orderId);
@@ -40,8 +59,7 @@ export default function CompletedOrdersPage() {
 
     const handleFilterSelect = (filter) => {
         setStatusFilter(filter);
-        setShowFilterDropdown(false); // ✅ FIXED: Close dropdown after selection
-        console.log("Selected filter:", filter);
+        setShowFilterDropdown(false);
     };
 
     const formatDate = (dateString) => {
@@ -78,17 +96,18 @@ export default function CompletedOrdersPage() {
         return labels[filter] || 'All Orders';
     };
 
-    const filteredOrders = orders.filter(order => {
-        if (statusFilter === 'all') return true;
-        return order.status.toLowerCase() === statusFilter;
-    });
+    const filteredOrders = orders
+        .filter(order => {
+            if (statusFilter === 'all') return true;
+            return order.status.toLowerCase() === statusFilter;
+        })
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Newest first
 
     const deliveredOrders = orders.filter(order => order.status.toLowerCase() === 'delivered');
     const cancelledOrders = orders.filter(order => order.status.toLowerCase() === 'cancelled');
     const pendingOrders = orders.filter(order => order.status.toLowerCase() === 'pending');
     const returnedOrders = orders.filter(order => order.status.toLowerCase() === 'returned');
 
-    // Calculate stats based on current filter
     const getFilteredStats = () => {
         switch (statusFilter) {
             case 'pending':
@@ -119,7 +138,7 @@ export default function CompletedOrdersPage() {
                     averageOrder: returnedOrders.length ? (returnedOrders.reduce((sum, order) => sum + order.total, 0) / returnedOrders.length).toFixed(2) : 0,
                     totalItems: returnedOrders.reduce((sum, order) => sum + order.orderedItems.length, 0)
                 };
-            default: // all
+            default:
                 return {
                     totalOrders: orders.length,
                     totalValue: orders.reduce((sum, order) => sum + order.total, 0),
@@ -135,37 +154,35 @@ export default function CompletedOrdersPage() {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="text-gray-600 text-lg">Loading your orders...</p>
+                    <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 lg:h-16 lg:w-16 border-b-2 border-blue-600 mx-auto mb-3 sm:mb-4"></div>
+                    <p className="text-gray-600 text-sm sm:text-base lg:text-lg">Loading your orders...</p>
                 </div>
             </div>
         );
     }
 
     return (<>
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {/* Header */}
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+            <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
+                <div className="flex items-center justify-between h-14 sm:h-16">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+                            <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                             </svg>
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold text-gray-900">My Dashboard</h1>
-                            <p className="text-xs text-gray-500">Manage your orders and account</p>
+                            <h1 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900">My Dashboard</h1>
+                            <p className="text-[10px] sm:text-xs text-gray-500 hidden sm:block">Manage your orders and account</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                        {/* <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button> */}
+                    <div className="flex items-center gap-2 sm:gap-3">
+                        <Link href="/" className="text-xs sm:text-sm text-gray-600 hover:text-blue-600 transition-colors hidden sm:block">
+                            ← Back to Store
+                        </Link>
                         <Link href="/dashboard/profile" className="flex items-center gap-2">
-                            <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm cursor-pointer hover:shadow-lg transition-shadow">
+                            <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-xs sm:text-sm cursor-pointer hover:shadow-lg transition-shadow">
                                 {data?.user?.name ? data.user.name.charAt(0).toUpperCase() : 'U'}
                             </div>
                         </Link>
@@ -173,39 +190,40 @@ export default function CompletedOrdersPage() {
                 </div>
             </div>
         </header>
-        <div className="min-h-screen bg-gray-50 relative">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-                {/* Header */}
-                <div className="mb-10 opacity-0 animate-fadeIn">
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <h1 className="text-4xl font-bold text-gray-900 mb-2 tracking-tight animate-slideDown">
-                                Your All Orders
-                                <span className="block w-20 h-1 bg-[#155dfc] mt-3 rounded-full"></span>
-                            </h1>
-                            <p className="text-gray-600 animate-slideUp">Track and manage all your purchases</p>
-                        </div>
+
+        <div className="min-h-screen bg-gray-50">
+            <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-5 lg:py-6">
+                {/* Header Section */}
+                <div className="mb-6 sm:mb-8 lg:mb-10">
+                    <div className="mb-4 sm:mb-6">
+                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1 sm:mb-2 tracking-tight">
+                            Your Orders
+                            <span className="block w-12 sm:w-16 lg:w-20 h-1 bg-blue-600 mt-2 sm:mt-3 rounded-full"></span>
+                        </h1>
+                        <p className="text-sm sm:text-base text-gray-600">Track and manage all your purchases</p>
                     </div>
                     <div className="h-px bg-gray-200"></div>
                 </div>
 
                 {/* Filter Section */}
-                <div className="mb-10 opacity-0 animate-fadeIn" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
-                    {/* Mobile Filter Dropdown - FIXED VERSION */}
-                    <div className="md:hidden relative z-50">
+                <div className="mb-6 sm:mb-8 lg:mb-10">
+                    {/* Mobile Filter Dropdown */}
+                    <div className="md:hidden relative" ref={dropdownRef}>
                         <button
                             onClick={toggleFilterDropdown}
-                            className="w-full flex items-center justify-between px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-all duration-300"
+                            className="w-full flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-lg shadow-sm active:bg-gray-50 transition-all"
                         >
-                            <div className="flex items-center">
-                                <span className="text-gray-700 font-medium">{getFilterLabel(statusFilter)}</span>
-                                <span className="ml-2 text-xs px-2 py-1 bg-[#155dfc] text-white rounded-full">
+                            <div className="flex items-center gap-2">
+                                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                </svg>
+                                <span className="text-sm sm:text-base text-gray-700 font-medium">{getFilterLabel(statusFilter)}</span>
+                                <span className="text-xs px-1.5 sm:px-2 py-0.5 bg-blue-600 text-white rounded-full">
                                     {filteredOrders.length}
                                 </span>
                             </div>
                             <svg
-                                className={`w-5 h-5 text-gray-500 transform transition-transform duration-300 ${showFilterDropdown ? 'rotate-180' : ''
-                                    }`}
+                                className={`w-4 h-4 sm:w-5 sm:h-5 text-gray-500 transform transition-transform duration-200 ${showFilterDropdown ? 'rotate-180' : ''}`}
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -215,46 +233,39 @@ export default function CompletedOrdersPage() {
                         </button>
 
                         {/* Dropdown Menu */}
-                        <div
-                            role="listbox"
-                            aria-label="Order status filter"
-                            className={`absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 transition-all duration-300 transform origin-top ${showFilterDropdown
-                                ? 'opacity-100 scale-100 translate-y-0'
-                                : 'opacity-0 scale-95 -translate-y-2 pointer-events-none'
-                                }`}
-                        >
-                            {[
-                                { key: 'all', label: 'All Orders', count: orders.length },
-                                { key: 'pending', label: 'Pending', count: pendingOrders.length },
-                                { key: 'delivered', label: 'Delivered', count: deliveredOrders.length },
-                                { key: 'cancelled', label: 'Cancelled', count: cancelledOrders.length },
-                                { key: 'returned', label: 'Returned', count: returnedOrders.length }
-                            ].map((tab, index) => (
-                                <button
-                                    key={tab.key}
-                                    role="option"
-                                    aria-selected={statusFilter === tab.key}
-                                    onClick={() => handleFilterSelect(tab.key)}
-                                    className={`w-full flex items-center justify-between px-4 py-3 text-left transition-all duration-200 ${statusFilter === tab.key
-                                        ? 'bg-blue-50 text-[#155dfc]'
-                                        : 'text-gray-700 hover:bg-gray-50'
-                                        } ${index !== 0 ? 'border-t border-gray-100' : ''}`}
-                                >
-                                    <span className="font-medium">{tab.label}</span>
-                                    <span
-                                        className={`text-xs px-2 py-1 rounded-full ${statusFilter === tab.key
-                                            ? 'bg-[#155dfc] text-white'
-                                            : 'bg-gray-200 text-gray-600'
-                                            }`}
+                        {showFilterDropdown && (
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden">
+                                {[
+                                    { key: 'all', label: 'All Orders', count: orders.length },
+                                    { key: 'pending', label: 'Pending', count: pendingOrders.length },
+                                    { key: 'delivered', label: 'Delivered', count: deliveredOrders.length },
+                                    { key: 'cancelled', label: 'Cancelled', count: cancelledOrders.length },
+                                    { key: 'returned', label: 'Returned', count: returnedOrders.length }
+                                ].map((tab, index) => (
+                                    <button
+                                        key={tab.key}
+                                        onClick={() => handleFilterSelect(tab.key)}
+                                        className={`w-full flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 text-left transition-colors ${statusFilter === tab.key
+                                            ? 'bg-blue-50 text-blue-600'
+                                            : 'text-gray-700 hover:bg-gray-50 active:bg-gray-100'
+                                            } ${index !== 0 ? 'border-t border-gray-100' : ''}`}
                                     >
-                                        {tab.count}
-                                    </span>
-                                </button>
-                            ))}
-                        </div>
+                                        <span className="text-sm sm:text-base font-medium">{tab.label}</span>
+                                        <span
+                                            className={`text-xs px-1.5 sm:px-2 py-0.5 rounded-full ${statusFilter === tab.key
+                                                ? 'bg-blue-600 text-white'
+                                                : 'bg-gray-200 text-gray-600'
+                                                }`}
+                                        >
+                                            {tab.count}
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
-                    {/* Desktop Filter Tabs - Only show on desktop */}
+                    {/* Desktop Filter Tabs */}
                     <div className="hidden md:flex flex-wrap gap-1 bg-gray-100 rounded-lg p-1">
                         {[
                             { key: 'all', label: 'All Orders', count: orders.length },
@@ -266,14 +277,14 @@ export default function CompletedOrdersPage() {
                             <button
                                 key={tab.key}
                                 onClick={() => setStatusFilter(tab.key)}
-                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-300 flex items-center ${statusFilter === tab.key
-                                    ? 'bg-[#155dfc] text-white shadow-sm transform scale-105'
+                                className={`px-3 lg:px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center ${statusFilter === tab.key
+                                    ? 'bg-blue-600 text-white shadow-sm'
                                     : 'text-gray-600 hover:text-gray-900 hover:bg-white'
                                     }`}
                             >
                                 {tab.label}
-                                <span className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${statusFilter === tab.key
-                                    ? 'bg-blue-100 text-[#155dfc]'
+                                <span className={`ml-1.5 lg:ml-2 text-xs px-1.5 py-0.5 rounded-full ${statusFilter === tab.key
+                                    ? 'bg-blue-100 text-blue-600'
                                     : 'bg-gray-200 text-gray-500'
                                     }`}>
                                     {tab.count}
@@ -283,46 +294,25 @@ export default function CompletedOrdersPage() {
                     </div>
                 </div>
 
-                {/* Stats Cards - Show relevant stats based on current filter */}
-                <div className={`${showFilterDropdown ? "opacity-0 pointer-events-none" : "block"}  grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-10 relative z-10`}>
+                {/* Stats Cards */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 mb-6 sm:mb-8 lg:mb-10">
                     {[
-                        {
-                            label: 'Total Orders',
-                            value: stats.totalOrders,
-                            icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
-                            delay: '0.3s'
-                        },
-                        {
-                            label: 'Total Items',
-                            value: stats.totalItems,
-                            icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10',
-                            delay: '0.4s'
-                        },
-                        {
-                            label: 'Total Value',
-                            value: `$${stats.totalValue.toFixed(2)}`,
-                            icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1',
-                            delay: '0.5s'
-                        },
-                        {
-                            label: 'Avg Order',
-                            value: `$${stats.averageOrder}`,
-                            icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6',
-                            delay: '0.6s'
-                        }
+                        { label: 'Total Orders', value: stats.totalOrders, icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
+                        { label: 'Total Items', value: stats.totalItems, icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10' },
+                        { label: 'Total Value', value: `$${stats.totalValue.toFixed(2)}`, icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1' },
+                        { label: 'Avg Order', value: `$${stats.averageOrder}`, icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' }
                     ].map((stat, idx) => (
                         <div
                             key={idx}
-                            className="bg-white rounded-lg p-4 md:p-6 shadow-sm border border-gray-200 opacity-0 animate-slideUp"
-                            style={{ animationDelay: stat.delay, animationFillMode: 'forwards' }}
+                            className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-5 shadow-sm border border-gray-200"
                         >
                             <div className="flex items-start justify-between">
-                                <div>
-                                    <p className="text-xs md:text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">{stat.label}</p>
-                                    <p className="text-xl md:text-3xl font-bold text-gray-900">{stat.value}</p>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 sm:mb-2 truncate">{stat.label}</p>
+                                    <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 truncate">{stat.value}</p>
                                 </div>
-                                <div className="p-2 md:p-3 bg-blue-50 rounded-lg transform transition-transform duration-300 hover:scale-110">
-                                    <svg className="w-4 h-4 md:w-6 md:h-6 text-[#155dfc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div className="p-1.5 sm:p-2 lg:p-3 bg-blue-50 rounded-lg flex-shrink-0 ml-2">
+                                    <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d={stat.icon} />
                                     </svg>
                                 </div>
@@ -332,51 +322,46 @@ export default function CompletedOrdersPage() {
                 </div>
 
                 {/* Orders List */}
-                <div className="space-y-4 relative z-0">
-                    {filteredOrders.map((order, index) => (
+                <div className="space-y-3 sm:space-y-4">
+                    {filteredOrders.map((order) => (
                         <div
                             key={order.orderId}
-                            className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 opacity-0 animate-slideUp"
-                            style={{
-                                animationDelay: `${0.7 + index * 0.1}s`,
-                                animationFillMode: 'forwards'
-                            }}
+                            className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
                         >
                             {/* Order Header */}
                             <div
-                                className="p-4 md:p-6 cursor-pointer hover:bg-blue-50 transition-all duration-300 border-l-4 border-[#155dfc]"
+                                className="p-3 sm:p-4 lg:p-5 cursor-pointer hover:bg-blue-50/50 transition-colors border-l-4 border-blue-600"
                                 onClick={() => toggleOrderExpansion(order.orderId)}
                             >
-                                <div className="flex justify-between items-start">
-                                    <div className="flex-1">
-                                        <div className="flex flex-wrap items-center gap-2 mb-3">
-                                            <h3 className="text-lg md:text-xl font-bold text-gray-900 tracking-wide">
+                                <div className="flex justify-between items-start gap-2">
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+                                            <h3 className="text-sm sm:text-base lg:text-lg font-bold text-gray-900">
                                                 #{order.orderId.substring(0, 8).toUpperCase()}
                                             </h3>
-                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadge(order.status)} uppercase tracking-wider`}>
-                                                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                            <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold ${getStatusBadge(order.status)} uppercase`}>
+                                                {order.status}
                                             </span>
                                         </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 text-sm">
-                                            <div className="flex items-center gap-2 text-gray-600">
-                                                <svg className="w-4 h-4 text-[#155dfc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm">
+                                            <div className="flex items-center gap-1.5 text-gray-600">
+                                                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                 </svg>
-                                                <span>{formatDate(order.createdAt)}</span>
+                                                <span className="truncate">{formatDate(order.createdAt)}</span>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-gray-600">Total:</span>
-                                                <span className="text-lg font-bold text-gray-900">${order.total?.toFixed(2)}</span>
+                                            <div className="flex items-center gap-1">
+                                                <span className="text-gray-500">Total:</span>
+                                                <span className="font-bold text-gray-900">${order.total?.toFixed(2)}</span>
                                             </div>
-                                            <div className="flex items-center gap-2 text-gray-600">
+                                            <div className="hidden sm:flex items-center gap-1 text-gray-600">
                                                 <span>Items: {order.orderedItems?.length || 0}</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="ml-2 md:ml-4">
+                                    <div className="flex-shrink-0">
                                         <svg
-                                            className={`w-5 h-5 text-[#155dfc] transform transition-transform duration-300 ${expandedOrder === order.orderId ? 'rotate-180' : ''
-                                                }`}
+                                            className={`w-4 h-4 sm:w-5 sm:h-5 text-blue-600 transform transition-transform duration-200 ${expandedOrder === order.orderId ? 'rotate-180' : ''}`}
                                             fill="none"
                                             stroke="currentColor"
                                             viewBox="0 0 24 24"
@@ -388,74 +373,50 @@ export default function CompletedOrdersPage() {
                             </div>
 
                             {/* Expanded Order Details */}
-                            <div
-                                className={`transition-all duration-500 overflow-hidden ${expandedOrder === order.orderId
-                                    ? 'max-h-[2000px] opacity-100'
-                                    : 'max-h-0 opacity-0'
-                                    }`}
-                            >
-                                <div className="px-4 md:px-6 pb-6 border-t border-gray-200">
+                            {expandedOrder === order.orderId && (
+                                <div className="px-3 sm:px-4 lg:px-5 pb-4 sm:pb-5 lg:pb-6 border-t border-gray-200">
                                     {/* Order Items */}
-                                    <div className="mt-6">
-                                        <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-4 flex items-center gap-2">
+                                    <div className="mt-4 sm:mt-5">
+                                        <h4 className="text-xs sm:text-sm font-bold text-gray-900 uppercase tracking-wide mb-3 sm:mb-4 flex items-center gap-2">
                                             <span>Order Items ({order.orderedItems?.length || 0})</span>
-                                            <span className="w-2 h-2 bg-[#155dfc] rounded-full animate-pulse"></span>
+                                            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-600 rounded-full animate-pulse"></span>
                                         </h4>
-                                        <div className="space-y-3">
-                                            {order.orderedItems?.map((item, itemIndex) => (
-                                                <div key={item._id} className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-200 hover:shadow-sm transition-all duration-300 transform hover:-translate-y-0.5">
-                                                    <div className="w-16 h-16 bg-blue-50 rounded-lg flex-shrink-0 flex items-center justify-center border border-blue-100 transform transition-transform duration-300 hover:scale-105">
-                                                        {/* <svg className="w-6 h-6 text-[#155dfc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
-                                                            </svg> */}
-                                                        <Link href={`/product/${item.productId}`} >
-                                                            <Image src={item.image} alt={item.name} width={60} height={60} className="w-16 h-16 object-contain rounded-md" />
-                                                        </Link>
-                                                    </div>
+                                        <div className="space-y-2 sm:space-y-3">
+                                            {order.orderedItems?.map((item) => (
+                                                <div key={item._id} className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                                    <Link href={`/product/${item.productId}`} className="flex-shrink-0">
+                                                        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-lg border border-gray-200 overflow-hidden">
+                                                            <Image src={item.image} alt={item.name} width={60} height={60} className="w-full h-full object-contain" unoptimized={item.image?.startsWith('/uploads')} />
+                                                        </div>
+                                                    </Link>
                                                     <div className="flex-1 min-w-0">
-                                                        <h5 className="font-bold text-gray-900 mb-1 truncate">{item.name}</h5>
-                                                        <p className="text-sm text-gray-600 mb-2 truncate">{item.brand} • {item.category}</p>
-                                                        <p className="text-sm text-gray-600 mb-2">Quantity: {item.quantity}</p>
-                                                        <div className="flex items-center">
-                                                            <div className="flex items-center">
-                                                                {[...Array(5)].map((_, i) => (
-                                                                    <svg
-                                                                        key={i}
-                                                                        className={`w-3 h-3 ${i < Math.floor(item.rating || 0)
-                                                                            ? 'text-amber-500'
-                                                                            : 'text-gray-300'
-                                                                            }`}
-                                                                        fill="currentColor"
-                                                                        viewBox="0 0 20 20"
-                                                                    >
-                                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                                    </svg>
-                                                                ))}
-                                                            </div>
-                                                            <span className="text-sm text-gray-600 ml-2">({item.reviewCount || 0})</span>
+                                                        <h5 className="text-xs sm:text-sm font-bold text-gray-900 truncate">{item.name}</h5>
+                                                        <p className="text-[10px] sm:text-xs text-gray-500 truncate">{item.brand} • Qty: {item.quantity}</p>
+                                                        <div className="flex items-center gap-0.5 mt-1">
+                                                            {[...Array(5)].map((_, i) => (
+                                                                <svg
+                                                                    key={i}
+                                                                    className={`w-2.5 h-2.5 sm:w-3 sm:h-3 ${i < Math.floor(item.rating || 0) ? 'text-amber-400' : 'text-gray-300'}`}
+                                                                    fill="currentColor"
+                                                                    viewBox="0 0 20 20"
+                                                                >
+                                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                                </svg>
+                                                            ))}
                                                         </div>
                                                     </div>
                                                     <div className="text-right flex-shrink-0">
-                                                        {item.originalPrice > item.price && (
-                                                            <p className="text-sm text-gray-400 line-through">${item.originalPrice?.toFixed(2)}</p>
-                                                        )}
-                                                        <p className="font-bold text-gray-900">${item.price?.toFixed(2)}</p>
-                                                        <p className="text-sm text-gray-600 mt-1">
-                                                            ${((item.price || 0) * (item.quantity || 0)).toFixed(2)}
+                                                        <p className="text-sm sm:text-base font-bold text-gray-900">${item.price?.toFixed(2)}</p>
+                                                        <p className="text-[10px] sm:text-xs text-gray-500">
+                                                            Total: ${((item.price || 0) * (item.quantity || 0)).toFixed(2)}
                                                         </p>
-
-                                                        {/* Action buttons for delivered items */}
                                                         {order.status.toLowerCase() === 'delivered' && (
-                                                            <div className="mt-3 flex flex-col gap-2">
-                                                                <Link href={`/review-order/${item.productId}`}
-                                                                    className="w-full px-2 py-1.5 bg-blue-50 text-blue-600 rounded-md text-xs font-medium hover:bg-blue-100 transition-colors border border-blue-200">
-                                                                    Give Review
-
-                                                                </Link>
-                                                                <button className="w-full px-2 py-1.5 bg-red-50 text-red-600 rounded-md text-xs font-medium hover:bg-red-100 transition-colors border border-red-200">
-                                                                    Return Item
-                                                                </button>
-                                                            </div>
+                                                            <Link
+                                                                href={`/review-order/${item.productId}`}
+                                                                className="inline-block mt-1.5 sm:mt-2 px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] sm:text-xs font-medium hover:bg-blue-100 transition-colors"
+                                                            >
+                                                                Write Review
+                                                            </Link>
                                                         )}
                                                     </div>
                                                 </div>
@@ -464,152 +425,87 @@ export default function CompletedOrdersPage() {
                                     </div>
 
                                     {/* Order Summary */}
-                                    <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                                        <div className="text-center transform transition-transform duration-300 hover:scale-105">
-                                            <p className="text-xs text-[#155dfc] uppercase tracking-wide mb-1 font-semibold">Subtotal</p>
-                                            <p className="text-base md:text-lg font-bold text-gray-900">${order.subtotal?.toFixed(2)}</p>
-                                        </div>
-                                        <div className="text-center transform transition-transform duration-300 hover:scale-105">
-                                            <p className="text-xs text-[#155dfc] uppercase tracking-wide mb-1 font-semibold">Tax</p>
-                                            <p className="text-base md:text-lg font-bold text-gray-900">${order.tax?.toFixed(2)}</p>
-                                        </div>
-                                        <div className="text-center transform transition-transform duration-300 hover:scale-105">
-                                            <p className="text-xs text-[#155dfc] uppercase tracking-wide mb-1 font-semibold">Shipping</p>
-                                            <p className="text-base md:text-lg font-bold text-gray-900">
-                                                {order.shippingCost === 0 ? 'Free' : `$${order.shippingCost}`}
-                                            </p>
-                                        </div>
-                                        <div className="text-center transform transition-transform duration-300 hover:scale-105">
-                                            <p className="text-xs text-[#155dfc] uppercase tracking-wide mb-1 font-semibold">Total</p>
-                                            <p className="text-lg md:text-xl font-bold text-gray-900">${order.total?.toFixed(2)}</p>
-                                        </div>
+                                    <div className="mt-4 sm:mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                        {[
+                                            { label: 'Subtotal', value: `$${order.subtotal?.toFixed(2)}` },
+                                            { label: 'Tax', value: `$${order.tax?.toFixed(2)}` },
+                                            { label: 'Shipping', value: order.shippingCost === 0 ? 'Free' : `$${order.shippingCost}` },
+                                            { label: 'Total', value: `$${order.total?.toFixed(2)}`, highlight: true }
+                                        ].map((item, idx) => (
+                                            <div key={idx} className="text-center">
+                                                <p className="text-[10px] sm:text-xs text-blue-600 uppercase font-semibold mb-0.5 sm:mb-1">{item.label}</p>
+                                                <p className={`text-sm sm:text-base lg:text-lg font-bold ${item.highlight ? 'text-blue-600' : 'text-gray-900'}`}>{item.value}</p>
+                                            </div>
+                                        ))}
                                     </div>
 
                                     {/* Customer & Shipping Info */}
-                                    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                                    <div className="mt-4 sm:mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                         <div>
-                                            <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Customer Information</h4>
-                                            <div className="bg-blue-50 p-3 md:p-4 rounded-lg border border-blue-100 space-y-2 text-sm">
-                                                <div className="flex items-start">
-                                                    <span className="text-[#155dfc] w-16 font-semibold">Name:</span>
-                                                    <span className="text-gray-900">{order.shippingForm?.firstName} {order.shippingForm?.lastName}</span>
-                                                </div>
-                                                <div className="flex items-start">
-                                                    <span className="text-[#155dfc] w-16 font-semibold">Email:</span>
-                                                    <span className="text-gray-900">{order.shippingForm?.email}</span>
-                                                </div>
-                                                <div className="flex items-start">
-                                                    <span className="text-[#155dfc] w-16 font-semibold">Phone:</span>
-                                                    <span className="text-gray-900">{order.shippingForm?.phone}</span>
-                                                </div>
+                                            <h4 className="text-xs sm:text-sm font-bold text-gray-900 uppercase mb-2 sm:mb-3">Customer</h4>
+                                            <div className="bg-gray-50 p-2.5 sm:p-3 rounded-lg border border-gray-200 text-xs sm:text-sm space-y-1">
+                                                <p><span className="text-gray-500">Name:</span> <span className="text-gray-900">{order.shippingForm?.firstName} {order.shippingForm?.lastName}</span></p>
+                                                <p className="truncate"><span className="text-gray-500">Email:</span> <span className="text-gray-900">{order.shippingForm?.email}</span></p>
+                                                <p><span className="text-gray-500">Phone:</span> <span className="text-gray-900">{order.shippingForm?.phone}</span></p>
                                             </div>
                                         </div>
                                         <div>
-                                            <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Shipping Address</h4>
-                                            <div className="bg-blue-50 p-3 md:p-4 rounded-lg border border-blue-100 text-sm">
+                                            <h4 className="text-xs sm:text-sm font-bold text-gray-900 uppercase mb-2 sm:mb-3">Shipping Address</h4>
+                                            <div className="bg-gray-50 p-2.5 sm:p-3 rounded-lg border border-gray-200 text-xs sm:text-sm">
                                                 <p className="text-gray-700 leading-relaxed">{formatShippingAddress(order.shippingForm)}</p>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Action Buttons */}
-                                    <div className="mt-6 flex flex-wrap gap-2">
-                                        {order.status.toLowerCase() === 'delivered' && (
-                                            <>
-
-                                                <button className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-all duration-300 transform hover:-translate-y-0.5 text-sm">
-                                                    Return Items
-                                                </button>
-                                            </>
-                                        )}
-
+                                    <div className="mt-4 sm:mt-5 flex flex-wrap gap-2">
                                         {order.status.toLowerCase() === 'pending' && (
-                                            <button className="px-4 py-2 bg-[#155dfc] text-white rounded-lg hover:bg-[#124fd0] transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm">
+                                            <button className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-xs sm:text-sm font-medium">
                                                 Track Order
                                             </button>
                                         )}
-                                        {order.status.toLowerCase() === 'returned' && (
-                                            <button className="px-4 py-2 bg-[#155dfc] text-white rounded-lg hover:bg-[#124fd0] transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm">
-                                                Buy Again
+                                        {order.status.toLowerCase() === 'delivered' && (
+                                            <button className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors text-xs sm:text-sm font-medium border border-gray-300">
+                                                Return Items
                                             </button>
                                         )}
-                                        <button className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-all duration-300 transform hover:-translate-y-0.5 text-sm">
+                                        <button className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors text-xs sm:text-sm font-medium border border-gray-300">
                                             Download Invoice
                                         </button>
-                                        <button className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-all duration-300 transform hover:-translate-y-0.5 text-sm">
+                                        <button className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors text-xs sm:text-sm font-medium border border-gray-300">
                                             Need Help?
                                         </button>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     ))}
                 </div>
 
                 {/* Empty State */}
                 {filteredOrders.length === 0 && !loading && (
-                    <div className="text-center py-12 md:py-16 bg-white rounded-lg border border-gray-200 shadow-sm transform hover:scale-105 transition-transform duration-300 relative z-0">
-                        <div className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 md:mb-6 bg-blue-50 rounded-full flex items-center justify-center transform transition-transform duration-300 hover:scale-110">
-                            <svg className="w-8 h-8 md:w-10 md:h-10 text-[#155dfc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="text-center py-10 sm:py-12 lg:py-16 bg-white rounded-xl border border-gray-200 shadow-sm">
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 mx-auto mb-3 sm:mb-4 bg-blue-50 rounded-full flex items-center justify-center">
+                            <svg className="w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
                             </svg>
                         </div>
-                        <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
-                            {statusFilter === 'all' ? 'No orders yet' :
-                                statusFilter === 'pending' ? 'No pending orders' :
-                                    statusFilter === 'delivered' ? 'No delivered orders' :
-                                        statusFilter === 'cancelled' ? 'No cancelled orders' :
-                                            'No returned orders'}
+                        <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-1 sm:mb-2">
+                            {statusFilter === 'all' ? 'No orders yet' : `No ${statusFilter} orders`}
                         </h3>
-                        <p className="text-gray-600 mb-6 md:mb-8 text-sm md:text-base">
-                            {statusFilter === 'all' ? "Start your shopping journey with us today" :
-                                statusFilter === 'pending' ? "You don't have any pending orders at the moment" :
-                                    statusFilter === 'delivered' ? "You don't have any delivered orders at the moment" :
-                                        statusFilter === 'cancelled' ? "You don't have any cancelled orders" :
-                                            "You don't have any returned orders"}
+                        <p className="text-xs sm:text-sm lg:text-base text-gray-600 mb-4 sm:mb-6 px-4">
+                            {statusFilter === 'all' ? "Start your shopping journey with us today" : `You don't have any ${statusFilter} orders at the moment`}
                         </p>
-
+                        <Link
+                            href="/"
+                            className="inline-block px-4 sm:px-6 py-2 sm:py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium"
+                        >
+                            Start Shopping
+                        </Link>
                     </div>
                 )}
             </div>
-
-            {/* Close dropdown when clicking outside - High z-index */}
-            {showFilterDropdown && (
-                <div
-                    className="fixed inset-0 z-40 md:hidden"
-                    onClick={() => setShowFilterDropdown(false)}
-                />
-            )}
-
-            <style jsx>{`
-                @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(10px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                
-                @keyframes slideUp {
-                    from { opacity: 0; transform: translateY(30px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-
-                @keyframes slideDown {
-                    from { opacity: 0; transform: translateY(-20px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                
-                .animate-fadeIn {
-                    animation: fadeIn 0.8s ease-out forwards;
-                }
-                
-                .animate-slideUp {
-                    animation: slideUp 0.8s ease-out forwards;
-                }
-
-                .animate-slideDown {
-                    animation: slideDown 0.8s ease-out forwards;
-                }
-            `}</style>
         </div>
     </>
     );
-}
+}           

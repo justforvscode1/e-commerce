@@ -6,13 +6,13 @@ const reviewSchema = new Schema(
             type: String,
             ref: 'User',
             required: [true, 'User is required'],
-            index: true,
+            index: true // Fast lookups by user
         },
         productId: {
             type: String,
             ref: 'Product',
             required: [true, 'Product is required'],
-            index: true,
+            index: true // Fast lookups by product
         },
         rating: {
             type: Number,
@@ -34,32 +34,14 @@ const reviewSchema = new Schema(
             minLength: [10, 'Comment must be at least 10 characters'],
             maxLength: [1000, 'Comment must not exceed 1000 characters']
         },
-        // images: {
-        //     type: [{
-        //         type: String,
-        //         // validate: {
-        //         //     validator: function (v) {
-        //         //         return /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif)$/i.test(v);
-        //         //     },
-        //         //     message: 'Invalid image URL format'
-        //         // }
-        //     }],
-        //     // validate: {
-        //     //     validator: function (v) {
-        //     //         return v.length <= 5;
-        //     //     },
-        //     //     message: 'Maximum 5 images allowed'
-        //     // },
-        //     default: []
-        // },
         images: [{
             type: String,
             required: false,
-                    }],
+        }],
         verified: {
             type: Boolean,
             default: false,
-            index: true
+            index: true // Filter verified reviews
         },
         status: {
             type: String,
@@ -68,7 +50,7 @@ const reviewSchema = new Schema(
                 message: '{VALUE} is not a valid status'
             },
             default: 'pending',
-            index: true
+            index: true // Filter by status
         },
         helpfulCount: {
             type: Number,
@@ -81,10 +63,31 @@ const reviewSchema = new Schema(
     }
 );
 
-// Prevent duplicate reviews from same user for same product
+// ===== INDEXES FOR OPTIMIZATION & SCALABILITY =====
 
+// Unique compound index: Prevent duplicate reviews from same user for same product
+reviewSchema.index({ userId: 1, productId: 1 }, { unique: true });
+
+// Compound index: Product reviews by status and date (most common query for product pages)
 reviewSchema.index({ productId: 1, status: 1, createdAt: -1 });
-reviewSchema.index({ productId: 1, rating: -1 });
-reviewSchema.index({ userId: 1, productId: 1, createdAt: -1 });
+
+// Compound index: Product reviews by rating (sorting by rating)
+reviewSchema.index({ productId: 1, rating: -1, createdAt: -1 });
+
+// Compound index: User's reviews sorted by date
+reviewSchema.index({ userId: 1, createdAt: -1 });
+
+// Compound index: Approved reviews for a product (public display)
+reviewSchema.index({ productId: 1, status: 1, verified: 1, createdAt: -1 });
+
+// Index for most helpful reviews
+reviewSchema.index({ productId: 1, helpfulCount: -1 });
+
+// Admin: Pending reviews to moderate
+reviewSchema.index({ status: 1, createdAt: 1 });
+
+// Index for calculating average rating per product
+reviewSchema.index({ productId: 1, rating: 1 });
+
 const Review = models.Review || model('Review', reviewSchema);
 export default Review;

@@ -188,12 +188,17 @@ export default function ReviewsPage({ params }) {
                 {matchedItem.map(item => (
                     <div key={item._id} className="bg-white border-2 border-blue-200 rounded-lg shadow-sm p-6 mb-8">
                         <div className="flex  sm:flex-row gap-6 items-start">
-                            <Image 
+                            <Image
                                 width={500} height={500}
-                                src={item?.variants[0].images[0]}
+                                src={(() => {
+                                    const productImage = item?.variants?.[0]?.images?.[0];
+                                    const productSlug = item?.name?.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+                                    return productImage || `/uploads/products/${productSlug}.png`;
+                                })()}
                                 alt={item.name}
                                 priority
                                 className="  rounded-lg border-2 border-gray-200"
+                                unoptimized={!item?.variants?.[0]?.images?.[0]?.startsWith('http')}
                             />
                             <div className="flex-1">
                                 <p className="text-sm text-blue-600 font-semibold mb-1 uppercase">{item.brand}</p>

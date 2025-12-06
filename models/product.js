@@ -4,7 +4,8 @@ const productSchema = new Schema({
   productid: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
+    index: true // Primary lookup index
   },
   name: {
     type: String,
@@ -18,16 +19,19 @@ const productSchema = new Schema({
   },
   category: {
     type: String,
-    required: true
+    required: true,
+    index: true // Filter products by category
   },
   productType: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+    index: true // Filter by product type (men, women, laptops, etc.)
   },
   brand: {
     type: String,
-    trim: true
+    trim: true,
+    index: true // Filter products by brand
   },
   variants: {
     type: [{
@@ -51,6 +55,32 @@ const productSchema = new Schema({
 }, {
   timestamps: true
 });
+
+// ===== INDEXES FOR OPTIMIZATION & SCALABILITY =====
+
+// Compound index: Category + productType (most common filter combination)
+productSchema.index({ category: 1, productType: 1 });
+
+// Compound index: Category + brand (brand filtering within category)
+productSchema.index({ category: 1, brand: 1 });
+
+// Compound index: Category + createdAt (new arrivals in category)
+productSchema.index({ category: 1, createdAt: -1 });
+
+// Index for price sorting (using first variant's price)
+productSchema.index({ 'variants.price': 1 });
+
+// Index for finding products in stock
+productSchema.index({ 'variants.stockCount': 1 });
+
+// Index for SKU lookups (inventory management)
+productSchema.index({ 'variants.sku': 1 });
+
+// Text index for search functionality
+productSchema.index({ name: 'text', description: 'text', brand: 'text' });
+
+// Compound index for product type + creation date
+productSchema.index({ productType: 1, createdAt: -1 });
 
 const Product = models.Product || model("Product", productSchema);
 export default Product;
