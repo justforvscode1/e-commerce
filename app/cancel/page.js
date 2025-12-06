@@ -202,56 +202,56 @@ export default function UserOrdersDashboard() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-gray-900 mb-2">Order History</h1>
-          <p className="text-gray-600">Track and manage your orders</p>
+        <div className="mb-4 sm:mb-6 lg:mb-8">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-900 mb-1 sm:mb-2">Order History</h1>
+          <p className="text-sm sm:text-base text-gray-600">Track and manage your orders</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar - Order Stats */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg border border-gray-200 p-6 sticky top-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">Order Summary</h3>
+          <div className="lg:col-span-1 order-2 lg:order-1">
+            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 lg:sticky lg:top-8">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Order Summary</h3>
 
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                  <span className="text-sm font-medium text-gray-600">Active</span>
-                  <span className="text-lg font-semibold text-blue-600">
+              <div className="grid grid-cols-4 lg:grid-cols-1 gap-2 sm:gap-4">
+                <div className="flex flex-col lg:flex-row justify-between items-center lg:py-3 lg:border-b border-gray-100">
+                  <span className="text-xs sm:text-sm font-medium text-gray-600">Active</span>
+                  <span className="text-base sm:text-lg font-semibold text-blue-600">
                     {orders.filter(o => ['pending', 'assigned', 'out_for_delivery'].includes(o.status)).length}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                  <span className="text-sm font-medium text-gray-600">Delivered</span>
-                  <span className="text-lg font-semibold text-emerald-600">
+                <div className="flex flex-col lg:flex-row justify-between items-center lg:py-3 lg:border-b border-gray-100">
+                  <span className="text-xs sm:text-sm font-medium text-gray-600">Delivered</span>
+                  <span className="text-base sm:text-lg font-semibold text-emerald-600">
                     {orders.filter(o => o.status === 'delivered').length}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                  <span className="text-sm font-medium text-gray-600">Cancelled</span>
-                  <span className="text-lg font-semibold text-gray-600">
+                <div className="flex flex-col lg:flex-row justify-between items-center lg:py-3 lg:border-b border-gray-100">
+                  <span className="text-xs sm:text-sm font-medium text-gray-600">Cancelled</span>
+                  <span className="text-base sm:text-lg font-semibold text-gray-600">
                     {orders.filter(o => o.status === 'cancelled').length}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center py-3">
-                  <span className="text-sm font-bold text-gray-900">Total Orders</span>
-                  <span className="text-lg font-bold text-gray-900">{orders.length}</span>
+                <div className="flex flex-col lg:flex-row justify-between items-center lg:py-3">
+                  <span className="text-xs sm:text-sm font-bold text-gray-900">Total</span>
+                  <span className="text-base sm:text-lg font-bold text-gray-900">{orders.length}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-3 order-1 lg:order-2">
             {/* Status Filter */}
-            <div className="mb-6">
-              <div className="flex flex-wrap gap-2">
+            <div className="mb-4 sm:mb-6 -mx-3 px-3 sm:mx-0 sm:px-0 overflow-x-auto scrollbar-hide">
+              <div className="flex gap-2 min-w-max pb-2 sm:pb-0 sm:flex-wrap">
                 {[
-                  { key: 'all', label: 'All Orders', count: orders.length },
+                  { key: 'all', label: 'All', count: orders.length },
                   { key: 'pending', label: 'Pending', count: orders.filter(o => o.status === 'pending').length },
                   { key: 'assigned', label: 'Preparing', count: orders.filter(o => o.status === 'assigned').length },
                   { key: 'out_for_delivery', label: 'In Transit', count: orders.filter(o => o.status === 'out_for_delivery').length },
@@ -261,9 +261,9 @@ export default function UserOrdersDashboard() {
                   <button
                     key={filter.key}
                     onClick={() => setStatusFilter(filter.key)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${statusFilter === filter.key
-                        ? 'bg-gray-900 text-white'
-                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                    className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${statusFilter === filter.key
+                      ? 'bg-gray-900 text-white'
+                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 active:bg-gray-100'
                       }`}
                   >
                     {filter.label} ({filter.count})
@@ -351,10 +351,10 @@ export default function UserOrdersDashboard() {
                             {progressSteps.map((step, index) => (
                               <div key={step.key} className="flex flex-col items-center">
                                 <div className={`w-3 h-3 rounded-full border-2 z-10 ${step.active
-                                    ? step.cancelled
-                                      ? 'bg-red-500 border-red-500'
-                                      : 'bg-gray-900 border-gray-900'
-                                    : 'bg-white border-gray-300'
+                                  ? step.cancelled
+                                    ? 'bg-red-500 border-red-500'
+                                    : 'bg-gray-900 border-gray-900'
+                                  : 'bg-white border-gray-300'
                                   }`}></div>
                                 <div className="mt-2 text-xs text-center">
                                   <div className={`font-medium ${step.active ? 'text-gray-900' : 'text-gray-500'
@@ -392,8 +392,8 @@ export default function UserOrdersDashboard() {
                                       width={176}
                                       height={176}
                                       className="object-cover w-full h-full"
+                                      unoptimized={item.image?.startsWith('/uploads')}
                                     />
-                                   
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <h5 className="font-medium text-gray-900 truncate">{item.name}</h5>

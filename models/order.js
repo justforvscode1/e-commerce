@@ -37,7 +37,6 @@ const orderSchema = new Schema({
   stripePaymentIntentId: {
     type: String,
     required: false,
-    sparse: true
   },
 
   paymentStatus: {
@@ -56,7 +55,6 @@ const orderSchema = new Schema({
   transactionId: {
     type: String,
     required: false,
-    sparse: true
   },
 
   shippingCost: {

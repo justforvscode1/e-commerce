@@ -285,8 +285,8 @@ export default function ShipperDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
           {/* Sidebar - Shipper Info */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl p-6 shadow-sm mb-6 transform transition-all duration-300 hover:shadow-md">
@@ -352,31 +352,33 @@ export default function ShipperDashboard() {
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Header */}
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Delivery Dashboard</h1>
-              <p className="text-gray-600">Manage your assigned deliveries</p>
+            <div className="mb-4 sm:mb-6">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">Delivery Dashboard</h1>
+              <p className="text-sm sm:text-base text-gray-600">Manage your assigned deliveries</p>
             </div>
 
             {/* Status Filter */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              {[
-                { key: 'all', label: 'All Orders', count: orders.length },
-                { key: 'pending', label: 'Pending', count: orders.filter(o => o.status === 'pending').length },
-                { key: 'assigned', label: 'Assigned', count: orders.filter(o => o.status === 'assigned').length },
-                { key: 'out_for_delivery', label: 'Out for Delivery', count: orders.filter(o => o.status === 'out_for_delivery').length },
-                { key: 'delivered', label: 'Delivered', count: orders.filter(o => o.status === 'delivered').length }
-              ].map((filter) => (
-                <button
-                  key={filter.key}
-                  onClick={() => setStatusFilter(filter.key)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 ${statusFilter === filter.key
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-                    }`}
-                >
-                  {filter.label} ({filter.count})
-                </button>
-              ))}
+            <div className="mb-4 sm:mb-6 -mx-3 px-3 lg:mx-0 lg:px-0 overflow-x-auto scrollbar-hide">
+              <div className="flex gap-2 min-w-max pb-2 lg:pb-0 lg:flex-wrap">
+                {[
+                  { key: 'all', label: 'All Orders', count: orders.length },
+                  { key: 'pending', label: 'Pending', count: orders.filter(o => o.status === 'pending').length },
+                  { key: 'assigned', label: 'Assigned', count: orders.filter(o => o.status === 'assigned').length },
+                  { key: 'out_for_delivery', label: 'Out for Delivery', count: orders.filter(o => o.status === 'out_for_delivery').length },
+                  { key: 'delivered', label: 'Delivered', count: orders.filter(o => o.status === 'delivered').length }
+                ].map((filter) => (
+                  <button
+                    key={filter.key}
+                    onClick={() => setStatusFilter(filter.key)}
+                    className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 whitespace-nowrap ${statusFilter === filter.key
+                      ? 'bg-blue-600 text-white shadow-lg'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 active:bg-gray-100'
+                      }`}
+                  >
+                    {filter.label} ({filter.count})
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Orders List */}
@@ -547,6 +549,7 @@ export default function ShipperDashboard() {
                                     src={item.image[0]}
                                     alt={item.name}
                                     className="w-full h-full object-cover"
+                                    unoptimized={item.image?.[0]?.startsWith('/uploads')}
                                     onError={(e) => {
                                       e.target.style.display = 'none';
                                       e.target.nextElementSibling.style.display = 'flex';
